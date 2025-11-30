@@ -92,6 +92,7 @@
   let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
   let playlistContainer = $state<HTMLElement | null>(null);
   let playlistHeight = $state(400);
+  const savedDurations = new Map<string, number>();
 
   /**
    * Custom next() function that checks for more tracks to load
@@ -182,6 +183,54 @@
     const ownerDid = trackDid || track.authorDid || track.author_did;
 
     return ownerDid === $session.did;
+  }
+
+  function updateDurationState(uri: string, seconds: number) {
+    // Update current track snapshot
+    current = current && current.uri === uri ? { ...current, duration_seconds: seconds } : current;
+
+    // Update any playlists in the player store that reference this track
+    player.update((s) => {
+      const apply = (list?: any[] | null) =>
+        list ? list.map((track) => (track?.uri === uri ? { ...track, duration_seconds: seconds } : track)) : list;
+
+      return {
+        ...s,
+        customPlaylist: apply(s.customPlaylist),
+        originalPlaylist: apply(s.originalPlaylist),
+      };
+    });
+  }
+
+  async function persistTrackDuration(seconds: number) {
+    if (!current?.uri) return;
+    if (!canEditTrack(current)) return;
+
+    const rounded = Math.round(seconds);
+    if (!Number.isFinite(rounded) || rounded <= 0) return;
+
+    const existing = current.duration_seconds ?? savedDurations.get(current.uri);
+    if (existing && Math.abs(existing - rounded) <= 1) return;
+
+    try {
+      await updateTrackByUri(current.uri, { duration_seconds: rounded });
+      savedDurations.set(current.uri, rounded);
+      updateDurationState(current.uri, rounded);
+      console.log(`[Player] Saved duration ${rounded}s for track ${current.uri}`);
+    } catch (e) {
+      console.error('[Player] Failed to save duration to track:', e);
+    }
+  }
+
+  function captureYouTubeDuration() {
+    try {
+      if (!ytPlayer?.getDuration || !current) return;
+      const seconds = ytPlayer.getDuration?.() || 0;
+      if (!seconds || seconds <= 0) return;
+      void persistTrackDuration(seconds);
+    } catch (e) {
+      console.error('[Player] Error capturing YouTube duration:', e);
+    }
   }
 
   async function deleteTrack(uri: string) {
@@ -561,6 +610,7 @@
           onReady: () => {
             console.log('[Player] YouTube player ready');
             ytPlayerReady = true;
+            captureYouTubeDuration();
             if (state.playing) {
               try { ytPlayer.playVideo(); } catch (e) { console.error('[Player] Error playing YouTube video:', e); }
             }
@@ -568,7 +618,10 @@
           onStateChange: (e) => {
             if (e?.data === window.YT.PlayerState.ENDED) next();
             syncingWithIframe = true;
-            if (e?.data === window.YT.PlayerState.PLAYING) player.update(s => ({ ...s, playing: true }));
+            if (e?.data === window.YT.PlayerState.PLAYING) {
+              player.update(s => ({ ...s, playing: true }));
+              captureYouTubeDuration();
+            }
             if (e?.data === window.YT.PlayerState.PAUSED) player.update(s => ({ ...s, playing: false }));
             setTimeout(() => { syncingWithIframe = false; }, 100);
           },

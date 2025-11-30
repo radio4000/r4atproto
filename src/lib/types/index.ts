@@ -21,6 +21,7 @@ export interface Track {
   description?: string;
   discogs_url?: string; // snake_case to match Radio4000
   media_error?: string; // snake_case - stores playback error message if any
+  duration_seconds?: number; // snake_case - media duration in seconds (if known)
   r4SupabaseId?: string;
   created_at?: string; // snake_case to match Radio4000
   updated_at?: string; // snake_case to match Radio4000
@@ -41,6 +42,7 @@ export interface UpdateTrackParams {
   description?: string;
   discogs_url?: string;
   media_error?: string;
+  duration_seconds?: number;
 }
 
 export interface ListTracksOptions {

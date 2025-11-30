@@ -1,13 +1,13 @@
 {
-  "client_id": "http://127.0.0.1/client-metadata.json",
+  "client_id": "https://c3.risk-tritone.ts.net/client-metadata.json",
   "client_name": "Radio4000 for AT Protocol",
-  "client_uri": "http://127.0.0.1",
-  "logo_uri": "http://127.0.0.1/logo.png",
-  "tos_uri": "http://127.0.0.1/tos",
-  "policy_uri": "http://127.0.0.1/privacy",
+  "client_uri": "https://c3.risk-tritone.ts.net",
+  "logo_uri": "https://c3.risk-tritone.ts.net/logo.png",
+  "tos_uri": "https://c3.risk-tritone.ts.net/tos",
+  "policy_uri": "https://c3.risk-tritone.ts.net/privacy",
   "redirect_uris": [
-    "http://127.0.0.1",
-    "http://127.0.0.1/"
+    "https://c3.risk-tritone.ts.net",
+    "https://c3.risk-tritone.ts.net/"
   ],
   "scope": "atproto transition:generic",
   "grant_types": ["authorization_code", "refresh_token"],

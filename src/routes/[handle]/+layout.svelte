@@ -29,8 +29,11 @@
   const profileImage = $derived(profile?.avatar || profile?.banner || '');
   const profileFavicon = $derived(profile?.avatar || '/favicon.png');
 
-  // Check if we're on an edit route
-  const isEditRoute = $derived($page.url.pathname.includes('/edit'));
+  // Check if we're on an edit route (segment equals "edit")
+  const isEditRoute = $derived.by(() => {
+    const parts = ($page.url.pathname || '').split('/').filter(Boolean);
+    return parts.includes('edit');
+  });
   const editRkey = $derived.by(() => {
     if (!isEditRoute) return '';
     const parts = $page.url.pathname.split('/');
