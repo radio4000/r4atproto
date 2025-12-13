@@ -48,6 +48,15 @@ class BskyOAuthService {
 		this.lastClientId = null
 	}
 
+	#authorizationDetails() {
+		return [
+			{ type: 'atproto_repo', actions: ['create','update','delete'], identifier: 'com.radio4000.track' },
+			{ type: 'atproto_repo', actions: ['create','update','delete'], identifier: 'com.radio4000.favorite' },
+			{ type: 'atproto_repo', actions: ['create','update'], identifier: 'com.radio4000.profile' },
+			{ type: 'atproto_repo', actions: ['create','update'], identifier: 'com.radio4000.sync' },
+		]
+	}
+
 	#canonicalRedirectUri(): string | undefined {
 		try {
 			const {origin} = window.location
@@ -143,12 +152,7 @@ class BskyOAuthService {
 				// Try fine-grained permissions first; if AS rejects, fall back to base scope
 				const withAuthz: any = {
 					...baseOpts,
-					authorization_details: [
-						{ type: 'atproto_repo', actions: ['create','update','delete'], identifier: 'com.radio4000.track' },
-						{ type: 'atproto_repo', actions: ['create','delete'], identifier: 'com.radio4000.favorite' },
-						{ type: 'atproto_repo', actions: ['create','update','delete'], identifier: 'com.radio4000.profile' },
-						{ type: 'atproto_repo', actions: ['create','update','delete'], identifier: 'com.radio4000.sync' },
-					],
+					authorization_details: this.#authorizationDetails(),
 				}
 
 				try {
@@ -200,12 +204,7 @@ class BskyOAuthService {
 		}
 		const withAuthz: any = {
 			...baseOpts,
-			authorization_details: [
-				{ type: 'atproto_repo', actions: ['create','update','delete'], identifier: 'com.radio4000.track' },
-				{ type: 'atproto_repo', actions: ['create','delete'], identifier: 'com.radio4000.favorite' },
-				{ type: 'atproto_repo', actions: ['create','update','delete'], identifier: 'com.radio4000.profile' },
-				{ type: 'atproto_repo', actions: ['create','update','delete'], identifier: 'com.radio4000.sync' },
-			],
+			authorization_details: this.#authorizationDetails(),
 		}
 
 		console.log('[requestScopes] Calling signIn with authorization_details...')

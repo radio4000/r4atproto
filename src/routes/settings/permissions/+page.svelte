@@ -48,11 +48,15 @@
           </div>
           <div class="border-l-2 border-border pl-2">
             <p class="font-mono text-foreground">com.radio4000.favorite</p>
-            <p class="text-muted-foreground">{t('settings.permissionsActionsCreateDelete')}</p>
+            <p class="text-muted-foreground">{t('settings.permissionsActionsCreateUpdateDeleteFavorites')}</p>
           </div>
           <div class="border-l-2 border-border pl-2">
             <p class="font-mono text-foreground">com.radio4000.profile</p>
-            <p class="text-muted-foreground">{t('settings.permissionsActionsCreateUpdateDelete')}</p>
+            <p class="text-muted-foreground">{t('settings.permissionsActionsCreateUpdate')}</p>
+          </div>
+          <div class="border-l-2 border-border pl-2">
+            <p class="font-mono text-foreground">com.radio4000.sync</p>
+            <p class="text-muted-foreground">{t('settings.permissionsActionsCreateUpdate')}</p>
           </div>
         </div>
       </div>

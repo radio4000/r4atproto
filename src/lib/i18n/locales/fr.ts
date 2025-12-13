@@ -148,6 +148,8 @@ const fr = {
 		permissionsAtProtocolLabel: "Autorisations AT Protocol :",
 		permissionsActionsCreateUpdateDelete: "Actions : créer, modifier, supprimer",
 		permissionsActionsCreateDelete: "Actions : créer, supprimer",
+		permissionsActionsCreateUpdateDeleteFavorites: "Actions : créer, modifier, supprimer (favoris)",
+		permissionsActionsCreateUpdate: "Actions : créer, modifier",
 		permissionsButton: "Demander les autorisations",
 		permissionsWorking: "Demande des autorisations…",
 		permissionsFootnote: "Cela vous redirigera vers votre serveur pour accorder à Radio4000 des autorisations spécifiques. Utilisez ceci si les fonctionnalités ne fonctionnent pas ou si vous souhaitez vérifier les accès.",
