@@ -9,7 +9,7 @@
     "https://radio4000.github.io/r4atproto",
     "https://radio4000.github.io/r4atproto/"
   ],
-  "scope": "atproto transition:generic",
+  "scope": "atproto",
   "grant_types": ["authorization_code", "refresh_token"],
   "response_types": ["code"],
   "application_type": "web",
