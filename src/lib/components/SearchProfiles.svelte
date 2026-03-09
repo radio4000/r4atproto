@@ -25,6 +25,8 @@
   // Fetch featured profiles on mount
   getProfiles(FEATURED_PROFILES).then((map) => {
     featuredProfiles = Array.from(map.values());
+  }).catch((err) => {
+    console.error('Failed to load featured profiles:', err);
   });
 
   async function executeSearch() {
