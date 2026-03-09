@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { searchActors } from '$lib/services/r4-service';
+  import { searchActors, getProfiles } from '$lib/services/r4-service';
   import { Button } from '$lib/components/ui/button';
   import { Card, CardContent } from '$lib/components/ui/card';
   import { Input } from '$lib/components/ui/input';
@@ -8,6 +8,7 @@
   import { locale, translate } from '$lib/i18n';
   import { cn } from '$lib/utils';
   import ProfileHeader from '$lib/components/ProfileHeader.svelte';
+  import { FEATURED_PROFILES } from '$lib/config/featured-profiles';
 
   const props = $props<{ showHeading?: boolean; class?: string }>();
   const showHeading = $derived(props.showHeading ?? true);
@@ -18,7 +19,13 @@
   let status = $state('');
   let loading = $state(false);
   let hasSearched = $state(false);
+  let featuredProfiles = $state<unknown[]>([]);
   const t = (key, vars = {}) => translate($locale, key, vars);
+
+  // Fetch featured profiles on mount
+  getProfiles(FEATURED_PROFILES).then((map) => {
+    featuredProfiles = Array.from(map.values());
+  });
 
   async function executeSearch() {
     if (!q.trim()) return;
@@ -99,6 +106,17 @@
   {:else if results.length > 0}
     <div class="space-y-4">
       {#each results as actor, idx (actor.did || actor.handle || idx)}
+        <ProfileHeader
+          profile={actor}
+          handle={actor.handle}
+          size="sm"
+          class="border-2"
+        />
+      {/each}
+    </div>
+  {:else if !q.trim() && featuredProfiles.length > 0}
+    <div class="space-y-4">
+      {#each featuredProfiles as actor, idx (actor.did || actor.handle || idx)}
         <ProfileHeader
           profile={actor}
           handle={actor.handle}
