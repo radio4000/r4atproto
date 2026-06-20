@@ -9,7 +9,7 @@
   import Player from '$lib/components/Player.svelte';
   import '../app.css';
   import StateCard from '$lib/components/ui/state-card.svelte';
-  import { Loader2, Menu, X, Home, Plus, User, Settings, AtSign, Play, Pause, LayoutList, Radio } from 'lucide-svelte';
+  import { Loader2, Menu, X, Home, Plus, User, Settings, AtSign, Play, Pause, LayoutList, Compass } from 'lucide-svelte';
   import { player, toggle } from '$lib/player/store';
   import { locale, translate } from '$lib/i18n';
   import { cn } from '$lib/utils';
@@ -232,7 +232,7 @@
 
     const baseItems = [
       { href: '/', label: t('nav.links.home'), icon: Home, isActive: checkActive('/') },
-      { href: '/network', label: t('nav.links.network'), icon: Radio, isActive: currentPath.startsWith(base + '/network') || currentPath.startsWith('/network') }
+      { href: '/explore', label: t('nav.links.explore'), icon: Compass, isActive: currentPath.startsWith(base + '/explore') || currentPath.startsWith('/explore') }
     ];
 
     if ($session?.did && userHandle) {

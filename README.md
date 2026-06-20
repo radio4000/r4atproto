@@ -64,7 +64,7 @@ Minimum metadata requirements:
 | Route | Purpose |
 | --- | --- |
 | `/` | Hub/sign-in and list of favorites once authenticated. |
-| `/network` | Network-wide feed: the latest tracks of every atproto user posting Radio4000 records (no backend). |
+| `/explore` | Network-wide feed: the latest tracks of every atproto user posting Radio4000 records (no backend). |
 | `/add` and `/@me/add` | Track creation form with Discogs helpers. |
 | `/@<handle>` | View a radio, play tracks, and open Discogs data if attached. |
 | `/@<handle>/<rkey>` | Track detail, including Discogs resource embeds. |

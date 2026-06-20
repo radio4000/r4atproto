@@ -40,10 +40,10 @@
       size="sm"
       onclick={playAll}
       class="gap-2 shrink-0"
-      title={t('network.playLatest')}
+      title={t('explore.playLatest')}
     >
       <PlayCircle class="h-4 w-4" />
-      <span class="hidden sm:inline">{t('network.playLatest')}</span>
+      <span class="hidden sm:inline">{t('explore.playLatest')}</span>
     </Button>
   </div>
 

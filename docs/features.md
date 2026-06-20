@@ -9,16 +9,17 @@
 
 ---
 
-### `/network` — Network feed
+### `/explore` — Explore feed
 
 A backend-free, network-wide "app view": the latest 10 tracks of **every** atproto
 user that publishes `com.radio4000.track` records.
 
-- Discovers radios across the network via the public relay (`listReposByCollection`)
+- Discovers radios across the network via the public relay (`listReposByCollection`),
+  a page (~12 radios) at a time
 - For each radio, shows a header (avatar, display name, `@handle` → profile) and their
   latest 10 tracks, newest first
 - "Play latest" queues that radio's 10 tracks in the player
-- "Load more radios" lazy-loads the next page of radios
+- "Load more radios" lazy-loads the next page of radios (cursor-based pagination)
 
 See [Network service](./services.md#network-service--atprotonetworkservicets) for how it
 works and its scaling ceiling.

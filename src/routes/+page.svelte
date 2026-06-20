@@ -128,8 +128,8 @@
             </CardDescription>
           </CardHeader>
           <CardContent class="flex flex-col sm:flex-row gap-2">
-            <Button href="/network" class="w-full">
-              {t('network.title')}
+            <Button href="/explore" class="w-full">
+              {t('explore.title')}
             </Button>
             <Button href="/search" variant="outline" class="w-full">
               {t('home.exploreProfiles')}
