@@ -16,8 +16,10 @@
 		--primary-foreground: var(--background);
 		--secondary: var(--background);
 		--secondary-foreground: var(--foreground);
-		--muted: var(--background);
-		--muted-foreground: var(--foreground);
+		/* One muted tone derived from the palette: secondary text + subtle fills.
+		   Runtime themes recompute these from the user's colors in +layout.svelte. */
+		--muted: 240 5% 92%;
+		--muted-foreground: 240 4% 44%;
 		--accent: var(--foreground);
 		--accent-foreground: var(--background);
 		--destructive: var(--foreground);
@@ -39,8 +41,8 @@
 		--primary-foreground: var(--background);
 		--secondary: var(--background);
 		--secondary-foreground: var(--foreground);
-		--muted: var(--background);
-		--muted-foreground: var(--foreground);
+		--muted: 240 4% 14%;
+		--muted-foreground: 240 5% 62%;
 		--accent: var(--foreground);
 		--accent-foreground: var(--background);
 		--destructive: var(--foreground);
@@ -80,18 +82,21 @@
 		border-width: var(--r4-border-size) !important;
 	}
 
-	/* Unify text sizing for a consistent typographic scale */
-	.text-xs,
-	.text-sm,
-	.text-base,
-	.text-lg,
-	.text-xl,
-	.text-2xl,
-	.text-3xl,
-	.text-4xl,
-	.text-5xl {
-		font-size: var(--r4-font-size) !important;
-		line-height: 1.3;
+	/* Restrained type scale: multiples of --r4-font-size so the base size knob
+	   still scales everything, while restoring real hierarchy (was flattened). */
+	.text-xs   { font-size: calc(var(--r4-font-size) * 0.8125) !important; line-height: 1.4; }
+	.text-sm   { font-size: calc(var(--r4-font-size) * 0.875)  !important; line-height: 1.4; }
+	.text-base { font-size: var(--r4-font-size) !important;                line-height: 1.5; }
+	.text-lg   { font-size: calc(var(--r4-font-size) * 1.125)  !important; line-height: 1.45; }
+	.text-xl   { font-size: calc(var(--r4-font-size) * 1.25)   !important; line-height: 1.3; }
+	.text-2xl  { font-size: calc(var(--r4-font-size) * 1.5)    !important; line-height: 1.25; }
+	.text-3xl  { font-size: calc(var(--r4-font-size) * 1.875)  !important; line-height: 1.2; }
+	.text-4xl  { font-size: calc(var(--r4-font-size) * 2.25)   !important; line-height: 1.15; }
+	.text-5xl  { font-size: calc(var(--r4-font-size) * 2.75)   !important; line-height: 1.1; }
+
+	/* Single source of truth for the "active / now playing" treatment. */
+	.is-active {
+		@apply bg-foreground text-background;
 	}
 
 	.animate-in {
@@ -107,5 +112,17 @@
 			opacity: 1;
 			transform: translateY(0);
 		}
+	}
+}
+
+/* Respect users who prefer reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.001ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.001ms !important;
+		scroll-behavior: auto !important;
 	}
 }

@@ -257,7 +257,7 @@
 								<span
 									class={cn(
 										'inline-block px-1 py-0.5 rounded transition-colors bg-background',
-										isActiveProfile ? 'bg-primary text-background' : '',
+										isActiveProfile ? 'is-active' : '',
 									)}
 								>
 									{profile?.displayName || handle}
@@ -272,7 +272,7 @@
 								<span
 									class={cn(
 										'inline-block px-1 py-0.5 rounded transition-colors bg-background',
-										isActiveProfile ? 'bg-primary text-background' : '',
+										isActiveProfile ? 'is-active' : '',
 									)}
 								>
 									@{handle}
@@ -301,7 +301,7 @@
 							<span
 								class={cn(
 									'inline-block px-1 py-0.5 rounded transition-colors bg-background',
-									isActiveProfile ? 'bg-primary text-background' : '',
+									isActiveProfile ? 'is-active' : '',
 								)}
 							>
 								{profile?.displayName || handle}
@@ -315,7 +315,7 @@
 								<span
 									class={cn(
 										'inline-block px-1 py-0.5 rounded transition-colors bg-background',
-										isActiveProfile ? 'bg-primary text-background' : '',
+										isActiveProfile ? 'is-active' : '',
 									)}
 								>
 									@{handle}

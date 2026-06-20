@@ -132,6 +132,18 @@
     }
   }
 
+  // Blend the lightness of two "H S% L%" channel strings, keeping `from`'s hue
+  // and saturation. Used to derive one muted tone from the active palette.
+  function mixChannels(from: string, to: string, t: number): string {
+    const f = from.trim().split(/\s+/);
+    const g = to.trim().split(/\s+/);
+    const lf = parseFloat(f[2]);
+    const lg = parseFloat(g[2]);
+    if (Number.isNaN(lf) || Number.isNaN(lg)) return from;
+    const l = lf + (lg - lf) * t;
+    return `${f[0]} ${f[1]} ${l.toFixed(1)}%`;
+  }
+
   // Apply theme to document using only background/foreground colors
   function applyTheme() {
     if (!browser) return;
@@ -158,7 +170,7 @@
     set('--foreground', colors.foreground);
 
     // Map all other tokens to either background or foreground
-    set('--muted', colors.background);
+    set('--muted', mixChannels(colors.foreground, colors.background, 0.92));
     set('--card', colors.background);
     set('--popover', colors.background);
     set('--secondary', colors.background);
@@ -171,7 +183,7 @@
 
     set('--card-foreground', colors.foreground);
     set('--popover-foreground', colors.foreground);
-    set('--muted-foreground', colors.foreground);
+    set('--muted-foreground', mixChannels(colors.foreground, colors.background, 0.45));
     set('--secondary-foreground', colors.foreground);
     set('--accent-foreground', colors.background);
     set('--primary-foreground', colors.background);

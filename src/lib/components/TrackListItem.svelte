@@ -243,7 +243,7 @@
               class={cn(
                 "transition-colors cursor-pointer py-0.5 inline-block",
                 isActiveTrack
-                  ? "bg-primary text-background rounded"
+                  ? "is-active rounded px-1"
                   : "hover:text-primary hover:underline"
               )}
             >

@@ -34,7 +34,7 @@
     variant === 'pills-muted' && 'gap-1.5 px-3 py-2',
     variant === 'sidebar' && 'px-3 py-2 rounded-md whitespace-nowrap',
     active
-      ? 'text-background bg-foreground border border-foreground hover:border-transparent'
+      ? 'is-active border border-foreground hover:border-transparent'
       : 'text-foreground border border-border hover:bg-foreground hover:text-background hover:border-transparent'
   );
 
