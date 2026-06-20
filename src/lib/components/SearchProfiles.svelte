@@ -10,7 +10,9 @@
   import ProfileHeader from '$lib/components/ProfileHeader.svelte';
   import { FEATURED_PROFILES } from '$lib/config/featured-profiles';
 
-  const props = $props<{ showHeading?: boolean; class?: string }>();
+  import { onMount } from 'svelte';
+
+  const props = $props<{ showHeading?: boolean; class?: string; initialQuery?: string }>();
   const showHeading = $derived(props.showHeading ?? true);
   const className = $derived(props.class ?? '');
 
@@ -48,6 +50,15 @@
     event.preventDefault();
     await executeSearch();
   }
+
+  // Run an initial search when arriving with a query (e.g. from the homepage bar).
+  onMount(() => {
+    const initial = props.initialQuery?.trim();
+    if (initial) {
+      q = initial;
+      executeSearch();
+    }
+  });
 </script>
 
 <div class={cn('space-y-8', className)}>
