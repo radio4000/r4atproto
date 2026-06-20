@@ -9,11 +9,23 @@ const fr = {
 		toggle: "Basculer le menu",
 		links: {
 			home: "Accueil",
+			network: "Réseau",
 			add: "Ajouter",
 			profile: "Profil",
 			search: "Recherche",
 			settings: "Paramètres",
 		},
+	},
+	network: {
+		title: "Réseau",
+		description: "Les derniers morceaux de toutes les personnes qui publient des enregistrements Radio4000 sur le protocole AT.",
+		playLatest: "Lire les derniers",
+		loadMore: "Charger plus de radios",
+		loadingMore: "Chargement…",
+		refresh: "Actualiser",
+		errorTitle: "Impossible de charger le fil du réseau",
+		emptyTitle: "Aucune radio pour le moment",
+		emptyDescription: "Dès que des personnes publieront des morceaux Radio4000 sur le réseau, leurs derniers morceaux apparaîtront ici.",
 	},
 	home: {
 		title: "r4@atproto",

@@ -52,6 +52,20 @@ export {
   getHandleByDid,
   getProfile,
   getProfiles,
+
+  // Network (backend-free app view)
+  RELAY_SERVICE,
+  listReposByCollection,
+  listAllReposByCollection,
+  getNetworkLatestTracks,
+} from './atproto'
+
+// Re-export network types
+export type {
+  RadioActor,
+  NetworkRadio,
+  NetworkFeedOptions,
+  NetworkFeedResult,
 } from './atproto'
 
 // Re-export Radio4000 sync services

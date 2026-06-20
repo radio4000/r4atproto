@@ -26,6 +26,7 @@ export interface Track {
   created_at?: string; // snake_case to match Radio4000
   updated_at?: string; // snake_case to match Radio4000
   authorDid?: string; // camelCase OK - this is internal to our app
+  authorHandle?: string; // resolved handle of the track's author (internal)
 }
 
 export interface CreateTrackParams {

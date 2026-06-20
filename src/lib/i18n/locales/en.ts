@@ -9,11 +9,23 @@ const en = {
 		toggle: "Toggle menu",
 		links: {
 			home: "Home",
+			network: "Network",
 			add: "Add",
 			profile: "Profile",
 			search: "Search",
 			settings: "Settings",
 		},
+	},
+	network: {
+		title: "Network",
+		description: "The latest tracks from everyone publishing Radio4000 records on the AT Protocol.",
+		playLatest: "Play latest",
+		loadMore: "Load more radios",
+		loadingMore: "Loading…",
+		refresh: "Refresh",
+		errorTitle: "Couldn't load the network feed",
+		emptyTitle: "No radios found yet",
+		emptyDescription: "Once people publish Radio4000 tracks on the network, their latest tracks will appear here.",
 	},
 	home: {
 		title: "r4@atproto",

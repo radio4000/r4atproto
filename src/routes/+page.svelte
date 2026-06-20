@@ -99,8 +99,11 @@
               Start adding Radio4000 favorites to see them here.
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <Button href="/search" class="w-full">
+          <CardContent class="flex flex-col sm:flex-row gap-2">
+            <Button href="/network" class="w-full">
+              {t('network.title')}
+            </Button>
+            <Button href="/search" variant="outline" class="w-full">
               {t('home.exploreProfiles')}
             </Button>
           </CardContent>

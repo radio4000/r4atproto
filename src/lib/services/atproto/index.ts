@@ -44,3 +44,17 @@ export {
   getProfile,
   getProfiles,
 } from './social.service'
+
+// Network (backend-free app view)
+export {
+  RELAY_SERVICE,
+  listReposByCollection,
+  listAllReposByCollection,
+  getNetworkLatestTracks,
+} from './network.service'
+export type {
+  RadioActor,
+  NetworkRadio,
+  NetworkFeedOptions,
+  NetworkFeedResult,
+} from './network.service'

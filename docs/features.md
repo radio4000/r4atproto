@@ -9,6 +9,22 @@
 
 ---
 
+### `/network` — Network feed
+
+A backend-free, network-wide "app view": the latest 10 tracks of **every** atproto
+user that publishes `com.radio4000.track` records.
+
+- Discovers radios across the network via the public relay (`listReposByCollection`)
+- For each radio, shows a header (avatar, display name, `@handle` → profile) and their
+  latest 10 tracks, newest first
+- "Play latest" queues that radio's 10 tracks in the player
+- "Load more radios" lazy-loads the next page of radios
+
+See [Network service](./services.md#network-service--atprotonetworkservicets) for how it
+works and its scaling ceiling.
+
+---
+
 ### `/add` — Add a track
 
 Form to publish a new music track to the AT Protocol network.

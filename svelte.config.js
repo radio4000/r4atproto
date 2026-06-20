@@ -21,7 +21,7 @@ const config = {
 		prerender: {
 			handleMissingId: 'ignore',
 			handleHttpError: 'warn',
-			entries: ['/', '/search', '/add', '/settings'],
+			entries: ['/', '/network', '/search', '/add', '/settings'],
 			handleUnseenRoutes: 'ignore'
 		}
 	}

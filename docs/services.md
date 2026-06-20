@@ -63,6 +63,39 @@ Wraps standard AT Protocol social graph calls.
 
 ---
 
+## Network service — `atproto/network.service.ts`
+
+A backend-free "app view" that builds a network-wide feed of every atproto repo
+publishing `com.radio4000.track` records. It composes three public, unauthenticated
+steps:
+
+1. **Discover** DIDs via the public relay (`com.atproto.sync.listReposByCollection`).
+   The relay already indexes which repos host which collection, so this is one cheap call.
+2. **Fan out** to each repo's PDS for its latest N tracks (`com.atproto.repo.listRecords`,
+   bounded concurrency). The public AppView does not proxy custom-collection `listRecords`,
+   so we resolve and hit the PDS directly.
+3. **Resolve** Bluesky profiles for display.
+
+| Function | Description |
+|---|---|
+| `listReposByCollection(collection?, opts?)` | One page of DIDs hosting the collection (relay, paginated) |
+| `listAllReposByCollection(collection?, opts?)` | Paginate the relay up to `max` DIDs |
+| `getNetworkLatestTracks(opts?)` | Full feed: `{ radios: { did, profile, tracks }[], cursor }` |
+
+```ts
+import { getNetworkLatestTracks } from '$lib/services/r4-service'
+const { radios, cursor } = await getNetworkLatestTracks({ tracksPerUser: 10, maxUsers: 50 })
+```
+
+**Scaling.** Step 2 is one request per repo, so this fan-out is appropriate up to roughly
+a few hundred radios; the feed paginates the relay cursor so the UI lazy-loads more on demand.
+Beyond that scale, a browser cannot fan out to (e.g.) a million PDSes — you would run a real
+indexing AppView instead: subscribe to Jetstream filtered on `com.radio4000.track`, index events
+into a database, and serve a precomputed "latest per user" feed. The route would then read that
+endpoint instead of `getNetworkLatestTracks`; the rest of the UI is unchanged.
+
+---
+
 ## Profile service — `atproto/profile.service.ts`
 
 Stores per-user customisation as a singleton record in `com.radio4000.profile`.

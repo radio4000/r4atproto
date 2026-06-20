@@ -9,7 +9,7 @@
   import Player from '$lib/components/Player.svelte';
   import '../app.css';
   import StateCard from '$lib/components/ui/state-card.svelte';
-  import { Loader2, Menu, X, Home, Plus, User, Search, Settings, AtSign, Play, Pause, LayoutList } from 'lucide-svelte';
+  import { Loader2, Menu, X, Home, Plus, User, Search, Settings, AtSign, Play, Pause, LayoutList, Radio } from 'lucide-svelte';
   import { player, toggle } from '$lib/player/store';
   import { locale, translate } from '$lib/i18n';
   import { cn } from '$lib/utils';
@@ -231,7 +231,8 @@
     const checkActive = (href: string) => currentPath === (base + href) || currentPath === href;
 
     const baseItems = [
-      { href: '/', label: t('nav.links.home'), icon: Home, isActive: checkActive('/') }
+      { href: '/', label: t('nav.links.home'), icon: Home, isActive: checkActive('/') },
+      { href: '/network', label: t('nav.links.network'), icon: Radio, isActive: currentPath.startsWith(base + '/network') || currentPath.startsWith('/network') }
     ];
 
     if ($session?.did && userHandle) {
