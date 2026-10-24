@@ -27,11 +27,13 @@ Until the permission set is published, the app asks for its permissions as raw s
 
 ## Publishing the schemas
 
-A PDS finds `radio.4000.*` lexicons, and the permission set, through DNS and a repository:
+The schemas are published as `com.atproto.lexicon.schema` records in the repo of [@4000.radio](https://bsky.app/profile/4000.radio) (`did:plc:hd34khf6wifegm23c2u3cv2d`, on eurosky.social). A PDS finds them, and the permission set, through DNS TXT records on 4000.radio, one per NSID group:
 
-1. Pick the account that holds the schemas (for example one with the handle `4000.radio`) and note its DID.
-2. Add a DNS TXT record on 4000.radio: `_lexicon.4000.radio` with the value `did=<that DID>`.
-3. Publish with [goat](https://github.com/bluesky-social/goat): `goat account login` as that account, then `bun run lexicons:publish` (runs `goat lex publish` over `lexicons/`).
-4. In `src/lib/config/app.json`, set `oauth.permissionSetPublished` to `true` and deploy. Users signing in from then on see the permission set; existing sessions keep their scopes until they renew permissions in Settings.
+- `_lexicon.4000.radio` → `did=did:plc:hd34khf6wifegm23c2u3cv2d` (`radio.4000.*`)
+- `_lexicon.chat.4000.radio` → same (`radio.4000.chat.*`)
+
+A new group (e.g. `radio.4000.feed.*`) needs its own record. To publish new or changed schemas, log in to [goat](https://github.com/bluesky-social/goat) as @4000.radio with an app password (`goat account login -u 4000.radio -p <app-password>`), then `bun run lexicons:publish`; `goat lex status` compares local schemas with the published ones. Published schemas only grow: add optional fields and new schemas, never rename, retype or remove (`goat lex breaking` checks).
+
+`oauth.permissionSetPublished` is `true`: users signing in see the permission set; sessions from before keep their scopes until they renew permissions in Settings.
 
 `bun run lexicons:lint` checks the schemas.
