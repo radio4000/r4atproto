@@ -126,14 +126,14 @@
 		if (!item?.uri) return false
 		// Only show errors to the track owner
 		if (!editable || !$session?.did) return false
-		return !!item.media_error
+		return !!item.playback_error
 	})
 
 	const hasMedia = $derived(!!item?.url)
 
 	function clearMediaError() {
 		if (!item?.uri) return
-		updateTrackByUri(item.uri, {media_error: ''}).catch((e) => {
+		updateTrackByUri(item.uri, {playback_error: ''}).catch((e) => {
 			console.error('[TrackListItem] Failed to clear media error:', e)
 		})
 	}
@@ -272,7 +272,7 @@
 						{#if hasMediaError}
 							<span
 								class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs bg-destructive/10 text-destructive border border-destructive/20"
-								title={item.media_error}
+								title={item.playback_error}
 							>
 								<AlertTriangle class="h-3 w-3" />
 								<span class="hidden sm:inline">Playback error</span>

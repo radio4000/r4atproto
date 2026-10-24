@@ -1,6 +1,7 @@
 // Helpers for at:// URIs and related route links
 
 import {AtUri} from '@atproto/api'
+import {TRACK} from '../lexicons'
 
 interface ParsedUri {
 	repo: string
@@ -20,7 +21,7 @@ export function parseAtUri(uri: string): ParsedUri | null {
 export function buildTrackUri(
 	repo: string,
 	rkey: string,
-	collection: string = 'com.radio4000.track'
+	collection: string = TRACK
 ): string | null {
 	if (!repo || !rkey) return null
 	return `at://${repo}/${collection}/${rkey}`

@@ -13,7 +13,7 @@ export default defineConfig({
 				handleMissingId: 'ignore',
 				handleHttpError: 'warn',
 				handleUnseenRoutes: 'ignore',
-				entries: ['/', '/explore', '/search', '/add', '/settings']
+				entries: ['/', '/explore', '/search', '/add', '/settings', '/client-metadata.json']
 			},
 			compilerOptions: {
 				experimental: {

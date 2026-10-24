@@ -200,9 +200,6 @@ const en = {
 		syncStatusImported: '{count} imported',
 		syncStatusMissing: '{count} missing',
 		syncAllImported: 'All tracks imported!',
-		syncApiEndpoint: 'API Endpoint',
-		syncApiKey: 'API Key (public)',
-		syncConfigNote: 'Configuration saved to com.radio4000.sync'
 	},
 	profile: {
 		errorTitle: 'Unable to load profile',

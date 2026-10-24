@@ -6,7 +6,7 @@
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
-		"build:cloudflare": "cp -f static/client-metadata.cloudflare.json static/client-metadata.json && vite build",
+		"build:cloudflare": "vite build",
 		"preview": "vite preview",
 		"deploy:wrangler": "wrangler deploy",
 		"test": "vitest run",
@@ -19,7 +19,9 @@
 	},
 	"dependencies": {
 		"@atproto/api": "^0.29.4",
+		"@atproto/common-web": "^0.5.15",
 		"@atproto/oauth-client-browser": "^0.5.10",
+		"@atproto/oauth-types": "^0.7.7",
 		"@tanstack/svelte-db": "^0.1.48",
 		"lucide-svelte": "^0.554.0"
 	},

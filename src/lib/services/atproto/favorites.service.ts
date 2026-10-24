@@ -1,8 +1,9 @@
 /**
  * AT Protocol Favorites Service
- * Handles com.radio4000.favorite records (user follows/favorites)
+ * Handles radio.4000.follow records (radios an account follows)
  */
 
+import {FOLLOW} from '../../lexicons'
 import {assertAgent, withDpopRetry, fetchWithAgentFallback} from '../../utils/atproto-client'
 import type {
 	R4FavoriteRecord,
@@ -11,7 +12,7 @@ import type {
 	AtProtoRecord
 } from '../../types'
 
-export const R4_FAVORITE_COLLECTION = 'com.radio4000.favorite'
+export const R4_FAVORITE_COLLECTION = FOLLOW
 
 /**
  * Convert DID to valid rkey for favorite records
@@ -87,7 +88,7 @@ export async function createR4Favorite(subjectDid: string) {
 		)
 	} catch (err) {
 		const msg = String((err as Error)?.message || err)
-		if (msg.includes('repo:com.radio4000.favorite?action=create')) {
+		if (msg.includes(`repo:${FOLLOW}`)) {
 			const e2 = new Error('Missing permission. Open Settings to re-consent.')
 			Object.assign(e2, {code: 'scope-missing'})
 			throw e2

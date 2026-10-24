@@ -1,4 +1,5 @@
 <script lang="ts">
+	import {TRACK, FOLLOW, CHANNEL, BROADCAST} from '#lib/lexicons.js'
 	import {bskyOAuth} from '#lib/services/bsky-oauth.js'
 	import {Button} from '#lib/components/ui/button/index.js'
 	import {
@@ -49,23 +50,23 @@
 				<p class="font-semibold mb-2">{t('settings.permissionsAtProtocolLabel')}</p>
 				<div class="space-y-2 text-xs">
 					<div class="border-l-2 border-border pl-2">
-						<p class="font-mono text-foreground">com.radio4000.track</p>
+						<p class="font-mono text-foreground">{TRACK}</p>
 						<p class="text-muted-foreground">
 							{t('settings.permissionsActionsCreateUpdateDelete')}
 						</p>
 					</div>
 					<div class="border-l-2 border-border pl-2">
-						<p class="font-mono text-foreground">com.radio4000.favorite</p>
+						<p class="font-mono text-foreground">{FOLLOW}</p>
 						<p class="text-muted-foreground">
 							{t('settings.permissionsActionsCreateUpdateDeleteFavorites')}
 						</p>
 					</div>
 					<div class="border-l-2 border-border pl-2">
-						<p class="font-mono text-foreground">com.radio4000.profile</p>
+						<p class="font-mono text-foreground">{CHANNEL}</p>
 						<p class="text-muted-foreground">{t('settings.permissionsActionsCreateUpdate')}</p>
 					</div>
 					<div class="border-l-2 border-border pl-2">
-						<p class="font-mono text-foreground">com.radio4000.sync</p>
+						<p class="font-mono text-foreground">{BROADCAST}</p>
 						<p class="text-muted-foreground">{t('settings.permissionsActionsCreateUpdate')}</p>
 					</div>
 				</div>

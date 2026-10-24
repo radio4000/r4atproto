@@ -20,7 +20,6 @@ export {
 	// Collections
 	R4_COLLECTION,
 	R4_FAVORITE_COLLECTION,
-	R4_PROFILE_COLLECTION,
 	// Track operations
 	createTrack,
 	listTracksByDid,
@@ -37,7 +36,6 @@ export {
 	hasR4Records,
 	hasR4FavoriteRecord,
 	// Profile operations
-	PROFILE_RKEY,
 	getR4Profile,
 	setR4Profile,
 	// Social operations
@@ -65,9 +63,6 @@ export type {
 
 // Re-export Radio4000 sync services
 export {
-	R4_SYNC_COLLECTION,
-	getR4SyncConfig,
-	setR4SyncConfig,
 	fetchRadio4000Channel,
 	fetchRadio4000Tracks,
 	importRadio4000Tracks

@@ -2,7 +2,8 @@
 	import {onMount} from 'svelte'
 	import {page} from '$app/state'
 	import {bskyOAuth} from '#lib/services/bsky-oauth.js'
-	import {buildLoopbackClientId} from '@atproto/oauth-client-browser'
+	import {buildAtprotoLoopbackClientId} from '@atproto/oauth-types'
+	import {CLIENT_METADATA_PATH, OAUTH_SCOPE} from '#lib/oauth.js'
 	import {session} from '#lib/state/session.js'
 	import {theme} from '#lib/state/theme.js'
 	import {getR4Profile} from '#lib/services/r4-service.js'
@@ -50,42 +51,15 @@
 
 	async function initOAuth() {
 		try {
-			const metadataFile = 'client-metadata.json'
-			let clientId: string
-			let useFallback = false
-			// Ensure loopback client IDs never include path components
-			const loopbackLocation = {
-				hostname: window.location.hostname,
-				port: window.location.port,
-				pathname: '/'
-			}
-
-			// Determine which client ID to use
-			if (window.location.protocol === 'https:') {
-				// For HTTPS, first check if we can reach the metadata
-				const metadataUrl = new URL(metadataFile, window.location.origin + '/').href
-
-				try {
-					// Quick check if metadata is accessible
-					const response = await fetch(metadataUrl, {method: 'HEAD', cache: 'no-cache'})
-					if (response.ok) {
-						clientId = metadataUrl
-					} else {
-						console.warn(`Metadata not accessible (${response.status}), using loopback client`)
-						useFallback = true
-					}
-				} catch (error) {
-					console.warn('Cannot reach metadata URL, using loopback client:', error)
-					useFallback = true
-				}
-
-				if (useFallback) {
-					clientId = buildLoopbackClientId(loopbackLocation as any)
-				}
-			} else {
-				// For HTTP (localhost), always use loopback client
-				clientId = buildLoopbackClientId(loopbackLocation as any)
-			}
+			// Over HTTPS we publish client metadata; plain-HTTP dev uses a loopback client
+			const {protocol, origin, port} = window.location
+			const clientId =
+				protocol === 'https:'
+					? `${origin}${CLIENT_METADATA_PATH}`
+					: buildAtprotoLoopbackClientId({
+							scope: OAUTH_SCOPE,
+							redirect_uris: [`http://127.0.0.1${port ? `:${port}` : ''}/`]
+						})
 
 			await bskyOAuth.init(clientId)
 

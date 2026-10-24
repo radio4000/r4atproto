@@ -14,8 +14,6 @@
 	import {session} from '#lib/state/session.js'
 	import {goto} from '$app/navigation'
 	import {
-		getR4SyncConfig,
-		setR4SyncConfig,
 		fetchRadio4000Channel,
 		fetchRadio4000Tracks,
 		importRadio4000Tracks,
@@ -24,14 +22,14 @@
 	} from '#lib/services/r4-service.js'
 	import {loadTracksForDid} from '#lib/stores/tracks-db.js'
 	import {onMount} from 'svelte'
+	import app from '#lib/config/app.json' with {type: 'json'}
+	import {getChannel, updateChannel} from '#lib/services/atproto/channel.service.js'
 
 	const t = (key: string, vars = {}) => translate($localeStore, key, vars)
 
 	// Config
-	let apiEndpoint = $state('https://oupgudlkspsmzkmeovlh.supabase.co')
-	let apiKey = $state(
-		'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im91cGd1ZGxrc3BzbXprbWVvdmxoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTM0NTIwNzQsImV4cCI6MjAyOTAyODA3NH0.KAbKFBChJHtxTmOZM2pdeppIyNbcnQkEgSi6RA7OQdo'
-	)
+	// The public, anonymous radio4000.com API
+	const {apiEndpoint, apiKey} = app.radio4000
 	let channelSlug = $state('')
 
 	// State
@@ -51,17 +49,8 @@
 			return
 		}
 
-		try {
-			const config = await getR4SyncConfig()
-			if (config) {
-				apiEndpoint = config.apiEndpoint
-				apiKey = config.apiKey
-				channelSlug = config.channelSlug
-			}
-		} catch (err) {
-			// Ignore auth errors on mount
-			console.error('Failed to load sync config:', err)
-		}
+		const channel = await getChannel($session.did).catch(() => null)
+		if (channel?.r4Slug) channelSlug = channel.r4Slug
 	})
 
 	async function handleLoad() {
@@ -72,9 +61,6 @@
 		isLoading = true
 
 		try {
-			// Save config
-			await setR4SyncConfig({apiEndpoint, apiKey, channelSlug})
-
 			// Fetch channel info only - no need to fetch all tracks yet
 			const channel = await fetchRadio4000Channel(apiEndpoint, apiKey, channelSlug)
 			if (!channel) {
@@ -133,6 +119,14 @@
 			)
 
 			importResult = result
+
+			// Remember where this radio came from, and adopt its name if it has none yet
+			const existing = await getChannel($session.did).catch(() => null)
+			await updateChannel({
+				r4Slug: channelSlug,
+				name: existing?.name || channelInfo?.name,
+				description: existing?.description || channelInfo?.description || undefined
+			})
 
 			// Final comparison
 			comparison = {
@@ -265,40 +259,6 @@
 					</div>
 				</div>
 			{/if}
-
-			<!-- Config Details (Collapsed) -->
-			<details class="border-t pt-4">
-				<summary
-					class="cursor-pointer text-sm font-medium text-muted-foreground hover:text-foreground"
-				>
-					Configuration
-				</summary>
-				<div class="mt-4 space-y-3">
-					<div class="space-y-2">
-						<Label for="api-endpoint" class="text-xs">{t('settings.syncApiEndpoint')}</Label>
-						<Input
-							id="api-endpoint"
-							type="text"
-							bind:value={apiEndpoint}
-							readonly
-							class="text-xs"
-						/>
-					</div>
-					<div class="space-y-2">
-						<Label for="api-key" class="text-xs">{t('settings.syncApiKey')}</Label>
-						<Input
-							id="api-key"
-							type="text"
-							bind:value={apiKey}
-							readonly
-							class="text-xs font-mono"
-						/>
-					</div>
-					<p class="text-xs text-muted-foreground">
-						{t('settings.syncConfigNote')}
-					</p>
-				</div>
-			</details>
 		</CardContent>
 	</Card>
 </div>

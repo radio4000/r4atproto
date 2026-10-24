@@ -1,0 +1,56 @@
+{
+	"lexicon": 1,
+	"id": "radio.4000.channel",
+	"defs": {
+		"main": {
+			"type": "record",
+			"description": "The radio channel of an account. One per repo.",
+			"key": "literal:self",
+			"record": {
+				"type": "object",
+				"required": ["createdAt"],
+				"properties": {
+					"name": {"type": "string", "maxLength": 640, "maxGraphemes": 64},
+					"description": {"type": "string", "maxLength": 20000, "maxGraphemes": 2000},
+					"image": {
+						"type": "blob",
+						"accept": ["image/png", "image/jpeg", "image/webp"],
+						"maxSize": 1000000
+					},
+					"url": {"type": "string", "format": "uri", "maxLength": 2048},
+					"geo": {"type": "ref", "ref": "#geo"},
+					"theme": {"type": "ref", "ref": "#theme"},
+					"r4Slug": {
+						"type": "string",
+						"description": "Slug of the channel on radio4000.com, when imported from there.",
+						"maxLength": 128
+					},
+					"createdAt": {"type": "string", "format": "datetime"},
+					"updatedAt": {"type": "string", "format": "datetime"}
+				}
+			}
+		},
+		"geo": {
+			"type": "object",
+			"description": "Public, coarse location of the radio (a city, not an address). Decimal degrees as strings, since lexicons have no floats.",
+			"required": ["latitude", "longitude"],
+			"properties": {
+				"latitude": {"type": "string", "maxLength": 16},
+				"longitude": {"type": "string", "maxLength": 16}
+			}
+		},
+		"theme": {
+			"type": "object",
+			"description": "Colors of the radio, as HSL triplets like '262 83% 58%'.",
+			"properties": {
+				"mode": {"type": "string", "knownValues": ["auto", "light", "dark"]},
+				"lightBackground": {"type": "string", "maxLength": 32},
+				"lightForeground": {"type": "string", "maxLength": 32},
+				"lightAccent": {"type": "string", "maxLength": 32},
+				"darkBackground": {"type": "string", "maxLength": 32},
+				"darkForeground": {"type": "string", "maxLength": 32},
+				"darkAccent": {"type": "string", "maxLength": 32}
+			}
+		}
+	}
+}

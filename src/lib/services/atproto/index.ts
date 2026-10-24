@@ -28,11 +28,13 @@ export {
 
 // Profile
 export {
-	R4_PROFILE_COLLECTION,
-	PROFILE_RKEY,
 	getR4Profile,
 	setR4Profile
 } from './profile.service'
+
+// Channel
+export {getChannel, updateChannel} from './channel.service'
+export type {ChannelRecord, ChannelTheme} from './channel.service'
 
 // Social
 export {

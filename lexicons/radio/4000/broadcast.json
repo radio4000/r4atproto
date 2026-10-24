@@ -1,0 +1,45 @@
+{
+	"lexicon": 1,
+	"id": "radio.4000.broadcast",
+	"defs": {
+		"main": {
+			"type": "record",
+			"description": "What a radio is playing live, deck by deck. Exists only while broadcasting.",
+			"key": "literal:self",
+			"record": {
+				"type": "object",
+				"required": ["decks", "updatedAt"],
+				"properties": {
+					"decks": {"type": "array", "maxLength": 8, "items": {"type": "ref", "ref": "#deck"}},
+					"updatedAt": {"type": "string", "format": "datetime"}
+				}
+			}
+		},
+		"deck": {
+			"type": "object",
+			"required": ["track", "url", "startedAt"],
+			"properties": {
+				"track": {
+					"type": "string",
+					"format": "at-uri",
+					"description": "The radio.4000.track record."
+				},
+				"url": {"type": "string", "format": "uri", "maxLength": 2048},
+				"title": {"type": "string", "maxLength": 3000, "maxGraphemes": 300},
+				"startedAt": {
+					"type": "string",
+					"format": "datetime",
+					"description": "When the track would have started at normal speed; listeners seek to now - startedAt."
+				},
+				"paused": {"type": "boolean"},
+				"speed": {
+					"type": "integer",
+					"description": "Playback rate in percent.",
+					"minimum": 25,
+					"maximum": 400,
+					"default": 100
+				}
+			}
+		}
+	}
+}

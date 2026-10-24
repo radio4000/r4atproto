@@ -1,6 +1,7 @@
 import {BrowserOAuthClient} from '@atproto/oauth-client-browser'
 import type {OAuthSession} from '@atproto/oauth-client-browser'
 import {Agent} from '@atproto/api'
+import {OAUTH_SCOPE} from '../oauth'
 
 interface Session {
 	did: string
@@ -46,23 +47,6 @@ class BskyOAuthService {
 		this.initialized = false
 		this.initPromise = null
 		this.lastClientId = null
-	}
-
-	#authorizationDetails() {
-		return [
-			{
-				type: 'atproto_repo',
-				actions: ['create', 'update', 'delete'],
-				identifier: 'com.radio4000.track'
-			},
-			{
-				type: 'atproto_repo',
-				actions: ['create', 'update', 'delete'],
-				identifier: 'com.radio4000.favorite'
-			},
-			{type: 'atproto_repo', actions: ['create', 'update'], identifier: 'com.radio4000.profile'},
-			{type: 'atproto_repo', actions: ['create', 'update'], identifier: 'com.radio4000.sync'}
-		]
 	}
 
 	#canonicalRedirectUri(): string | undefined {
@@ -156,33 +140,11 @@ class BskyOAuthService {
 			try {
 				localStorage.setItem('bsky-oauth-redirect', redirectUri || '')
 			} catch {}
-			const baseOpts: any = {
+			await this.client.signIn(handle, {
+				scope: OAUTH_SCOPE,
 				state: window.location.pathname,
-				signal: new AbortController().signal,
-				prompt: 'consent' as const,
-				redirect_uri: redirectUri
-			}
-
-			// Try fine-grained permissions first; if AS rejects, fall back to base scope
-			const withAuthz: any = {
-				...baseOpts,
-				authorization_details: this.#authorizationDetails()
-			}
-
-			try {
-				await this.client.signIn(handle, withAuthz)
-			} catch (e) {
-				const msg = String((e as Error)?.message || e)
-				if (
-					msg.includes('invalid_request') ||
-					msg.includes('invalid_client_metadata') ||
-					msg.includes('invalid_scope')
-				) {
-					await this.client.signIn(handle, baseOpts)
-				} else {
-					throw e
-				}
-			}
+				redirect_uri: redirectUri as any
+			})
 
 			return {
 				success: true,
@@ -200,57 +162,17 @@ class BskyOAuthService {
 		}
 	}
 
-	/**
-	 * Request additional fine-grained permissions via re-consent.
-	 */
+	/** Sign in again, asking to consent to the current scopes (after they changed). */
 	async requestScopes(): Promise<void> {
-		console.log('[requestScopes] Starting...')
 		await this.ensureInitialized()
-		console.log('[requestScopes] Client initialized')
-
 		if (!this.client) throw new Error('OAuth client not available')
-
 		const handle = this.session?.handle || this.session?.did
-		console.log('[requestScopes] Current session handle/DID:', handle)
 		if (!handle) throw new Error('No session - please sign in first')
-
-		// Don't pass redirect_uri explicitly - let the client use its configured redirect URIs
-		const baseOpts: any = {
+		await this.client.signIn(handle, {
+			scope: OAUTH_SCOPE,
 			state: window.location.pathname,
-			signal: new AbortController().signal,
-			prompt: 'consent' as const
-		}
-		const withAuthz: any = {
-			...baseOpts,
-			authorization_details: this.#authorizationDetails()
-		}
-
-		console.log('[requestScopes] Calling signIn with authorization_details...')
-		try {
-			await this.client.signIn(handle, withAuthz)
-			console.log('[requestScopes] signIn returned (should not reach here - should redirect)')
-		} catch (e) {
-			console.error('[requestScopes] signIn failed:', e)
-			const msg = String((e as Error)?.message || e)
-			if (
-				msg.includes('invalid_request') ||
-				msg.includes('invalid_client_metadata') ||
-				msg.includes('invalid_scope') ||
-				msg.includes('Invalid redirect_uri')
-			) {
-				console.log('[requestScopes] Falling back to base scope...')
-				try {
-					await this.client.signIn(handle, baseOpts)
-				} catch (e2) {
-					console.error('[requestScopes] Base scope also failed:', e2)
-					throw new Error(
-						'Unable to request permissions. The authorization server may not support fine-grained permissions.'
-					)
-				}
-			} else {
-				throw e
-			}
-		}
+			prompt: 'consent'
+		})
 	}
 
 	/** Resolve handle lazily and update session */

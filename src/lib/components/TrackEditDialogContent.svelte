@@ -1,4 +1,5 @@
 <script lang="ts">
+	import {TRACK} from '#lib/lexicons.js'
 	import {onMount} from 'svelte'
 	import {resolveHandle, getTrackByUri} from '#lib/services/r4-service.js'
 	import TrackEditForm from '#lib/components/TrackEditForm.svelte'
@@ -47,7 +48,7 @@
 				}
 			}
 			if (didOrRepo && rkeyValue) {
-				const nextUri = `at://${didOrRepo}/com.radio4000.track/${rkeyValue}`
+				const nextUri = `at://${didOrRepo}/${TRACK}/${rkeyValue}`
 				uri = nextUri
 				try {
 					const rec = await getTrackByUri(nextUri)

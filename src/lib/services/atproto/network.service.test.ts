@@ -20,9 +20,14 @@ import {getNetworkLatestTracks, listReposByCollection} from './network.service'
 
 function record(did: string, rkey: string, title: string) {
 	return {
-		uri: `at://${did}/com.radio4000.track/${rkey}`,
+		uri: `at://${did}/radio.4000.track/${rkey}`,
 		cid: `cid-${rkey}`,
-		value: {$type: 'com.radio4000.track', url: `https://example/${rkey}`, title}
+		value: {
+			$type: 'radio.4000.track',
+			url: `https://example/${rkey}`,
+			title,
+			createdAt: '2026-01-01T00:00:00.000Z'
+		}
 	}
 }
 

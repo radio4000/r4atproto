@@ -1,0 +1,43 @@
+{
+	"lexicon": 1,
+	"id": "radio.4000.track",
+	"defs": {
+		"main": {
+			"type": "record",
+			"description": "A media reference curated into a radio: a URL with a title, a description and #tags.",
+			"key": "tid",
+			"record": {
+				"type": "object",
+				"required": ["url", "title", "createdAt"],
+				"properties": {
+					"url": {"type": "string", "format": "uri", "maxLength": 2048},
+					"title": {"type": "string", "maxLength": 3000, "maxGraphemes": 300},
+					"description": {
+						"type": "string",
+						"description": "Free text. #tags and @mentions are parsed from it.",
+						"maxLength": 30000,
+						"maxGraphemes": 3000
+					},
+					"discogsUrl": {"type": "string", "format": "uri", "maxLength": 2048},
+					"duration": {
+						"type": "integer",
+						"description": "Media duration in seconds, when known.",
+						"minimum": 0
+					},
+					"playbackError": {
+						"type": "string",
+						"description": "Set when the media could not be played, e.g. a removed video.",
+						"maxLength": 1000
+					},
+					"r4Id": {
+						"type": "string",
+						"description": "ID of the track on radio4000.com, when imported from there.",
+						"maxLength": 64
+					},
+					"createdAt": {"type": "string", "format": "datetime"},
+					"updatedAt": {"type": "string", "format": "datetime"}
+				}
+			}
+		}
+	}
+}

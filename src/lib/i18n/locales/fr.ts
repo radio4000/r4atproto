@@ -203,9 +203,6 @@ const fr = {
 		syncStatusImported: '{count} importés',
 		syncStatusMissing: '{count} manquants',
 		syncAllImported: 'Tous les morceaux sont importés !',
-		syncApiEndpoint: 'Point de terminaison API',
-		syncApiKey: 'Clé API (publique)',
-		syncConfigNote: 'Configuration enregistrée dans com.radio4000.sync'
 	},
 	profile: {
 		errorTitle: 'Impossible de charger le profil',

@@ -12,7 +12,7 @@
 ### `/explore` — Explore feed
 
 A backend-free, network-wide "app view": the latest 10 tracks of **every** atproto
-user that publishes `com.radio4000.track` records.
+user that publishes `radio.4000.track` records.
 
 - Discovers radios across the network via the public relay (`listReposByCollection`),
   a page (~12 radios) at a time
@@ -119,7 +119,7 @@ Customise the app's visual theme:
 
 - Mode: Auto / Light / Dark
 - Background, foreground, and accent colors with a color picker
-- Changes are saved to the `com.radio4000.profile` AT Protocol record and are visible to other users on the profile page
+- Changes are saved to the `radio.4000.channel` record and are visible to other users on the profile page
 
 ### `/settings/permissions`
 
@@ -136,4 +136,4 @@ Import tracks from the legacy Radio4000 platform (Supabase backend).
 1. Enter your Radio4000 channel slug (and optionally a custom API endpoint / key)
 2. "Load Channel" fetches track count and channel metadata
 3. "Import Missing Tracks" creates AT Protocol records for any tracks not yet imported (skips duplicates)
-4. Config is persisted as a `com.radio4000.sync` record on AT Protocol
+4. The radio4000.com slug is remembered on the `radio.4000.channel` record (`r4Slug`)

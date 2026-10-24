@@ -1,6 +1,6 @@
 /**
  * AT Protocol Tracks Service
- * Handles CRUD operations for com.radio4000.track records
+ * Handles CRUD operations for radio.4000.track records
  */
 
 import {Agent} from '@atproto/api'
@@ -13,7 +13,10 @@ import type {
 	AtProtoRecord
 } from '../../types'
 
-export const R4_COLLECTION = 'com.radio4000.track'
+import {TRACK} from '../../lexicons'
+import {trackFromRecord, trackToRecord} from './track-record'
+
+export const R4_COLLECTION = TRACK
 
 /**
  * Create a new track record
@@ -23,18 +26,10 @@ export async function createTrack({
 	title,
 	description,
 	discogs_url,
-	r4SupabaseId
+	r4_id
 }: CreateTrackParams) {
 	const agent = assertAgent()
-	const record = {
-		$type: R4_COLLECTION,
-		url,
-		title,
-		description: description || undefined,
-		discogs_url: discogs_url || undefined,
-		r4SupabaseId: r4SupabaseId || undefined,
-		created_at: new Date().toISOString()
-	}
+	const record = trackToRecord({url, title, description, discogs_url, r4_id})
 
 	try {
 		return await withDpopRetry(() =>
@@ -46,7 +41,7 @@ export async function createTrack({
 		)
 	} catch (err) {
 		const msg = String((err as Error)?.message || err)
-		if (msg.includes('repo:com.radio4000.track?action=create')) {
+		if (msg.includes(`repo:${TRACK}`)) {
 			const e2 = new Error(
 				'Missing permission to save to library. Open Settings to re-consent. If on localhost, set a HTTPS client metadata URL and re-login.'
 			)
@@ -76,13 +71,7 @@ export async function listTracksByDid(
 		{did, useAuthForOwn: true}
 	)
 
-	const items = (res.data?.records || []).map((r: AtProtoRecord) => ({
-		uri: r.uri,
-		cid: r.cid,
-		rkey: r.uri?.split('/').pop(),
-		...r.value
-	}))
-	const tracks = items as Track[]
+	const tracks = (res.data?.records || []).map((r: AtProtoRecord) => trackFromRecord(r))
 
 	// API returns records ordered by rkey (timestamp-based)
 	// reverse=false (default): oldest first - preserves Radio4000 chronological order
@@ -113,12 +102,7 @@ export async function getTrackByUri(uri: string): Promise<Track> {
 		res as unknown as {data: {uri: string; cid: string; value: Record<string, unknown>}}
 	).data
 
-	return {
-		uri: data.uri,
-		cid: data.cid,
-		rkey,
-		...data.value
-	} as Track
+	return trackFromRecord(data)
 }
 
 /**
@@ -135,11 +119,8 @@ export async function updateTrackByUri(uri: string, changes: Partial<Track>) {
 		rkey
 	})
 
-	const updated = {
-		...(existing as unknown as {data: {value: Record<string, unknown>}}).data.value,
-		...changes,
-		updated_at: new Date().toISOString()
-	}
+	const current = trackFromRecord(existing.data as {uri: string; value: unknown})
+	const updated = trackToRecord({...current, ...changes, updated_at: new Date().toISOString()})
 
 	return await withDpopRetry(() =>
 		agent.com.atproto.repo.putRecord({

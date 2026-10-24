@@ -215,15 +215,13 @@
 
 	function updateDurationState(uri: string, seconds: number) {
 		// Update current track snapshot
-		current = current && current.uri === uri ? {...current, duration_seconds: seconds} : current
+		current = current && current.uri === uri ? {...current, duration: seconds} : current
 
 		// Update any playlists in the player store that reference this track
 		player.update((s) => {
 			const apply = (list?: any[] | null) =>
 				list
-					? list.map((track) =>
-							track?.uri === uri ? {...track, duration_seconds: seconds} : track
-						)
+					? list.map((track) => (track?.uri === uri ? {...track, duration: seconds} : track))
 					: list
 
 			return {
@@ -241,11 +239,11 @@
 		const rounded = Math.round(seconds)
 		if (!Number.isFinite(rounded) || rounded <= 0) return
 
-		const existing = current.duration_seconds ?? savedDurations.get(current.uri)
+		const existing = current.duration ?? savedDurations.get(current.uri)
 		if (existing && Math.abs(existing - rounded) <= 1) return
 
 		try {
-			await updateTrackByUri(current.uri, {duration_seconds: rounded})
+			await updateTrackByUri(current.uri, {duration: rounded})
 			savedDurations.set(current.uri, rounded)
 			updateDurationState(current.uri, rounded)
 			console.log(`[Player] Saved duration ${rounded}s for track ${current.uri}`)
@@ -766,7 +764,7 @@
 
 						// Record error for this track (only if user owns it)
 						if (current?.uri && canEditTrack(current)) {
-							updateTrackByUri(current.uri, {media_error: errorMsg}).catch((e) => {
+							updateTrackByUri(current.uri, {playback_error: errorMsg}).catch((e) => {
 								console.error('[Player] Failed to save media error to track:', e)
 							})
 						}
@@ -790,9 +788,11 @@
 
 				// Record error for this track (only if user owns it)
 				if (current?.uri && canEditTrack(current)) {
-					updateTrackByUri(current.uri, {media_error: 'SoundCloud playback error'}).catch((e) => {
-						console.error('[Player] Failed to save media error to track:', e)
-					})
+					updateTrackByUri(current.uri, {playback_error: 'SoundCloud playback error'}).catch(
+						(e) => {
+							console.error('[Player] Failed to save media error to track:', e)
+						}
+					)
 				}
 
 				// Skip to next track
@@ -855,7 +855,7 @@
 				// Record error for this track (only if user owns it)
 				if (current?.uri && canEditTrack(current)) {
 					const errorMsg = e?.message || 'Vimeo playback error'
-					updateTrackByUri(current.uri, {media_error: errorMsg}).catch((e) => {
+					updateTrackByUri(current.uri, {playback_error: errorMsg}).catch((e) => {
 						console.error('[Player] Failed to save media error to track:', e)
 					})
 				}

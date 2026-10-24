@@ -20,9 +20,9 @@ export interface Track {
 	title: string
 	description?: string
 	discogs_url?: string // snake_case to match Radio4000
-	media_error?: string // snake_case - stores playback error message if any
-	duration_seconds?: number // snake_case - media duration in seconds (if known)
-	r4SupabaseId?: string
+	playback_error?: string // snake_case - stores playback error message if any
+	duration?: number // snake_case - media duration in seconds (if known)
+	r4_id?: string
 	created_at?: string // snake_case to match Radio4000
 	updated_at?: string // snake_case to match Radio4000
 	authorDid?: string // camelCase OK - this is internal to our app
@@ -34,7 +34,7 @@ export interface CreateTrackParams {
 	title: string
 	description?: string
 	discogs_url?: string
-	r4SupabaseId?: string
+	r4_id?: string
 }
 
 export interface UpdateTrackParams {
@@ -42,8 +42,8 @@ export interface UpdateTrackParams {
 	title?: string
 	description?: string
 	discogs_url?: string
-	media_error?: string
-	duration_seconds?: number
+	playback_error?: string
+	duration?: number
 }
 
 export interface ListTracksOptions {
@@ -112,17 +112,6 @@ export interface R4ProfileRecord {
 	updatedAt?: string
 }
 
-// Sync types
-export interface R4SyncRecord {
-	uri?: string
-	cid?: string
-	apiEndpoint: string
-	apiKey: string
-	channelSlug: string
-	createdAt?: string
-	updatedAt?: string
-}
-
 // Radio4000 legacy types
 export interface Radio4000Track {
 	id: string
@@ -157,21 +146,6 @@ export interface Relationship {
 
 export interface RelationshipsResponse {
 	relationships?: Relationship[]
-}
-
-// OAuth types
-export interface OAuthOptions {
-	state?: string
-	signal?: AbortSignal
-	prompt?: 'none' | 'login' | 'consent' | 'select_account'
-	redirect_uri?: string
-	authorization_details?: AuthorizationDetail[]
-}
-
-export interface AuthorizationDetail {
-	type: string
-	actions?: string[]
-	identifier?: string
 }
 
 // Service response types

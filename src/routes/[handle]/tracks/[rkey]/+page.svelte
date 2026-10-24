@@ -1,4 +1,5 @@
 <script lang="ts">
+	import {TRACK} from '#lib/lexicons.js'
 	import {getTrackByUri, resolveHandle, listTracksByDid} from '#lib/services/r4-service.js'
 	import TrackDetail from '#lib/components/TrackDetail.svelte'
 	import {session} from '#lib/state/session.js'
@@ -89,7 +90,7 @@
 
 			// Load both the specific track and all profile tracks in parallel
 			const [trackData, profileTracks] = await Promise.all([
-				getTrackByUri(`at://${resolvedDid}/com.radio4000.track/${currentRkey}`),
+				getTrackByUri(`at://${resolvedDid}/${TRACK}/${currentRkey}`),
 				listTracksByDid(resolvedDid)
 			])
 

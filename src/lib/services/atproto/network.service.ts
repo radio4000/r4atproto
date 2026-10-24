@@ -4,7 +4,7 @@
  * A lightweight, backend-free "app view" for Radio4000.
  *
  * It builds a network-wide feed of every atproto repo that publishes
- * `com.radio4000.track` records, without running any indexing infrastructure:
+ * `radio.4000.track` records, without running any indexing infrastructure:
  *
  *   1. Discover DIDs via the public relay
  *      (`com.atproto.sync.listReposByCollection`). The relay already indexes
@@ -29,6 +29,7 @@
 import {getPdsForDid} from '../../utils/atproto-client'
 import {getProfiles} from './social.service'
 import {R4_COLLECTION} from './tracks.service'
+import {trackFromRecord} from './track-record'
 import type {Track, AtProtoRecord} from '../../types'
 
 /**
@@ -141,13 +142,7 @@ async function fetchLatestTracksForDid(did: string, limit: number): Promise<Trac
 		// would return the oldest records.)
 		reverse: false
 	})
-	return (data.records || []).map((r: AtProtoRecord) => ({
-		uri: r.uri,
-		cid: r.cid,
-		rkey: r.uri?.split('/').pop(),
-		authorDid: did,
-		...r.value
-	})) as Track[]
+	return (data.records || []).map((r: AtProtoRecord) => ({...trackFromRecord(r), authorDid: did}))
 }
 
 /** Run async tasks with bounded concurrency, preserving input order. */
@@ -172,7 +167,7 @@ async function mapWithConcurrency<T, R>(
 
 /**
  * Build the network-wide feed: the latest tracks of every atproto user that
- * publishes `com.radio4000.track` records.
+ * publishes `radio.4000.track` records.
  *
  * Radios with no readable tracks (deleted records, unreachable PDS) are
  * dropped from the result.

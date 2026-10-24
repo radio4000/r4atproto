@@ -10,16 +10,7 @@ import { createTrack, getProfiles, searchActors, … } from '$lib/services/r4-se
 
 ## AT Protocol collections
 
-The app writes to four custom Lexicon collections under the `com.radio4000.*` namespace.
-
-| Collection               | Purpose                          | Key operations                        |
-| ------------------------ | -------------------------------- | ------------------------------------- |
-| `com.radio4000.track`    | Music track records              | create, list, get, update, delete     |
-| `com.radio4000.favorite` | Followed Radio4000 profiles      | create, list, delete, check existence |
-| `com.radio4000.profile`  | User preferences (theme, colors) | get, set                              |
-| `com.radio4000.sync`     | Legacy import config             | get, set                              |
-
----
+See [lexicons.md](./lexicons.md) for the collections, their rkeys and the OAuth scope.
 
 ## Track service — `atproto/tracks.service.ts`
 
@@ -66,7 +57,7 @@ Wraps standard AT Protocol social graph calls.
 ## Network service — `atproto/network.service.ts`
 
 A backend-free "app view" that builds a network-wide feed of every atproto repo
-publishing `com.radio4000.track` records. It composes three public, unauthenticated
+publishing `radio.4000.track` records. It composes three public, unauthenticated
 steps:
 
 1. **Discover** DIDs via the public relay (`com.atproto.sync.listReposByCollection`).
@@ -90,7 +81,7 @@ const {radios, cursor} = await getNetworkLatestTracks({tracksPerUser: 10, maxUse
 **Scaling.** Step 2 is one request per repo, so this fan-out is appropriate up to roughly
 a few hundred radios; the feed paginates the relay cursor so the UI lazy-loads more on demand.
 Beyond that scale, a browser cannot fan out to (e.g.) a million PDSes — you would run a real
-indexing AppView instead: subscribe to Jetstream filtered on `com.radio4000.track`, index events
+indexing AppView instead: subscribe to Jetstream filtered on `radio.4000.track`, index events
 into a database, and serve a precomputed "latest per user" feed. The route would then read that
 endpoint instead of `getNetworkLatestTracks`; the rest of the UI is unchanged.
 
@@ -98,7 +89,7 @@ endpoint instead of `getNetworkLatestTracks`; the rest of the UI is unchanged.
 
 ## Profile service — `atproto/profile.service.ts`
 
-Stores per-user customisation as a singleton record in `com.radio4000.profile`.
+Stores the theme on the account's `radio.4000.channel` record (rkey `self`).
 
 | Function             | Description                                           |
 | -------------------- | ----------------------------------------------------- |
@@ -113,8 +104,6 @@ Import from the legacy Radio4000 platform.
 
 | Function                               | Description                                   |
 | -------------------------------------- | --------------------------------------------- |
-| `getR4SyncConfig(did)`                 | Read stored sync config                       |
-| `setR4SyncConfig(data)`                | Persist sync config                           |
 | `fetchRadio4000Channel(slug, opts?)`   | Get channel metadata from legacy API          |
 | `fetchRadio4000Tracks(slug, opts?)`    | Fetch all tracks from legacy channel          |
 | `importRadio4000Tracks(tracks, opts?)` | Create AT Protocol records for missing tracks |

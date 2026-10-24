@@ -285,7 +285,7 @@ describe('Discogs Service', () => {
 				uri: 'https://discogs.com/release/999'
 			}
 
-			const sourceTrackUri = 'at://did:plc:abc123/com.radio4000.track/xyz789'
+			const sourceTrackUri = 'at://did:plc:abc123/radio.4000.track/xyz789'
 			const r4Track = resourceTrackToR4Track(track, resource, sourceTrackUri)
 
 			expect(r4Track.source_track_uri).toBe(sourceTrackUri)

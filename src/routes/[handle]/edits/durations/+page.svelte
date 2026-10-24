@@ -25,7 +25,7 @@
 	const tracks = $derived.by(() => {
 		const all = tracksQuery.data || []
 		if (!did) return []
-		return all.filter((t) => t.authorDid === did && !t.duration_seconds)
+		return all.filter((t) => t.authorDid === did && !t.duration)
 	})
 
 	let loadingTracks = $state(false)
@@ -275,7 +275,7 @@
 		if (working) return
 
 		await loadAllTracks()
-		const targets = tracks.filter((t) => !t.duration_seconds)
+		const targets = tracks.filter((t) => !t.duration)
 		total = targets.length
 		processed = 0
 		runState = {}
@@ -287,7 +287,7 @@
 			try {
 				const seconds = await fetchDurationForTrack(track)
 				const rounded = Math.max(1, Math.round(seconds))
-				await updateTrack(track.uri, {duration_seconds: rounded})
+				await updateTrack(track.uri, {duration: rounded})
 				updateRun(track.uri, {status: 'success', duration: rounded, message: 'Saved'})
 			} catch (e) {
 				const message = (e as Error)?.message || String(e)
@@ -398,8 +398,8 @@
 								<span class="max-w-[12rem] truncate text-amber-500" title={run.message}
 									>{run.message || 'Error'}</span
 								>
-							{:else if track.duration_seconds}
-								<span class="font-mono">{formatDuration(track.duration_seconds)}</span>
+							{:else if track.duration}
+								<span class="font-mono">{formatDuration(track.duration)}</span>
 							{:else}
 								<span class="text-muted-foreground text-xs">Pending</span>
 							{/if}

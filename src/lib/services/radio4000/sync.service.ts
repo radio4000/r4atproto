@@ -3,78 +3,17 @@
  * Handles syncing data from Radio4000 legacy platform to AT Protocol
  */
 
-import {AtUri} from '@atproto/api'
-import {assertAgent, withDpopRetry, withRetry} from '../../utils/atproto-client'
+import {TID} from '@atproto/common-web'
+import {TRACK} from '../../lexicons'
+import {trackToRecord} from '../atproto/track-record'
+import {assertAgent, withRetry} from '../../utils/atproto-client'
 import {listAllTracksByDid} from '../atproto/tracks.service'
-import type {R4SyncRecord, Radio4000Channel, Radio4000Track} from '../../types'
+import type {Radio4000Channel, Radio4000Track} from '../../types'
 
-export const R4_SYNC_COLLECTION = 'com.radio4000.sync'
-export const R4_COLLECTION = 'com.radio4000.track'
-
-/**
- * Get the Radio4000 sync configuration for the current user
- */
-export async function getR4SyncConfig(): Promise<R4SyncRecord | null> {
-	const agent = assertAgent()
-	const did = agent.accountDid!
-	try {
-		const res = await withDpopRetry(() =>
-			agent.com.atproto.repo.listRecords({
-				repo: did,
-				collection: R4_SYNC_COLLECTION,
-				limit: 1
-			})
-		)
-		if (res.data.records.length === 0) return null
-		const record = res.data.records[0]
-		return {uri: record.uri, cid: record.cid, ...record.value} as R4SyncRecord
-	} catch (err) {
-		console.error('Failed to get sync config:', err)
-		return null
-	}
-}
-
-/**
- * Set the Radio4000 sync configuration
- */
-export async function setR4SyncConfig(config: {
-	apiEndpoint: string
-	apiKey: string
-	channelSlug: string
-}): Promise<void> {
-	const agent = assertAgent()
-	const did = agent.accountDid!
-	const existing = await getR4SyncConfig()
-
-	if (existing?.uri) {
-		const at = new AtUri(existing.uri)
-		const record = {
-			$type: R4_SYNC_COLLECTION,
-			...config,
-			updatedAt: new Date().toISOString()
-		}
-		await withDpopRetry(() =>
-			agent.com.atproto.repo.putRecord({
-				repo: did,
-				collection: R4_SYNC_COLLECTION,
-				rkey: at.rkey!,
-				record
-			})
-		)
-	} else {
-		const record = {
-			$type: R4_SYNC_COLLECTION,
-			...config,
-			createdAt: new Date().toISOString()
-		}
-		await withDpopRetry(() =>
-			agent.com.atproto.repo.createRecord({
-				repo: did,
-				collection: R4_SYNC_COLLECTION,
-				record
-			})
-		)
-	}
+/** A TID for an ISO date. The clock id is random, so equal timestamps don't collide. */
+export function tidFromDate(iso: string): string {
+	const micros = new Date(iso).getTime() * 1000
+	return TID.fromTime(micros, Math.floor(Math.random() * 1024)).toString()
 }
 
 /**
@@ -178,33 +117,22 @@ export async function importRadio4000Tracks(
 		const batch = tracksToImport.slice(i, i + BATCH_SIZE)
 
 		try {
-			// Build create operations for this batch
-			// Use timestamp-based rkeys derived from track.created_at
-			// Radio4000 timestamps include milliseconds and are unique per track
-			const writes = batch.map((track, batchIndex) => {
-				// Convert ISO timestamp to sortable format
-				// Radio4000's channel_track.created_at has millisecond precision and is unique
-				const timestamp = new Date(track.created_at).getTime()
-				// Use timestamp directly as rkey (milliseconds since epoch)
-				// Pad to 13 digits for consistent string sorting
-				const rkey = timestamp.toString().padStart(13, '0')
-
-				return {
-					$type: 'com.atproto.repo.applyWrites#create' as const,
-					collection: R4_COLLECTION,
-					rkey: rkey,
-					value: {
-						$type: R4_COLLECTION,
-						url: track.url,
-						title: track.title,
-						description: track.description || undefined,
-						discogs_url: track.discogs_url || undefined,
-						r4SupabaseId: track.id, // Save Radio4000 Supabase ID
-						created_at: track.created_at, // Preserve original created timestamp
-						updated_at: track.updated_at // Preserve original updated timestamp
-					}
-				}
-			})
+			// rkeys are TIDs made from when the track was added on radio4000.com,
+			// so imported tracks sort among manually added ones by date.
+			const writes = batch.map((track) => ({
+				$type: 'com.atproto.repo.applyWrites#create' as const,
+				collection: TRACK,
+				rkey: tidFromDate(track.created_at),
+				value: trackToRecord({
+					url: track.url,
+					title: track.title,
+					description: track.description || undefined,
+					discogs_url: track.discogs_url || undefined,
+					r4_id: track.id,
+					created_at: track.created_at,
+					updated_at: track.updated_at
+				})
+			}))
 
 			// Execute batch create with retry logic
 			await withRetry(() =>
