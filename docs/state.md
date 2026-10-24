@@ -25,6 +25,8 @@ PDS → Query cache (memory) → Collection (memory) → useLiveQuery → Compon
 
 `src/lib/chat.ts`. Each radio has a public room at `/@handle/chat`. Messages are records in their senders' repos; the room's history comes from Constellation (microcosm's public backlinks index, `services.constellation`), new messages from Jetstream.
 
+Rooms respect Bluesky blocks (`chat-blocks.ts`): accounts the radio's owner blocks are out of its room and can't post there, and accounts you block are out of every room you read. Blocks are public `app.bsky.graph.block` records, read up to `chat.blockListPages` pages. Muting an account (`chat-moderation.svelte.ts`) is private and stays in the browser. Unread counts skip both.
+
 ## Broadcast
 
 `src/lib/broadcast.ts`. Going live writes the broadcast record on every track change, pause, seek or speed change (debounced) and as a heartbeat; stopping, or idling past `broadcast.idleStopSeconds`, deletes it. Joining replaces your decks with one listener deck per broadcast deck, seeked to the broadcaster's position and re-synced when drifted (r4's logic and `broadcast-utils.js`). Timings live in `config/app.json`.

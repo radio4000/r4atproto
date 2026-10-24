@@ -3,6 +3,8 @@
 	import {appState} from '#lib/app-state.svelte.js'
 	import {deleteChatMessage, fetchChatHistory, sendChatMessage, watchChat} from '#lib/chat.js'
 	import {openChatRoom} from '#lib/chat-unread.svelte.js'
+	import {blockedBy, roomBlocks} from '#lib/chat-blocks.js'
+	import {muteAuthor, mutedAuthors, unmuteAuthor} from '#lib/chat-moderation.svelte.js'
 	import {authHref, channelHref} from '#lib/links.js'
 	import {relativeDateDetailed} from '#lib/dates.js'
 	import ChannelAvatar from '#lib/components/channel-avatar.svelte'
@@ -22,6 +24,24 @@
 	let error = $state('')
 	/** @type {HTMLElement | undefined} */
 	let list = $state()
+	/** Accounts blocked by the radio's owner or by you */
+	let blocked = $state(new Set())
+	/** The radio's owner blocks you */
+	let blockedFromRoom = $state(false)
+
+	const me = $derived(appState.session?.did)
+	const visible = $derived(messages.filter((m) => m.did === me || !blocked.has(m.did)))
+
+	$effect(() => {
+		const did = radioDid
+		const reader = me
+		blocked = new Set()
+		blockedFromRoom = false
+		roomBlocks(did, reader).then((set) => {
+			if (did === radioDid) blocked = set
+		})
+		if (reader) blockedBy(did).then((set) => (blockedFromRoom = set.has(reader)))
+	})
 
 	function add(message) {
 		if (messages.some((m) => m.id === message.id)) return
@@ -49,7 +69,7 @@
 
 	// Keep the newest message in view
 	$effect(() => {
-		void messages.length
+		void visible.length
 		list?.scrollTo({top: list.scrollHeight})
 	})
 
@@ -76,29 +96,49 @@
 
 <r4-chat-room>
 	<ol bind:this={list} aria-live="polite">
-		{#each messages as message (message.id)}
-			<li>
-				<a href={channelHref(message.handle)} title="@{message.handle}">
-					<ChannelAvatar src={message.avatar} alt={message.handle} />
-				</a>
-				<article>
-					<header>
-						<a href={channelHref(message.handle)}>@{message.handle}</a>
-						<time datetime={message.created_at}>{relativeDateDetailed(message.created_at)}</time>
-						{#if message.did === appState.session?.did}
-							<button
-								type="button"
-								onclick={() => remove(message.id)}
-								title={m.chat_delete()}
-								aria-label={m.chat_delete()}
-							>
-								<Icon icon="delete" size={14} />
-							</button>
-						{/if}
-					</header>
-					<p><LinkEntities text={message.text} /></p>
-				</article>
-			</li>
+		{#each visible as message (message.id)}
+			{#if mutedAuthors.includes(message.did)}
+				<li>
+					<r4-chat-muted>
+						<small>{m.chat_muted({handle: message.handle})}</small>
+						<button type="button" onclick={() => unmuteAuthor(message.did)}
+							>{m.chat_unmute()}</button
+						>
+					</r4-chat-muted>
+				</li>
+			{:else}
+				<li>
+					<a href={channelHref(message.handle)} title="@{message.handle}">
+						<ChannelAvatar src={message.avatar} alt={message.handle} />
+					</a>
+					<article>
+						<header>
+							<a href={channelHref(message.handle)}>@{message.handle}</a>
+							<time datetime={message.created_at}>{relativeDateDetailed(message.created_at)}</time>
+							{#if message.did === me}
+								<button
+									type="button"
+									onclick={() => remove(message.id)}
+									title={m.chat_delete()}
+									aria-label={m.chat_delete()}
+								>
+									<Icon icon="delete" size={14} />
+								</button>
+							{:else}
+								<button
+									type="button"
+									onclick={() => muteAuthor(message.did)}
+									title={m.chat_mute({handle: message.handle})}
+									aria-label={m.chat_mute({handle: message.handle})}
+								>
+									<Icon icon="eye-close" size={14} />
+								</button>
+							{/if}
+						</header>
+						<p><LinkEntities text={message.text} /></p>
+					</article>
+				</li>
+			{/if}
 		{:else}
 			<li>
 				<r4-empty
@@ -108,7 +148,9 @@
 		{/each}
 	</ol>
 
-	{#if appState.session}
+	{#if blockedFromRoom}
+		<p role="status">{m.chat_blocked_from_room()}</p>
+	{:else if appState.session}
 		<form onsubmit={send}>
 			<label for="{uid}-text">{m.chat_input_placeholder()}</label>
 			<r4-chat-input>
@@ -167,6 +209,24 @@
 		&:has(r4-empty) {
 			display: block;
 			margin: auto;
+		}
+
+		&:has(r4-chat-muted) {
+			display: block;
+		}
+	}
+
+	r4-chat-muted {
+		display: flex;
+		align-items: baseline;
+		gap: var(--space-2);
+		font-size: var(--font-2);
+		color: var(--gray-9);
+
+		button {
+			min-height: 0;
+			padding: 0 var(--space-1);
+			font-size: inherit;
 		}
 	}
 

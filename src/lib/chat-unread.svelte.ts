@@ -10,6 +10,8 @@ import {appState} from '#lib/app-state.svelte.js'
 import {CHAT_MESSAGE} from '#lib/lexicons.js'
 import {subscribe} from '#lib/atproto/jetstream.js'
 import {fetchChatRefs, type ChatMessageRecord} from '#lib/chat.js'
+import {roomBlocks} from '#lib/chat-blocks.js'
+import {mutedAuthors} from '#lib/chat-moderation.svelte.js'
 import {LOCAL_STORAGE_KEYS} from '#lib/storage-keys.js'
 
 /** Unread messages per radio DID */
@@ -79,10 +81,16 @@ const tidTime = (rkey: string) => {
  *  time is known without fetching the record. */
 async function countOwnRadio(did: string) {
 	const since = seen[did] ?? 0
-	const refs = await fetchChatRefs(did).catch(() => [])
-	const count = refs.filter((ref) => ref.did !== did && tidTime(ref.rkey) > since).length
+	const [refs, blocked] = await Promise.all([fetchChatRefs(did).catch(() => []), roomBlocks(did)])
+	const count = refs.filter(
+		(ref) => ref.did !== did && !hidden(ref.did, blocked) && tidTime(ref.rkey) > since
+	).length
 	if (count && !openRooms.has(did)) unreadChat[did] = count
 }
+
+/** Messages you don't see in a room don't count */
+const hidden = (author: string, blocked: Set<string>) =>
+	blocked.has(author) || mutedAuthors.includes(author)
 
 /** Count new messages. Call once, from the root layout's script (it sets up effects). */
 export function watchUnreadChat() {
@@ -100,12 +108,14 @@ export function watchUnreadChat() {
 
 	// One socket for every room; the effect closes it with the app
 	$effect(() =>
-		subscribe<ChatMessageRecord>([CHAT_MESSAGE], ({did, commit}) => {
+		subscribe<ChatMessageRecord>([CHAT_MESSAGE], async ({did, commit}) => {
 			const subject = commit.record?.subject
-			if (commit.operation !== 'create' || !subject || did === appState.session?.did) return
+			const reader = appState.session?.did
+			if (commit.operation !== 'create' || !subject || did === reader) return
 			if (!watchedRadios().has(subject) || openRooms.has(subject)) return
 			const since = Math.max(seen[subject] ?? 0, listeningSince[subject] ?? 0)
 			if (Date.parse(commit.record?.createdAt ?? '') <= since) return
+			if (hidden(did, await roomBlocks(subject, reader))) return
 			unreadChat[subject] = (unreadChat[subject] ?? 0) + 1
 		})
 	)

@@ -11,5 +11,8 @@ export const CHAT_MESSAGE = `${NAMESPACE}.chat.message`
 /** The permission set the app asks for at sign-in */
 export const AUTH = `${NAMESPACE}.${app.oauth.permissionSet}`
 
+/** Bluesky's block records, which chat rooms respect */
+export const BSKY_BLOCK = 'app.bsky.graph.block'
+
 /** rkey of singleton records (channel, broadcast) */
 export const SELF = 'self'

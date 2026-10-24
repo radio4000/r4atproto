@@ -29,7 +29,8 @@
 		"maxDecks": 4
 	},
 	"chat": {
-		"historySize": 50
+		"historySize": 50,
+		"blockListPages": 20
 	},
 	"reads": {
 		"cacheSeconds": 30
