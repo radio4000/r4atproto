@@ -350,7 +350,7 @@
 
 	/* Narrow lists: a radio is just its avatar next to each track */
 	@container (max-width: 520px) {
-		r4-tracklist[show-slug='true'] :global(r4-channel-micro-card span) {
+		r4-tracklist[show-slug='true'] :global(r4-channel-micro-card a > span) {
 			display: none;
 		}
 	}

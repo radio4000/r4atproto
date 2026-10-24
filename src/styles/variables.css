@@ -36,6 +36,8 @@
 	--explore-map-height: 70dvh;
 	--chat-height: 60dvh;
 	--chat-avatar-size: 2rem;
+	--home-avatar-size: 4rem;
+	--home-card-min: 150px;
 	--tooltip-width: 200px;
 	--popover-min-width: 10rem;
 	--dialog-width: 640px;

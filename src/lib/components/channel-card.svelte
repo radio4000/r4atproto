@@ -204,6 +204,12 @@
 		gap: var(--space-1);
 		padding: var(--space-1) var(--space-2) var(--space-2);
 
+		small {
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
 		> menu {
 			margin-inline-start: auto;
 			flex-wrap: nowrap;
