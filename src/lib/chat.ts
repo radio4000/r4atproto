@@ -48,13 +48,19 @@ async function toMessage(uri: string, record: ChatMessageRecord): Promise<ChatMe
 	return {id: uri, did, ...(await author(did)), text: record.text, created_at: record.createdAt}
 }
 
-/** The latest messages of a radio's room, oldest first */
-export async function fetchChatHistory(radioDid: string): Promise<ChatMessage[]> {
+/** Sender and record key of the latest messages of a radio's room (records not fetched) */
+export async function fetchChatRefs(radioDid: string): Promise<{did: string; rkey: string}[]> {
 	const {records} = await xrpcGet<{records: {did: string; collection: string; rkey: string}[]}>(
 		app.services.constellation,
 		'blue.microcosm.links.getBacklinks',
 		{subject: radioDid, source: `${CHAT_MESSAGE}:subject`, limit: app.chat.historySize}
 	)
+	return records
+}
+
+/** The latest messages of a radio's room, oldest first */
+export async function fetchChatHistory(radioDid: string): Promise<ChatMessage[]> {
+	const records = await fetchChatRefs(radioDid)
 	const messages: ChatMessage[] = []
 	for (let i = 0; i < records.length; i += CONCURRENCY) {
 		const batch = await Promise.all(

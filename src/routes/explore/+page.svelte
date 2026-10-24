@@ -168,9 +168,11 @@
 </r4-page>
 
 <style>
+	/* Fills the rest of the page */
 	r4-explore-map {
 		display: flex;
-		height: var(--explore-map-height);
+		flex: 1 1 0;
+		min-height: var(--map-min-height);
 		border-radius: var(--border-radius);
 		overflow: hidden;
 	}

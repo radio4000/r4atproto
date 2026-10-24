@@ -159,3 +159,17 @@ dl {
 		margin: 0;
 	}
 }
+
+/* A count of new things (unread messages): a small accent pill */
+mark {
+	display: inline-grid;
+	place-content: center;
+	min-width: 1.4em;
+	padding: 0 var(--space-1);
+	border-radius: calc(var(--border-radius) * 999);
+	background: var(--accent-9);
+	color: var(--gray-1);
+	font-size: var(--font-1);
+	font-weight: 600;
+	line-height: 1.4;
+}

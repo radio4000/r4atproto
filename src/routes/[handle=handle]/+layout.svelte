@@ -1,4 +1,5 @@
 <script>
+	import {unreadChat} from '#lib/chat-unread.svelte.js'
 	import {page} from '$app/state'
 	import {goto} from '$app/navigation'
 	import {eq} from '@tanstack/db'
@@ -109,7 +110,7 @@
 		{href: base, label: m.nav_tracks(), count: tracks.length || undefined},
 		{href: `${base}/tags`, label: m.channel_tags_link()},
 		{href: `${base}/following`, label: m.nav_following()},
-		{href: `${base}/chat`, label: m.chat_panel_title()}
+		{href: `${base}/chat`, label: m.chat_panel_title(), unread: unreadChat[channel?.id ?? '']}
 	])
 </script>
 
@@ -214,6 +215,8 @@
 						<a href={tab.href} aria-current={page.url.pathname === tab.href ? 'page' : undefined}>
 							{tab.label}
 							{#if tab.count}<small>{tab.count}</small>{/if}
+							{#if tab.unread}<mark title={m.chat_unread({count: tab.unread})}>{tab.unread}</mark
+								>{/if}
 						</a>
 					</li>
 				{/each}
@@ -230,6 +233,7 @@
 
 <style>
 	r4-channel {
+		flex: 1 0 auto;
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-2);

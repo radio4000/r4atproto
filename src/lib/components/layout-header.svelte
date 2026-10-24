@@ -1,4 +1,5 @@
 <script>
+	import {unreadChat} from '#lib/chat-unread.svelte.js'
 	import {page} from '$app/state'
 	import {onMount} from 'svelte'
 	import {MediaQuery} from 'svelte/reactivity'
@@ -83,6 +84,11 @@
 						<ChannelAvatar src={appState.channel?.image} alt={appState.channel?.name ?? handle} />
 					</r4-header-avatar>
 					<span>@{handle}</span>
+					{#if appState.session && unreadChat[appState.session.did]}
+						<mark title={m.chat_unread({count: unreadChat[appState.session.did]})}
+							>{unreadChat[appState.session.did]}</mark
+						>
+					{/if}
 				</a>
 			</li>
 		{:else}

@@ -32,6 +32,7 @@
 	import {createStallRecovery} from '#lib/player/stall-recovery.svelte.js'
 	import {appState, canEditChannel, deckAccent} from '#lib/app-state.svelte.js'
 	import ChannelMicroCard from '#lib/components/channel-micro-card.svelte'
+	import ChatUnreadBadge from '#lib/components/chat-unread-badge.svelte'
 	import Icon from '#lib/components/icon.svelte'
 	import AutoRadioButton from '#lib/components/auto-radio-button.svelte'
 	import PopoverMenu from '#lib/components/popover-menu.svelte'
@@ -689,6 +690,7 @@
 
 {#snippet headerChannelCard(/** @type {Channel} */ ch)}
 	<ChannelMicroCard channel={ch} href={channelHref(ch.slug)} />
+	<ChatUnreadBadge radioDid={ch.id} slug={ch.slug} />
 {/snippet}
 
 {#snippet btnPrev()}

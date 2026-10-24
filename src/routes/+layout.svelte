@@ -5,6 +5,7 @@
 	import '../styles/style.css'
 	import {appState, deckAccent} from '#lib/app-state.svelte.js'
 	import {applyAppearance} from '#lib/appearance.svelte.js'
+	import {watchUnreadChat} from '#lib/chat-unread.svelte.js'
 	import {sortedDeckIds} from '#lib/deck.js'
 	import {toggleDeckCompact} from '#lib/api.js'
 	import {leaveBroadcast} from '#lib/broadcast.js'
@@ -94,6 +95,7 @@
 	)
 
 	applyAppearance()
+	watchUnreadChat()
 
 	// The saved language wins, before any message renders
 	if (appState.language && isLocale(appState.language) && getLocale() !== appState.language) {

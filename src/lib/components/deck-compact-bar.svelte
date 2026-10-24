@@ -26,6 +26,7 @@
 	import DeckMenu from '#lib/components/deck-menu.svelte'
 	import AutoRadioButton from '#lib/components/auto-radio-button.svelte'
 	import ChannelMicroCard from '#lib/components/channel-micro-card.svelte'
+	import ChatUnreadBadge from '#lib/components/chat-unread-badge.svelte'
 	import TrackCard from '#lib/components/track-card.svelte'
 	import SpeedControl from '#lib/components/speed-control.svelte'
 	import VolumeControl from '#lib/components/volume-control.svelte'
@@ -135,6 +136,7 @@
 			<r4-deck-compact-channels>
 				{#if headerChannel}
 					<ChannelMicroCard channel={headerChannel} href={channelHref(headerChannel.slug)} />
+					<ChatUnreadBadge radioDid={headerChannel.id} slug={headerChannel.slug} />
 				{/if}
 				{#if secondaryChannel}
 					<ChannelMicroCard channel={secondaryChannel} href={channelHref(secondaryChannel.slug)} />

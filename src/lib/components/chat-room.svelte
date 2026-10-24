@@ -2,6 +2,7 @@
 	import {page} from '$app/state'
 	import {appState} from '#lib/app-state.svelte.js'
 	import {deleteChatMessage, fetchChatHistory, sendChatMessage, watchChat} from '#lib/chat.js'
+	import {openChatRoom} from '#lib/chat-unread.svelte.js'
 	import {authHref, channelHref} from '#lib/links.js'
 	import {relativeDateDetailed} from '#lib/dates.js'
 	import ChannelAvatar from '#lib/components/channel-avatar.svelte'
@@ -42,6 +43,9 @@
 			removed: (id) => (messages = messages.filter((m) => m.id !== id))
 		})
 	})
+
+	// Read while on screen: no unread count for this room
+	$effect(() => openChatRoom(radioDid))
 
 	// Keep the newest message in view
 	$effect(() => {
@@ -133,7 +137,9 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-2);
-		height: var(--chat-height);
+		/* Fills the rest of the page, scrolling its messages */
+		flex: 1 1 0;
+		min-height: var(--chat-min-height);
 		padding: var(--space-2);
 		background: var(--color-interface-elevated);
 		border: 1px solid var(--color-interface-border);
@@ -142,6 +148,7 @@
 
 	ol {
 		flex: 1;
+		min-height: 0;
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-2);

@@ -36,8 +36,7 @@
 	--map-min-height: 300px;
 	--map-picker-height: 18rem;
 	--map-popup-width: 14.5rem;
-	--explore-map-height: 70dvh;
-	--chat-height: 60dvh;
+	--chat-min-height: 20rem;
 	--chat-avatar-size: 2rem;
 	--home-avatar-size: 4rem;
 	--home-card-min: 150px;

@@ -2,6 +2,7 @@
 import {parseAtUri} from '#lib/atproto/repo.js'
 
 export const channelHref = (slug: string) => `/@${slug}`
+export const channelChatHref = (slug: string) => `/@${slug}/chat`
 
 export const trackHref = (track: {id: string; slug: string}) =>
 	`/@${track.slug}/tracks/${parseAtUri(track.id).rkey}`

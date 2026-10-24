@@ -341,6 +341,7 @@
 	"chat_send_button": "Envoyer",
 	"chat_send_failed": "Envoi impossible : {message}",
 	"chat_sign_in": "Connectez-vous pour discuter",
+	"chat_unread": "{count} nouveaux messages dans le chat",
 	"common_auto": "Auto",
 	"common_back": "Retour",
 	"common_cancel": "Annuler",

@@ -341,6 +341,7 @@
 	"chat_send_button": "Send",
 	"chat_send_failed": "Could not send: {message}",
 	"chat_sign_in": "Sign in to chat",
+	"chat_unread": "{count} new chat messages",
 	"common_auto": "Auto",
 	"common_back": "Back",
 	"common_cancel": "Cancel",
