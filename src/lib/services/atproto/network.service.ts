@@ -30,7 +30,7 @@ import {getPdsForDid} from '../../utils/atproto-client'
 import {getProfiles} from './social.service'
 import {R4_COLLECTION} from './tracks.service'
 import {trackFromRecord} from './track-record'
-import type {Track, AtProtoRecord} from '../../types'
+import type {Track, AtProtoRecord} from '../../types/index'
 
 /**
  * Public relay that indexes the firehose. Its `listReposByCollection`

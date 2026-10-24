@@ -2,7 +2,6 @@
 
 The message catalog and tooling come from r4-svelte, so screens ported from it keep their keys and their 21 languages. Strings specific to this app are added in English (and French), and fall back to English elsewhere. The legacy `src/lib/i18n` module only serves screens not yet ported, and goes away with them.
 
-
 - Translations live in `i18n/messages/<languageTag>.json`
 - English (`en`) is the source of truth; all other languages fall back to `en` for missing keys
 - Supported locales are listed in `i18n/project.inlang/settings.json` (`languageTags`)

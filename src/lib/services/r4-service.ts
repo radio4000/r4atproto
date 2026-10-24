@@ -69,4 +69,4 @@ export {
 } from './radio4000'
 
 // Re-export types
-export type {R4ProfileRecord} from '../types'
+export type {R4ProfileRecord} from '../types/index'

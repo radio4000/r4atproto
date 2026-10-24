@@ -1,7 +1,7 @@
 /**
  * Theme of a radio, stored on its radio.4000.channel record.
  */
-import type {R4ProfileRecord} from '../../types'
+import type {R4ProfileRecord} from '../../types/index'
 import {getChannel, updateChannel} from './channel.service'
 
 const DEFAULTS: Omit<R4ProfileRecord, 'uri' | 'cid' | 'createdAt' | 'updatedAt'> = {

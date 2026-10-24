@@ -30,8 +30,13 @@
 		"@atproto/oauth-client-browser": "^0.5.10",
 		"@atproto/oauth-types": "^0.7.7",
 		"@inlang/paraglide-js": "^2.29.1",
-		"@tanstack/svelte-db": "^0.1.48",
+		"@tanstack/db": "^0.15.2",
+		"@tanstack/query-core": "^5.104.5",
+		"@tanstack/query-db-collection": "^1.4.8",
+		"@tanstack/svelte-db": "^0.5.12",
+		"fuzzysort": "^4.0.2",
 		"lucide-svelte": "^0.554.0",
+		"media-now": "^2.2.3",
 		"obra-icons-svelte": "^1.25.0"
 	},
 	"devDependencies": {

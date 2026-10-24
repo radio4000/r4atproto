@@ -3,7 +3,7 @@
  * app's Track (snake_case, as in r4's domain model).
  */
 import {TRACK} from '../../lexicons'
-import type {Track} from '../../types'
+import type {Track} from '../../types/index'
 
 export interface TrackRecord {
 	$type?: string

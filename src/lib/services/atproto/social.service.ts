@@ -4,7 +4,7 @@
  */
 
 import {assertAgent, getPublicAgent} from '../../utils/atproto-client'
-import type {AtProtoRecord, Relationship, Actor} from '../../types'
+import type {AtProtoRecord, Relationship, Actor} from '../../types/index'
 
 /**
  * Follow an actor by DID

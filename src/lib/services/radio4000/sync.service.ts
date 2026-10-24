@@ -8,7 +8,7 @@ import {TRACK} from '../../lexicons'
 import {trackToRecord} from '../atproto/track-record'
 import {assertAgent, withRetry} from '../../utils/atproto-client'
 import {listAllTracksByDid} from '../atproto/tracks.service'
-import type {Radio4000Channel, Radio4000Track} from '../../types'
+import type {Radio4000Channel, Radio4000Track} from '../../types/index'
 
 /** A TID for an ISO date. The clock id is random, so equal timestamps don't collide. */
 export function tidFromDate(iso: string): string {

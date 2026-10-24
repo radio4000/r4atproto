@@ -11,7 +11,7 @@ import type {
 	ListTracksOptions,
 	ListTracksResult,
 	AtProtoRecord
-} from '../../types'
+} from '../../types/index'
 
 import {TRACK} from '../../lexicons'
 import {trackFromRecord, trackToRecord} from './track-record'

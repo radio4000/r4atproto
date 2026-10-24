@@ -10,7 +10,7 @@ import type {
 	ListR4FavoriteOptions,
 	ListR4FavoriteResult,
 	AtProtoRecord
-} from '../../types'
+} from '../../types/index'
 
 export const R4_FAVORITE_COLLECTION = FOLLOW
 
