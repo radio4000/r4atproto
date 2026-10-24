@@ -318,6 +318,7 @@
 	"channels_view_label_map": "خريطة",
 	"channels_view_label_tuner": "موجّه",
 	"channels_view_mode": "عرض كـ {mode}",
+	"chat_attach_track": "إرفاق المقطع الذي يُشغَّل برسالتك",
 	"chat_blocked_from_room": "لا يمكنك الكتابة في هذه الغرفة.",
 	"chat_empty_state": "دردشة مؤقتة",
 	"chat_input_placeholder": "اكتب رسالة…",

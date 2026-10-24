@@ -332,6 +332,7 @@
 	"channels_view_label_map": "carte",
 	"channels_view_label_tuner": "tuner",
 	"channels_view_mode": "Afficher en mode {mode}",
+	"chat_attach_track": "Joindre le morceau en cours à votre message",
 	"chat_blocked_from_room": "Vous ne pouvez pas écrire dans ce salon.",
 	"chat_delete": "Supprimer le message",
 	"chat_empty_state": "Discussion éphémère",

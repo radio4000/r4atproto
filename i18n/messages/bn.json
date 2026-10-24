@@ -318,6 +318,7 @@
 	"channels_view_label_map": "ম্যাপ",
 	"channels_view_label_tuner": "টিউনার",
 	"channels_view_mode": "{mode} হিসেবে দেখুন",
+	"chat_attach_track": "বাজতে থাকা ট্র্যাকটি বার্তায় যুক্ত করুন",
 	"chat_blocked_from_room": "আপনি এই রুমে লিখতে পারবেন না।",
 	"chat_empty_state": "ইফেমেরাল চ্যাট",
 	"chat_input_placeholder": "মেসেজ লিখুন…",

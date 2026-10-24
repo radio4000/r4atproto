@@ -8,7 +8,9 @@
 	import {authHref, channelHref} from '#lib/links.js'
 	import {relativeDateDetailed} from '#lib/dates.js'
 	import ChannelAvatar from '#lib/components/channel-avatar.svelte'
+	import {tracksCollection, watchTracks} from '#lib/collections/tracks.js'
 	import LinkEntities from '#lib/components/link-entities.svelte'
+	import ChatTrack from '#lib/components/chat-track.svelte'
 	import Icon from '#lib/components/icon.svelte'
 	import * as m from '#lib/paraglide/messages.js'
 
@@ -29,7 +31,17 @@
 	/** The radio's owner blocks you */
 	let blockedFromRoom = $state(false)
 
+	/** Attach the playing track to the next message */
+	let attachTrack = $state(false)
+
 	const me = $derived(appState.session?.did)
+	/** The track on the active deck, when it has a record to point at */
+	const playing = $derived.by(() => {
+		watchTracks()
+		const id = appState.decks[appState.active_deck_id]?.playlist_track
+		const track = id ? tracksCollection.get(id) : undefined
+		return track?.cid ? track : undefined
+	})
 	const visible = $derived(messages.filter((m) => m.did === me || !blocked.has(m.did)))
 
 	$effect(() => {
@@ -79,8 +91,10 @@
 		sending = true
 		error = ''
 		try {
-			add(await sendChatMessage(radioDid, text))
+			const track = attachTrack && playing?.cid ? {uri: playing.id, cid: playing.cid} : undefined
+			add(await sendChatMessage(radioDid, text, track))
 			text = ''
+			attachTrack = false
 		} catch (err) {
 			error = m.chat_send_failed({message: err instanceof Error ? err.message : String(err)})
 		} finally {
@@ -136,6 +150,7 @@
 							{/if}
 						</header>
 						<p><LinkEntities text={message.text} /></p>
+						{#if message.track}<ChatTrack uri={message.track} />{/if}
 					</article>
 				</li>
 			{/if}
@@ -166,6 +181,17 @@
 					>{m.chat_send_button()}</button
 				>
 			</r4-chat-input>
+			{#if playing}
+				<button
+					type="button"
+					aria-pressed={attachTrack}
+					onclick={() => (attachTrack = !attachTrack)}
+					title={m.chat_attach_track()}
+				>
+					<Icon icon="play-fill" size={14} />
+					<span>{playing.title}</span>
+				</button>
+			{/if}
 			<small>{m.chat_public_note()}</small>
 			{#if error}<p role="alert">{error}</p>{/if}
 		</form>
@@ -281,5 +307,22 @@
 
 	form {
 		gap: var(--space-1);
+
+		> button {
+			align-self: flex-start;
+			display: flex;
+			align-items: center;
+			gap: var(--space-1);
+			max-width: 100%;
+			min-height: 0;
+			padding: var(--space-1) var(--space-2);
+			font-size: var(--font-3);
+
+			span {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+		}
 	}
 </style>

@@ -318,6 +318,7 @@
 	"channels_view_label_map": "hartă",
 	"channels_view_label_tuner": "tuner",
 	"channels_view_mode": "Vizualizare ca {mode}",
+	"chat_attach_track": "Atașează piesa care rulează la mesaj",
 	"chat_blocked_from_room": "Nu poți scrie în această cameră.",
 	"chat_empty_state": "Chat efemer",
 	"chat_input_placeholder": "Scrie un mesaj…",

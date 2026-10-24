@@ -318,6 +318,7 @@
 	"channels_view_label_map": "Karte",
 	"channels_view_label_tuner": "Tuner",
 	"channels_view_mode": "Als {mode} anzeigen",
+	"chat_attach_track": "Den laufenden Titel an deine Nachricht anhängen",
 	"chat_blocked_from_room": "Du kannst in diesem Raum nicht schreiben.",
 	"chat_empty_state": "Flüchtiger Chat",
 	"chat_input_placeholder": "Nachricht eingeben…",

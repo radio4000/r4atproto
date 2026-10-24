@@ -5,18 +5,20 @@
  */
 import {TID} from '@atproto/common-web'
 import app from '#lib/config/app.json' with {type: 'json'}
-import {CHAT_MESSAGE} from '#lib/lexicons.js'
+import {CHAT_MESSAGE, TRACK} from '#lib/lexicons.js'
 import {resolveIdentity} from '#lib/atproto/identity.js'
 import {getProfiles} from '#lib/atproto/profiles.js'
 import {getRecord, parseAtUri} from '#lib/atproto/repo.js'
 import {subscribe} from '#lib/atproto/jetstream.js'
 import {xrpcGet} from '#lib/atproto/xrpc.js'
 import {createRecord, deleteRecord, myDid} from '#lib/atproto/write.js'
+import type {StrongRef} from '#lib/atproto/records.js'
 
 export interface ChatMessageRecord {
 	$type?: string
 	subject: string
 	text: string
+	track?: StrongRef
 	createdAt: string
 }
 
@@ -28,6 +30,8 @@ export interface ChatMessage {
 	handle: string
 	avatar?: string
 	text: string
+	/** at:// URI of the track the message is about */
+	track?: string
 	created_at: string
 }
 
@@ -45,7 +49,16 @@ async function author(did: string): Promise<{handle: string; avatar?: string}> {
 
 async function toMessage(uri: string, record: ChatMessageRecord): Promise<ChatMessage> {
 	const {did} = parseAtUri(uri)
-	return {id: uri, did, ...(await author(did)), text: record.text, created_at: record.createdAt}
+	const track = record.track?.uri
+	return {
+		id: uri,
+		did,
+		...(await author(did)),
+		text: record.text,
+		// at://did/collection/rkey
+		track: track?.split('/')[3] === TRACK ? track : undefined,
+		created_at: record.createdAt
+	}
 }
 
 /** Sender and record key of the latest messages of a radio's room (records not fetched) */
@@ -87,8 +100,13 @@ export function watchChat(
 	})
 }
 
-/** Post to a radio's room as the signed-in account; resolves with the message */
-export async function sendChatMessage(radioDid: string, text: string): Promise<ChatMessage> {
+/** Post to a radio's room as the signed-in account, optionally about a track;
+ *  resolves with the message */
+export async function sendChatMessage(
+	radioDid: string,
+	text: string,
+	track?: StrongRef
+): Promise<ChatMessage> {
 	const did = myDid()
 	if (!did) throw new Error('Not signed in')
 	const rkey = TID.nextStr()
@@ -96,6 +114,7 @@ export async function sendChatMessage(radioDid: string, text: string): Promise<C
 		$type: CHAT_MESSAGE,
 		subject: radioDid,
 		text: text.trim(),
+		track,
 		createdAt: new Date().toISOString()
 	}
 	await createRecord(CHAT_MESSAGE, record, rkey)

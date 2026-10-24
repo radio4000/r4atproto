@@ -318,6 +318,7 @@
 	"channels_view_label_map": "지도",
 	"channels_view_label_tuner": "튜너",
 	"channels_view_mode": "{mode} 보기",
+	"chat_attach_track": "재생 중인 트랙을 메시지에 첨부",
 	"chat_blocked_from_room": "이 방에는 글을 쓸 수 없습니다.",
 	"chat_empty_state": "일시적 채팅",
 	"chat_input_placeholder": "메시지를 입력하세요…",

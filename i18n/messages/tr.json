@@ -318,6 +318,7 @@
 	"channels_view_label_map": "harita",
 	"channels_view_label_tuner": "tuner",
 	"channels_view_mode": "{mode} olarak görüntüle",
+	"chat_attach_track": "Çalan parçayı mesajına ekle",
 	"chat_blocked_from_room": "Bu odaya yazamazsınız.",
 	"chat_empty_state": "Geçici sohbet",
 	"chat_input_placeholder": "Bir mesaj yazın…",

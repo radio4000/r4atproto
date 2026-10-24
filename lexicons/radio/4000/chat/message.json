@@ -16,6 +16,11 @@
 						"description": "The radio whose room this is."
 					},
 					"text": {"type": "string", "maxLength": 3000, "maxGraphemes": 300},
+					"track": {
+						"type": "ref",
+						"ref": "com.atproto.repo.strongRef",
+						"description": "A radio.4000.track record the message is about, like the one playing as it was sent."
+					},
 					"createdAt": {"type": "string", "format": "datetime"}
 				}
 			}

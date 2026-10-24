@@ -13,7 +13,7 @@ Records use camelCase as in the lexicons. The app's `Track` type is snake_case l
 
 Records read from the network are validated against these schemas (`src/lib/atproto/schemas.ts`) and dropped when they don't match. Schemas of other namespaces that ours refer to, like `com.atproto.repo.strongRef`, are pulled next to them with `goat lex pull <nsid>`; `goat lex publish` only publishes the ones whose DNS points at the publishing account.
 
-`radio.4000.chat.message` has no `facets`, `langs` or `reply` yet: optional fields can be added to a published lexicon, so they come with the features that use them. The `large-string` lint is ignored: track descriptions allow 30,000 bytes, as imported radio4000.com descriptions may be long.
+`radio.4000.chat.message` can point at a track (`track`, a strongRef). It has no `facets`, `langs` or `reply` yet: optional fields can be added to a published lexicon, so they come with the features that use them. The `large-string` lint is ignored: track descriptions allow 30,000 bytes, as imported radio4000.com descriptions may be long.
 
 Everything in a repo is public. Nothing private goes in a record: settings that aren't meant to be seen stay in the browser.
 

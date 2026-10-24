@@ -318,6 +318,7 @@
 	"channels_view_label_map": "mapa",
 	"channels_view_label_tuner": "sintonizador",
 	"channels_view_mode": "Ver como {mode}",
+	"chat_attach_track": "Anexar a faixa em reprodução à sua mensagem",
 	"chat_blocked_from_room": "Você não pode escrever nesta sala.",
 	"chat_empty_state": "Chat efêmero",
 	"chat_input_placeholder": "Digite uma mensagem…",

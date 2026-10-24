@@ -318,6 +318,7 @@
 	"channels_view_label_map": "карта",
 	"channels_view_label_tuner": "тюнер",
 	"channels_view_mode": "Перегляд як {mode}",
+	"chat_attach_track": "Прикріпити трек, що грає, до повідомлення",
 	"chat_blocked_from_room": "Ви не можете писати в цій кімнаті.",
 	"chat_empty_state": "Ефемерний чат",
 	"chat_input_placeholder": "Введіть повідомлення…",

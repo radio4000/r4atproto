@@ -318,6 +318,7 @@
 	"channels_view_label_map": "マップ",
 	"channels_view_label_tuner": "チューナー",
 	"channels_view_mode": "{mode} で表示",
+	"chat_attach_track": "再生中のトラックをメッセージに添付",
 	"chat_blocked_from_room": "このルームには投稿できません。",
 	"chat_empty_state": "エフェメラルチャット",
 	"chat_input_placeholder": "メッセージを入力…",

@@ -332,6 +332,7 @@
 	"channels_view_label_map": "Map",
 	"channels_view_label_tuner": "Tuner",
 	"channels_view_mode": "View as {mode}",
+	"chat_attach_track": "Attach the playing track to your message",
 	"chat_blocked_from_room": "You can't post in this room.",
 	"chat_delete": "Delete message",
 	"chat_empty_state": "Ephemeral chat",

@@ -318,6 +318,7 @@
 	"channels_view_label_map": "Kort",
 	"channels_view_label_tuner": "Tuner",
 	"channels_view_mode": "Vis som {mode}",
+	"chat_attach_track": "Vedhæft det spillende nummer til din besked",
 	"chat_blocked_from_room": "Du kan ikke skrive i dette rum.",
 	"chat_empty_state": "Midlertidig chat",
 	"chat_input_placeholder": "Skriv en besked…",

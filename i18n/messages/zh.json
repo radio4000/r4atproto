@@ -318,6 +318,7 @@
 	"channels_view_label_map": "地图",
 	"channels_view_label_tuner": "调谐器",
 	"channels_view_mode": "以 {mode} 模式查看",
+	"chat_attach_track": "将正在播放的曲目附加到消息",
 	"chat_blocked_from_room": "你无法在此房间发言。",
 	"chat_empty_state": "临时聊天",
 	"chat_input_placeholder": "输入消息…",

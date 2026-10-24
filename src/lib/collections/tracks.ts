@@ -66,6 +66,18 @@ async function fetchTracksByIds(ids: string[]): Promise<Track[]> {
 	return rows.filter((t): t is Track => Boolean(t))
 }
 
+/** One track by its URI, from the collection or else its repo (then kept in the collection) */
+export async function fetchTrack(id: string): Promise<Track | undefined> {
+	const loaded = tracksCollection.get(id)
+	if (loaded) return loaded
+	const [track] = await fetchTracksByIds([id]).catch(() => [])
+	if (track) {
+		if (!tracksCollection.isReady()) tracksCollection.startSyncImmediate()
+		tracksCollection.utils.writeUpsert(track)
+	}
+	return track
+}
+
 export const tracksCollection = createCollection<Track, string>({
 	...queryCollectionOptions({
 		queryKey: (opts) => getTrackQueryKey(parseTrackParams(opts)),
