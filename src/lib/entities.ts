@@ -44,3 +44,8 @@ export function extractMentions(text: string): string[] {
 		entity.startsWith('@') ? entity.toLowerCase() : ''
 	)
 }
+
+/** #tags of a description, without the #, as r4 stores them */
+export function bareTags(description: string): string[] {
+	return [...new Set(extractHashtags(description).map((tag) => tag.slice(1)))]
+}

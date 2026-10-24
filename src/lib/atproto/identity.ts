@@ -84,8 +84,24 @@ export async function resolvePds(did: string): Promise<string> {
  */
 export async function resolveIdentity(handleOrDid: string): Promise<Identity> {
 	const did = isDid(handleOrDid) ? handleOrDid : await resolveHandle(handleOrDid)
-	const doc = await didDocument(did)
+	return identityOf(did, await didDocument(did), resolveHandle)
+}
+
+/** The same for a DID, without this session's caches: for a long-running service (the indexer) */
+export async function resolveIdentityFresh(did: string): Promise<Identity> {
+	return identityOf(did, await fetchDidDocument(did), (handle) =>
+		xrpcGet<{did: string}>(app.services.appview, 'com.atproto.identity.resolveHandle', {
+			handle: normalizeHandle(handle)
+		}).then((res) => res.did)
+	)
+}
+
+async function identityOf(
+	did: string,
+	doc: DidDocument,
+	resolve: (handle: string) => Promise<string>
+): Promise<Identity> {
 	const claimed = handleFromDocument(doc)
-	const verified = claimed && (await resolveHandle(claimed).catch(() => null)) === did
+	const verified = claimed && (await resolve(claimed).catch(() => null)) === did
 	return {did, handle: verified ? normalizeHandle(claimed) : did, pds: pdsFromDocument(doc)}
 }

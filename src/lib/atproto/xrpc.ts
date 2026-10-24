@@ -29,7 +29,7 @@ export async function xrpcGet<T>(
 	}
 	const res = await pooledFetch(url)
 	if (!res.ok) {
-		const body = await res.json().catch(() => ({}))
+		const body = (await res.json().catch(() => ({}))) as {error?: string; message?: string}
 		throw new XrpcError(res.status, body.error, body.message || `${nsid} failed (${res.status})`)
 	}
 	return res.json()

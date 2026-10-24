@@ -4,7 +4,9 @@
  */
 import {parseUrl} from 'media-now'
 import {BROADCAST, CHANNEL, TRACK} from '#lib/lexicons.js'
-import {extractHashtags, extractMentions} from '#lib/entities.js'
+import {bareTags, extractMentions} from '#lib/entities.js'
+
+export {bareTags}
 import type {Broadcast, Channel, Track} from '#lib/types.js'
 import type {Profile} from './profiles'
 import type {RepoRecord} from './repo'
@@ -53,11 +55,6 @@ export interface ChannelRecord {
 	r4Slug?: string
 	createdAt: string
 	updatedAt?: string
-}
-
-/** #tags of a description, without the #, as r4 stores them */
-export function bareTags(description: string): string[] {
-	return [...new Set(extractHashtags(description).map((tag) => tag.slice(1)))]
 }
 
 /** A track from its record, or null when its link isn't http(s) */
