@@ -1,0 +1,101 @@
+:root {
+	color-scheme: light dark;
+
+	/* layout */
+	--scaling: 1;
+	--space-1: calc(0.2rem * var(--scaling));
+	--space-2: calc(0.5rem * var(--scaling));
+	--space-3: calc(1rem * var(--scaling));
+	--border-radius: 0.4rem;
+	--media-radius: var(--border-radius);
+	/* Floating UI — shell/deck panel padding, gaps, border, background. */
+	--floating-padding: 0.35rem;
+	--floating-gap: 0.35rem;
+	--floating-bg: var(--color-interface-elevated);
+	--floating-border: 1px solid var(--color-interface-border);
+	--track-artwork-size: 2.5rem;
+	--control-size: 2.25rem;
+	--control-padding: 0 0.625rem;
+	--measure: 44rem;
+	--measure-narrow: 22rem;
+	/* layout header: a rail on desktop, a tab bar on mobile */
+	--header-nav-size: 3.5rem;
+	--header-nav-size-mobile: 2.5rem;
+	--header-glyph-size: 1.4rem;
+	--header-label-width: 10ch;
+	/* deck strip next to the page on desktop */
+	--deck-strip-width: 28rem;
+	--shadow-modal: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+	/* motion: --duration-1 for micro feedback (presses, hovers, exits),
+	   --duration-2 for overlays and larger moves (menus, dialogs) */
+	--duration-1: 100ms;
+	--duration-2: 150ms;
+	--ease-out: cubic-bezier(0.2, 0, 0, 1);
+
+	/* media-chrome icon size */
+	--media-button-icon-width: 18px;
+	--media-button-icon-height: 18px;
+
+	/* typography */
+	--font-root: 16px;
+	--font-sans: 'firava', system-ui, sans-serif;
+	--font-mono: ui-monospace, monospace;
+	--font-1: 0.6875rem;
+	--font-2: 0.75rem;
+	--font-3: 0.8125rem;
+	--font-4: 0.9375rem;
+	--font-5: 1rem;
+	--font-6: 1.125rem;
+	--font-7: 1.25rem;
+	--font-8: 1.5rem;
+	--font-9: 2.25rem;
+
+	/* interface surface colors (neutral backgrounds, not accent-derived).
+	   Border/elevated steps are asymmetric per theme on purpose: the same gray
+	   step reads with very different contrast near white than near black, so a
+	   single step number for both themes was too strong in light mode and too
+	   weak in dark mode. */
+	--color-interface: var(--gray-1);
+	--color-interface-elevated: light-dark(var(--gray-2), var(--gray-4));
+	--color-interface-border: light-dark(var(--gray-4), var(--gray-6));
+	--color-control-border: var(--color-interface-border);
+	--color-control-border-hover: var(--gray-7);
+
+	/* buttons (*-light/*-dark overrides come from the theme editor) */
+	--button-bg: light-dark(
+		var(--button-bg-light, var(--gray-3)),
+		var(--button-bg-dark, var(--gray-3))
+	);
+	--button-color: light-dark(
+		var(--button-color-light, var(--gray-11)),
+		var(--button-color-dark, var(--gray-11))
+	);
+
+	/* media queries can't use variables, but still, nice to declare what we use */
+	--breakpoint-xs: 520px;
+	--breakpoint-s: 640px;
+	--breakpoint-sm: 768px;
+	--breakpoint-md: 1024px;
+	--breakpoint-lg: 1280px;
+	--breakpoint-xl: 1640px;
+}
+
+@media (min-width: 520px) {
+	:root {
+		--font-root: 17px;
+	}
+}
+
+@media (min-width: 1280px) {
+	:root {
+		--font-root: 18px;
+	}
+}
+
+:root[theme='light'] {
+	color-scheme: light;
+}
+
+:root[theme='dark'] {
+	color-scheme: dark;
+}

@@ -1,0 +1,18 @@
+{
+	"mobileBreakpoint": 768,
+	"conceptIcons": {
+		"home": "r4",
+		"explore": "globe",
+		"tracks": "unordered-list",
+		"tags": "tag",
+		"search": "search",
+		"broadcast": "signal",
+		"settings": "menu",
+		"add": "add",
+		"user": "user",
+		"following": "sparkles",
+		"followers": "users",
+		"map": "map",
+		"chat": "message-circle"
+	}
+}

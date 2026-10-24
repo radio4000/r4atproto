@@ -1,0 +1,129 @@
+input,
+button,
+textarea,
+select {
+	font: inherit;
+}
+
+select option {
+	color: var(--gray-12);
+	background: var(--gray-2);
+}
+
+select,
+textarea,
+input:is(
+	[type='email'],
+	[type='search'],
+	[type='password'],
+	[type='number'],
+	[type='text'],
+	[type='url']
+) {
+	min-height: var(--control-size);
+	padding: var(--control-padding);
+	font-size: var(--font-4);
+	background: var(--color-interface-elevated);
+	color: var(--gray-12);
+	border-radius: var(--border-radius);
+	border: 1px solid var(--color-control-border);
+	line-height: 1;
+
+	&:hover {
+		border-color: var(--color-control-border-hover);
+	}
+
+	&:active,
+	&:focus {
+		outline: 2px solid var(--accent-9);
+		outline-offset: -2px;
+	}
+}
+
+input[type='checkbox'] {
+	margin: 0;
+	accent-color: var(--accent-9);
+}
+
+input[type='range'] {
+	margin: 0;
+	accent-color: var(--accent-7);
+	background: transparent;
+	-webkit-appearance: none;
+	--range-track-height: 0.2rem;
+	--range-thumb-size: 0.75rem;
+	min-height: var(--range-thumb-size);
+
+	&::-webkit-slider-runnable-track {
+		height: var(--range-track-height);
+		background: linear-gradient(
+			to right,
+			var(--range-track-color, var(--accent-5)) var(--range-fill, 0%),
+			var(--gray-4) var(--range-fill, 0%)
+		);
+	}
+
+	&::-webkit-slider-thumb {
+		-webkit-appearance: none;
+		width: var(--range-thumb-size);
+		height: var(--range-thumb-size);
+		border-radius: 50%;
+		background: var(--range-color, var(--accent-9));
+		margin-top: calc(var(--range-track-height) / 2 - var(--range-thumb-size) / 2);
+	}
+
+	&::-moz-range-thumb {
+		width: var(--range-thumb-size);
+		height: var(--range-thumb-size);
+		border-radius: 50%;
+		border: none;
+		background: var(--range-color, var(--accent-9));
+	}
+
+	&::-moz-range-track {
+		height: var(--range-track-height);
+		background: var(--gray-4);
+	}
+
+	&::-moz-range-progress {
+		background: var(--range-track-color, var(--accent-5));
+	}
+
+	&:disabled {
+		opacity: 0.4;
+		cursor: default;
+	}
+}
+
+textarea {
+	min-height: 4rem;
+	padding-block: var(--space-2);
+	line-height: inherit;
+}
+
+/* Forms stack their fields; a fieldset groups a label with its control */
+form {
+	display: flex;
+	flex-flow: column;
+	gap: var(--space-2);
+}
+
+fieldset {
+	display: flex;
+	flex-flow: column;
+	gap: var(--space-1);
+	margin: 0;
+	border: 0;
+	padding: 0;
+
+	&[hidden] {
+		display: none;
+	}
+
+	label,
+	legend {
+		font-size: var(--font-3);
+		font-weight: 500;
+		padding: 0;
+	}
+}

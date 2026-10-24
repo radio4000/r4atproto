@@ -9,35 +9,17 @@
 	import {getR4Profile} from '#lib/services/r4-service.js'
 	import Player from '#lib/components/Player.svelte'
 	import '../app.css'
-	import StateCard from '#lib/components/ui/state-card.svelte'
-	import {
-		Loader2,
-		Menu,
-		X,
-		Home,
-		Plus,
-		User,
-		Settings,
-		AtSign,
-		Play,
-		Pause,
-		LayoutList,
-		Compass
-	} from 'lucide-svelte'
-	import {player, toggle} from '#lib/player/store.js'
-	import {locale, translate} from '#lib/i18n/index.js'
-	import {cn} from '#lib/utils/index.js'
-	import {resolveHandle} from '#lib/services/r4-service.js'
-	import NavTabs from '#lib/components/NavTabs.svelte'
+	import '../styles/style.css'
+	import {player} from '#lib/player/store.js'
 	import {browser} from '$app/environment'
 	import ToastContainer from '#lib/components/ui/toast/ToastContainer.svelte'
 	import SeoHead from '#lib/components/SeoHead.svelte'
+	import LayoutHeader from '#lib/components/layout-header.svelte'
+	import * as m from '#lib/paraglide/messages.js'
+	import {getLocale} from '#lib/paraglide/runtime.js'
 
 	let {children} = $props()
 	let ready = $state(false)
-	let hasDesktopPlayer = $state(false)
-	let playerVisible = $state(true)
-	let mobilePanelOpen = $state(true)
 	let playerState = $state({
 		playing: false,
 		customPlaylist: [],
@@ -45,9 +27,6 @@
 		index: -1,
 		isShuffled: false
 	})
-	// Legacy modal placeholders to avoid runtime errors from stale navigation state
-	let viewModal = $state(null)
-	let editModal = $state(null)
 
 	async function initOAuth() {
 		try {
@@ -155,12 +134,9 @@
 					: 'light'
 				: $theme.mode
 
-		// Apply dark class
-		if (effectiveMode === 'dark') {
-			document.documentElement.classList.add('dark')
-		} else {
-			document.documentElement.classList.remove('dark')
-		}
+		document.documentElement.setAttribute('theme', effectiveMode)
+		// Legacy Tailwind screens read the dark class
+		document.documentElement.classList.toggle('dark', effectiveMode === 'dark')
 
 		// Apply custom colors (only background/foreground)
 		const colors = effectiveMode === 'dark' ? $theme.darkColors : $theme.lightColors
@@ -196,9 +172,6 @@
 	onMount(() => {
 		initOAuth().catch(console.error)
 		const unsubscribe = player.subscribe((state) => {
-			// Player is active if we have a context (profile/author/discogs) or custom playlist
-			hasDesktopPlayer =
-				(state.context !== null || state.customPlaylist?.length > 0) && state.index >= 0
 			playerState = state
 		})
 
@@ -235,147 +208,130 @@
 		}
 	})
 
-	const t = (key, vars = {}) => translate($locale, key, vars)
-	const defaultDescription = $derived(
-		t('home.subtitle') || 'Share and discover music tracks on the AT Protocol.'
-	)
-
-	const userHandle = $derived(($session && $session.handle) || '')
-	const myPath = $derived(userHandle ? `/@${encodeURIComponent(userHandle)}` : '/')
-	const addPath = $derived(userHandle ? `/@${encodeURIComponent(userHandle)}/add` : '/')
-
-	const navItems = $derived.by(() => {
-		const currentPath = page.url.pathname
-		const checkActive = (href: string) => currentPath === href
-
-		const baseItems = [
-			{href: '/', label: t('nav.links.home'), icon: Home, isActive: checkActive('/')},
-			{
-				href: '/explore',
-				label: t('nav.links.explore'),
-				icon: Compass,
-				isActive: currentPath.startsWith('/explore')
-			}
-		]
-
-		if ($session?.did && userHandle) {
-			baseItems.push(
-				{href: myPath, label: userHandle, icon: AtSign, isActive: checkActive(myPath)},
-				{href: addPath, label: t('nav.links.add'), icon: Plus, isActive: checkActive(addPath)}
-			)
-		}
-
-		baseItems.push({
-			href: '/settings',
-			label: t('nav.links.settings'),
-			icon: Settings,
-			isActive: currentPath.startsWith('/settings')
-		})
-
-		return baseItems
-	})
+	// Until decks land, the legacy player fills the deck strip whenever something plays
 	const hasPlayback = $derived(
 		(playerState.customPlaylist?.length > 0 || playerState.context !== null) &&
 			playerState.index >= 0
 	)
-	const playbackCollapsed = $derived(!hasPlayback || !playerVisible)
+
+	$effect(() => {
+		document.documentElement.lang = getLocale()
+	})
 </script>
 
-<SeoHead title="Radio4000" description={defaultDescription} />
+<SeoHead title="Radio4000" description={m.welcome_tagline_channel()} />
 
 {#if !ready}
-	<div class="flex items-center justify-center min-h-screen p-4">
-		<StateCard
-			icon={Loader2}
-			loading={true}
-			title={t('app.loadingTitle')}
-			description={t('app.loadingDescription')}
-		/>
-	</div>
+	<r4-loading role="status">{m.common_loading()}</r4-loading>
 {:else}
-	<div class="min-h-screen bg-background flex flex-col">
-		<div class="flex-1 px-0.5 sm:px-1 lg:px-2">
-			<div class="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-center lg:gap-4">
-				{#if hasPlayback}
-					<section
-						class={cn(
-							'layout-playback order-1 w-full sticky top-0 z-10 transition-all duration-200 lg:order-2 lg:w-full lg:max-w-lg h-screen',
-							playbackCollapsed && 'hidden'
-						)}
-						aria-label="layout-playback"
-					>
-						<div class="h-full rounded-xl bg-background/95 p-2 lg:p-3 shadow-sm">
-							<Player visible={!playbackCollapsed} bind:mobilePanelOpen class="w-full h-full" />
-						</div>
-					</section>
-				{/if}
-
-				<section
-					class={cn(
-						'layout-panel relative z-20 flex-1 min-w-0 flex flex-col gap-4 order-2 lg:order-1 min-h-screen w-full bg-background/95 rounded-xl',
-						playbackCollapsed ? 'lg:max-w-5xl lg:mx-auto' : ''
-					)}
-					aria-label="layout-panel"
-				>
-					<main class="flex-1 min-h-0 rounded-2xl">
-						{@render children()}
-					</main>
-
-					<nav class="mt-2 sticky bottom-0 left-0 right-0 z-40 rounded-2xl pb-1">
-						<div class="flex items-center justify-center gap-2 flex-wrap">
-							<NavTabs items={navItems} variant="pills" />
-
-							{#if hasPlayback}
-								<div
-									class="inline-flex gap-1 rounded-full bg-background/95 backdrop-blur-xl border border-border"
-								>
-									<button
-										type="button"
-										onclick={toggle}
-										class={cn(
-											'flex items-center justify-center px-3 py-2 rounded-full text-sm font-medium transition-all duration-200',
-											playerState.playing
-												? 'text-background bg-foreground border border-foreground shadow-sm hover:border-background'
-												: 'text-foreground border border-border hover:bg-foreground hover:text-background hover:border-background'
-										)}
-										aria-label={playerState.playing ? 'Pause' : 'Play'}
-									>
-										{#if playerState.playing}
-											<Pause class="h-3.5 w-3.5" />
-										{:else}
-											<Play class="h-3.5 w-3.5" />
-										{/if}
-									</button>
-									<!-- Never stop playback when hiding the player -->
-									<button
-										type="button"
-										onclick={() => {
-											if (window.innerWidth < 1024) {
-												mobilePanelOpen = !mobilePanelOpen
-												playerVisible = mobilePanelOpen
-											} else {
-												playerVisible = !playerVisible
-											}
-										}}
-										class={cn(
-											'flex items-center justify-center px-3 py-2 rounded-full text-sm font-medium transition-all duration-200',
-											playerVisible || mobilePanelOpen
-												? 'text-background bg-foreground border border-foreground shadow-sm hover:border-background'
-												: 'text-foreground border border-border hover:bg-foreground hover:text-background hover:border-background'
-										)}
-										aria-label="Toggle player visibility"
-									>
-										<LayoutList class="h-3.5 w-3.5" />
-									</button>
-								</div>
-							{/if}
-						</div>
-					</nav>
-				</section>
-			</div>
-		</div>
-	</div>
+	<r4-layout deck-active={hasPlayback}>
+		<LayoutHeader />
+		<r4-content>
+			<r4-scroll-area>
+				<main>
+					{@render children()}
+				</main>
+			</r4-scroll-area>
+			{#if hasPlayback}
+				<r4-deck-strip>
+					<Player visible={true} mobilePanelOpen={true} />
+				</r4-deck-strip>
+			{/if}
+		</r4-content>
+	</r4-layout>
 {/if}
 
-<!-- Toast Notifications -->
 <ToastContainer />
+
+<style>
+	/* Shell: same layout decisions as r4-svelte. On desktop the header is a rail
+	   on the left, the page scrolls in the middle and decks stack on the right.
+	   On mobile it is a column with the header as a tab bar at the bottom. */
+	r4-loading {
+		display: grid;
+		place-content: center;
+		height: 100dvh;
+	}
+
+	r4-layout {
+		display: flex;
+		flex-direction: row;
+		height: 100dvh;
+		overflow: hidden;
+		padding: var(--floating-padding);
+		gap: var(--floating-gap);
+	}
+
+	r4-layout > :global(header) {
+		flex-shrink: 0;
+		border-radius: var(--border-radius);
+		border: var(--floating-border);
+	}
+
+	r4-content {
+		display: flex;
+		flex: 1;
+		min-width: 0;
+		min-height: 0;
+		gap: var(--floating-gap);
+	}
+
+	r4-scroll-area {
+		flex: 1;
+		min-width: 0;
+		min-height: 0;
+		overflow-y: auto;
+		scrollbar-width: thin;
+		overscroll-behavior: contain;
+		scrollbar-gutter: stable;
+		display: flex;
+		flex-direction: column;
+	}
+
+	main {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+	}
+
+	r4-deck-strip {
+		display: flex;
+		flex-direction: column;
+		flex: 0 0 var(--deck-strip-width);
+		min-height: 0;
+		overflow: hidden;
+		border-radius: var(--border-radius);
+		background: var(--floating-bg);
+		border: var(--floating-border);
+	}
+
+	@media (max-width: 768px) {
+		r4-layout {
+			flex-direction: column;
+		}
+
+		r4-layout > :global(header) {
+			order: 2;
+			border: none;
+			border-block-start: var(--floating-border);
+			border-radius: 0;
+			background: color-mix(in oklch, var(--floating-bg) 75%, transparent);
+			backdrop-filter: blur(12px);
+		}
+
+		r4-content {
+			order: 1;
+			flex-direction: column;
+		}
+
+		/* While a deck plays, it gets most of the viewport */
+		r4-layout[deck-active='true'] r4-scroll-area {
+			flex: 0 1 auto;
+			max-height: 28dvh;
+		}
+
+		r4-deck-strip {
+			flex: 1 1 auto;
+		}
+	}
+</style>

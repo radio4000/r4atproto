@@ -31,7 +31,8 @@
 		"@atproto/oauth-types": "^0.7.7",
 		"@inlang/paraglide-js": "^2.29.1",
 		"@tanstack/svelte-db": "^0.1.48",
-		"lucide-svelte": "^0.554.0"
+		"lucide-svelte": "^0.554.0",
+		"obra-icons-svelte": "^1.25.0"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.6.2",
