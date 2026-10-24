@@ -6,7 +6,7 @@ Each radio's PDS is the source of truth; there is no server of ours. `src/lib/at
 
 ## Reads and rate limits
 
-PDSes rate-limit by IP, and a page showing many radios reads from many repos. So single records (channel, broadcast, chat messages) come from Slingshot, microcosm's public record cache, with the PDS as fallback; only track listings go to PDSes, and cards and feeds share one listing per radio (`feed.perRadio`). Identical reads share one request and are reused for `reads.cacheSeconds`. Home costs each radio's PDS one request.
+PDSes rate-limit by IP, and a page showing many radios reads from many repos. So single records (channel, broadcast, chat messages) come from Slingshot, microcosm's public record cache, with the PDS as fallback; only track listings go to PDSes, and cards and feeds share one listing per radio (`feed.perRadio`). Identical reads share one request and are reused for `reads.cacheSeconds`. Every read goes through one pool (`atproto/pool.ts`): at most `reads.perHost` requests in flight per host, and a host answering 429 is paused for as long as it asks, then retried up to `reads.retries` times. Home costs each radio's PDS one request.
 
 ## Collections
 

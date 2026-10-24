@@ -33,7 +33,11 @@
 		"blockListPages": 20
 	},
 	"reads": {
-		"cacheSeconds": 30
+		"cacheSeconds": 30,
+		"perHost": 6,
+		"retries": 3,
+		"backoffMs": 1000,
+		"maxBackoffMs": 30000
 	},
 	"feed": {
 		"perRadio": 5

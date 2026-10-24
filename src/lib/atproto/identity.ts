@@ -2,6 +2,7 @@
  * Handle ⇄ DID ⇄ PDS resolution, cached for the session. Supports did:plc and did:web.
  */
 import app from '../config/app.json' with {type: 'json'}
+import {pooledFetch} from './pool'
 import {xrpcGet} from './xrpc'
 import {safeUrl} from './validate'
 
@@ -31,7 +32,7 @@ function fetchDidDocument(did: string): Promise<DidDocument> {
 	else if (did.startsWith('did:web:'))
 		url = `https://${did.slice('did:web:'.length)}/.well-known/did.json`
 	else return Promise.reject(new Error(`Unsupported DID method: ${did}`))
-	return fetch(url).then((res) => {
+	return pooledFetch(url).then((res) => {
 		if (!res.ok) throw new Error(`Could not resolve ${did} (${res.status})`)
 		return res.json()
 	})
