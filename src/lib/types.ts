@@ -34,8 +34,6 @@ export type ChannelRef = Pick<Channel, 'id' | 'slug'>
 export interface Track {
 	/** at:// URI of the record */
 	id: string
-	/** CID of the record version, when read from a repo */
-	cid?: string | null
 	/** DID of the channel */
 	did: string
 	/** handle of the channel */

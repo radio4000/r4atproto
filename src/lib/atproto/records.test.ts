@@ -166,7 +166,7 @@ describe('broadcast decks', () => {
 	test('are known by their track record, or by URL without one', () => {
 		const uri = 'at://did:plc:x/radio.4000.track/1'
 		const broadcast = broadcastFromRecord('did:plc:x', {
-			decks: [{...deck, track: {uri, cid: 'bafy'}}, deck],
+			decks: [{...deck, track: uri}, deck],
 			updatedAt: '2026-01-01T00:00:00Z'
 		})
 		expect(broadcast.decks.map((d) => d.track_id)).toEqual([uri, deck.url])

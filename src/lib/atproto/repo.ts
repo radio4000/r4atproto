@@ -120,6 +120,9 @@ export async function blobUrl(did: string, cid: string): Promise<string> {
 }
 
 /** Parse at://did/collection/rkey */
+/** Whether an id is a record (at:// URI), not a bare media id */
+export const isRecordUri = (id: string) => id.startsWith('at://')
+
 export function parseAtUri(uri: string): {did: string; collection: string; rkey: string} {
 	const [did, collection, rkey] = uri.replace('at://', '').split('/')
 	if (!did || !collection || !rkey) throw new Error(`Invalid at:// URI: ${uri}`)

@@ -20,8 +20,8 @@
 			"required": ["url", "positionMs", "positionAt", "playing"],
 			"properties": {
 				"track": {
-					"type": "ref",
-					"ref": "com.atproto.repo.strongRef",
+					"type": "string",
+					"format": "at-uri",
 					"description": "The radio.4000.track record playing, when the media has one."
 				},
 				"url": {"type": "string", "format": "uri", "maxLength": 2048},

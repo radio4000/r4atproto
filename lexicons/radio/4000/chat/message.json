@@ -17,8 +17,8 @@
 					},
 					"text": {"type": "string", "maxLength": 3000, "maxGraphemes": 300},
 					"track": {
-						"type": "ref",
-						"ref": "com.atproto.repo.strongRef",
+						"type": "string",
+						"format": "at-uri",
 						"description": "A radio.4000.track record the message is about, like the one playing as it was sent."
 					},
 					"createdAt": {"type": "string", "format": "datetime"}

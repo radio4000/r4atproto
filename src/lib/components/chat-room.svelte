@@ -9,6 +9,7 @@
 	import {relativeDateDetailed} from '#lib/dates.js'
 	import ChannelAvatar from '#lib/components/channel-avatar.svelte'
 	import {tracksCollection, watchTracks} from '#lib/collections/tracks.js'
+	import {isRecordUri} from '#lib/atproto/repo.js'
 	import LinkEntities from '#lib/components/link-entities.svelte'
 	import ChatTrack from '#lib/components/chat-track.svelte'
 	import Icon from '#lib/components/icon.svelte'
@@ -40,7 +41,7 @@
 		watchTracks()
 		const id = appState.decks[appState.active_deck_id]?.playlist_track
 		const track = id ? tracksCollection.get(id) : undefined
-		return track?.cid ? track : undefined
+		return track && isRecordUri(track.id) ? track : undefined
 	})
 	const visible = $derived(messages.filter((m) => m.did === me || !blocked.has(m.did)))
 
@@ -91,8 +92,7 @@
 		sending = true
 		error = ''
 		try {
-			const track = attachTrack && playing?.cid ? {uri: playing.id, cid: playing.cid} : undefined
-			add(await sendChatMessage(radioDid, text, track))
+			add(await sendChatMessage(radioDid, text, attachTrack ? playing?.id : undefined))
 			text = ''
 			attachTrack = false
 		} catch (err) {

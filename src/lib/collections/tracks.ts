@@ -108,15 +108,15 @@ export const tracksCollection = createCollection<Track, string>({
 	onInsert: async ({transaction}) => {
 		for (const m of transaction.mutations) {
 			const {rkey} = parseAtUri(m.modified.id)
-			const {cid} = await createRecord(TRACK, trackToRecord(m.modified), rkey)
-			tracksCollection.utils.writeUpsert({...m.modified, cid})
+			await createRecord(TRACK, trackToRecord(m.modified), rkey)
+			tracksCollection.utils.writeUpsert(m.modified)
 		}
 	},
 	onUpdate: async ({transaction}) => {
 		for (const m of transaction.mutations) {
 			const {rkey} = parseAtUri(m.modified.id)
-			const {cid} = await putRecord(TRACK, rkey, trackToRecord(m.modified))
-			tracksCollection.utils.writeUpsert({...m.modified, cid})
+			await putRecord(TRACK, rkey, trackToRecord(m.modified))
+			tracksCollection.utils.writeUpsert(m.modified)
 		}
 	},
 	onDelete: async ({transaction}) => {

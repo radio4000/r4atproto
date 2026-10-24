@@ -24,6 +24,7 @@ import {
 import {sortedDeckIds} from '#lib/deck.js'
 import {BROADCAST, SELF} from '#lib/lexicons.js'
 import {deleteRecord, putRecord} from '#lib/atproto/write.js'
+import {isRecordUri} from '#lib/atproto/repo.js'
 import {
 	broadcastFromRecord,
 	broadcastToRecord,
@@ -76,7 +77,7 @@ function deckRecords(): BroadcastDeckRecord[] {
 		const position = broadcastPosition(deck, getMediaPlayer(id)?.currentTime)
 		return [
 			{
-				track: track.cid ? {uri: track.id, cid: track.cid} : undefined,
+				track: isRecordUri(track.id) ? track.id : undefined,
 				url: track.url,
 				title: track.title,
 				positionMs: Math.max(0, Math.round(position * 1000)),

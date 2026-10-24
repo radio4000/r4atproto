@@ -28,12 +28,6 @@ describe('isValidRecord', () => {
 		)
 	})
 
-	test('resolves references to other lexicons', () => {
-		const deck = {url: 'https://youtu.be/x', positionMs: 0, positionAt: now, playing: true}
-		const cid = 'bafyreie5737gdxlw5i64vzichcalba3z2v5n6icifvx5xytvske7mr3hpm'
-		const track = {uri: 'at://did:plc:abc/radio.4000.track/3kabc', cid}
-		expect(isValidRecord(BROADCAST, {decks: [deck, {...deck, track}], updatedAt: now})).toBe(true)
-	})
 
 	test('rejects wrong types, missing fields and oversized values', () => {
 		expect(isValidRecord(TRACK, {url: 'https://youtu.be/x', createdAt: now})).toBe(false)
@@ -45,8 +39,11 @@ describe('isValidRecord', () => {
 		).toBe(false)
 		expect(isValidRecord(BROADCAST, {decks: 'many', updatedAt: now})).toBe(false)
 		const deck = {url: 'https://youtu.be/x', positionMs: 0, positionAt: now, playing: true}
+		expect(isValidRecord(BROADCAST, {decks: [{...deck, track: 'not a uri'}], updatedAt: now})).toBe(
+			false
+		)
 		const track = 'at://did:plc:abc/radio.4000.track/3kabc'
-		expect(isValidRecord(BROADCAST, {decks: [{...deck, track}], updatedAt: now})).toBe(false)
+		expect(isValidRecord(BROADCAST, {decks: [{...deck, track}], updatedAt: now})).toBe(true)
 		expect(isValidRecord(TRACK, null)).toBe(false)
 	})
 

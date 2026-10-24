@@ -72,7 +72,6 @@ export function trackFromRecord(
 	const description = v.description ?? null
 	return {
 		id: record.uri,
-		cid: record.cid,
 		did: owner.did,
 		slug: owner.handle,
 		url,
@@ -177,14 +176,9 @@ export function followRkey(subject: string): string {
 	return subject.replace(/[^a-z0-9._-]/gi, '-').toLowerCase()
 }
 
-export interface StrongRef {
-	uri: string
-	cid: string
-}
-
 export interface BroadcastDeckRecord {
-	/** The track record, when the media has one */
-	track?: StrongRef
+	/** at:// URI of the track record, when the media has one */
+	track?: string
 	url: string
 	title?: string
 	positionMs: number
@@ -208,7 +202,7 @@ export function broadcastFromRecord(did: string, record: BroadcastRecord): Broad
 		decks: record.decks.slice(0, app.broadcast.maxDecks).map((d, index) => ({
 			index,
 			// Media without a record is known by its URL
-			track_id: d.track?.uri ?? d.url,
+			track_id: d.track ?? d.url,
 			track_url: safeUrl(d.url) ?? '',
 			track_title: d.title ?? null,
 			track_media_id: null,

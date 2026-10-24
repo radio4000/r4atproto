@@ -12,13 +12,13 @@ import {getRecord, parseAtUri} from '#lib/atproto/repo.js'
 import {subscribe} from '#lib/atproto/jetstream.js'
 import {xrpcGet} from '#lib/atproto/xrpc.js'
 import {createRecord, deleteRecord, myDid} from '#lib/atproto/write.js'
-import type {StrongRef} from '#lib/atproto/records.js'
 
 export interface ChatMessageRecord {
 	$type?: string
 	subject: string
 	text: string
-	track?: StrongRef
+	/** at:// URI of a track record */
+	track?: string
 	createdAt: string
 }
 
@@ -49,7 +49,7 @@ async function author(did: string): Promise<{handle: string; avatar?: string}> {
 
 async function toMessage(uri: string, record: ChatMessageRecord): Promise<ChatMessage> {
 	const {did} = parseAtUri(uri)
-	const track = record.track?.uri
+	const track = record.track
 	return {
 		id: uri,
 		did,
@@ -105,7 +105,7 @@ export function watchChat(
 export async function sendChatMessage(
 	radioDid: string,
 	text: string,
-	track?: StrongRef
+	track?: string
 ): Promise<ChatMessage> {
 	const did = myDid()
 	if (!did) throw new Error('Not signed in')

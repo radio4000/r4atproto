@@ -3,6 +3,7 @@
 	import {MediaQuery} from 'svelte/reactivity'
 	import ui from '#lib/config/ui.json' with {type: 'json'}
 	import {channelHref, channelTracksHref} from '#lib/links.js'
+	import {isRecordUri} from '#lib/atproto/repo.js'
 	import IconR4 from '#lib/components/icon-r4.svelte'
 	import {
 		next,
@@ -82,7 +83,7 @@
 	let deck = $derived(appState.decks[deckId])
 	const mobile = new MediaQuery(`(max-width: ${ui.mobileBreakpoint}px)`)
 	/** Records on the PDS, not ephemeral tracks (e.g. Discogs videos) */
-	const isRecord = (id) => Boolean(id?.startsWith('at://'))
+	const isRecord = (id) => Boolean(id && isRecordUri(id))
 	let isActiveDeck = $derived(appState.active_deck_id === deckId)
 	let hasMultipleDecks = $derived(Object.keys(appState.decks).length > 1)
 	let listeningDeckIds = $derived(sortedListeningDeckIds(appState.decks))
