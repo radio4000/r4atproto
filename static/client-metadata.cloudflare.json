@@ -1,13 +1,13 @@
 {
-  "client_id": "https://atproto.radio4000.com/client-metadata.json",
+  "client_id": "https://4000.radio/client-metadata.json",
   "client_name": "r4.atproto",
-  "client_uri": "https://atproto.radio4000.com",
-  "logo_uri": "https://atproto.radio4000.com/logo.png",
-  "tos_uri": "https://atproto.radio4000.com/tos",
-  "policy_uri": "https://atproto.radio4000.com/privacy",
+  "client_uri": "https://4000.radio",
+  "logo_uri": "https://4000.radio/logo.png",
+  "tos_uri": "https://4000.radio/tos",
+  "policy_uri": "https://4000.radio/privacy",
   "redirect_uris": [
-    "https://atproto.radio4000.com",
-    "https://atproto.radio4000.com/"
+    "https://4000.radio",
+    "https://4000.radio/"
   ],
   "scope": "atproto",
   "grant_types": ["authorization_code", "refresh_token"],

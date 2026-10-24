@@ -1,4 +1,5 @@
 name = "r4atproto"
+account_id = "46bcc6e9a78b2e839068c0685143e1a2"
 compatibility_date = "2025-11-19"
 # pages_build_output_dir = "dist" # legacy
 main = "src/index.ts"
