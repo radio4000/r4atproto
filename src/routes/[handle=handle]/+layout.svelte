@@ -99,7 +99,8 @@
 	const tabs = $derived([
 		{href: base, label: m.nav_tracks(), count: tracks.length || undefined},
 		{href: `${base}/tags`, label: m.channel_tags_link()},
-		{href: `${base}/following`, label: m.nav_following()}
+		{href: `${base}/following`, label: m.nav_following()},
+		{href: `${base}/chat`, label: m.chat_panel_title()}
 	])
 </script>
 

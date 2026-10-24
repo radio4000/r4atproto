@@ -10,7 +10,8 @@
 		"appview": "https://public.api.bsky.app",
 		"plcDirectory": "https://plc.directory",
 		"relay": "https://relay1.us-west.bsky.network",
-		"jetstream": "wss://jetstream2.us-east.bsky.network/subscribe"
+		"jetstream": "wss://jetstream2.us-east.bsky.network/subscribe",
+		"constellation": "https://constellation.microcosm.blue"
 	},
 	"oauth": {
 		"permissionSet": "authFull",
@@ -22,5 +23,8 @@
 		"staleSeconds": 300,
 		"writeDebounceMs": 800,
 		"idleStopSeconds": 600
+	},
+	"chat": {
+		"historySize": 50
 	}
 }

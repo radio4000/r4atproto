@@ -7,6 +7,7 @@ export const TRACK = `${NAMESPACE}.track`
 export const CHANNEL = `${NAMESPACE}.channel`
 export const FOLLOW = `${NAMESPACE}.follow`
 export const BROADCAST = `${NAMESPACE}.broadcast`
+export const CHAT_MESSAGE = `${NAMESPACE}.chat.message`
 /** The permission set the app asks for at sign-in */
 export const AUTH = `${NAMESPACE}.${app.oauth.permissionSet}`
 

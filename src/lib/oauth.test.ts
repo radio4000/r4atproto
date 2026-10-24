@@ -17,6 +17,7 @@ test('asks only for our own collections, and image uploads', () => {
 		'repo:radio.4000.channel?action=create&action=update',
 		'repo:radio.4000.follow',
 		'repo:radio.4000.broadcast',
+		'repo:radio.4000.chat.message?action=create&action=delete',
 		'blob:image/*'
 	])
 })
