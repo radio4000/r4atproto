@@ -4,7 +4,7 @@
  */
 import {parseUrl} from 'media-now'
 import {BROADCAST, CHANNEL, TRACK} from '#lib/lexicons.js'
-import {extractHashtags, extractMentions} from '#lib/utils.js'
+import {extractHashtags, extractMentions} from '#lib/entities.js'
 import type {Broadcast, Channel, Track} from '#lib/types.js'
 import type {Profile} from './profiles'
 import type {RepoRecord} from './repo'
