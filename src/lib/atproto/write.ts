@@ -44,3 +44,17 @@ export async function uploadBlob(file: Blob) {
 	const res = await agent().com.atproto.repo.uploadBlob(file, {encoding: file.type})
 	return res.data.blob
 }
+
+/** Create many records in one commit (a PDS accepts up to 200 writes per call) */
+export async function createRecords(collection: string, items: {rkey: string; value: object}[]) {
+	const a = agent()
+	await a.com.atproto.repo.applyWrites({
+		repo: a.did!,
+		writes: items.map(({rkey, value}) => ({
+			$type: 'com.atproto.repo.applyWrites#create' as const,
+			collection,
+			rkey,
+			value: {...value}
+		}))
+	})
+}

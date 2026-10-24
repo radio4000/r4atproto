@@ -128,6 +128,16 @@
 		document.documentElement.lang = getLocale()
 	})
 
+	// Appearance settings: custom CSS variables (e.g. the accent) on :root
+	let appliedVariables: string[] = []
+	$effect(() => {
+		const vars = appState.custom_css_variables ?? {}
+		const root = document.documentElement.style
+		for (const name of appliedVariables) if (!(name in vars)) root.removeProperty(name)
+		for (const [name, value] of Object.entries(vars)) root.setProperty(name, value)
+		appliedVariables = Object.keys(vars)
+	})
+
 	// On mobile an expanded deck fills the screen like a dialog: "back" should close it,
 	// not navigate the page underneath. A same-URL history entry while expanded does that.
 	let deckHistoryPushed = false
