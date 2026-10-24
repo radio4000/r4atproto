@@ -48,6 +48,8 @@ export function clientMetadata(origin: string) {
 		client_id: `${origin}${CLIENT_METADATA_PATH}`,
 		client_name: app.name,
 		client_uri: origin,
+		// Shown on the authorization page by servers that display client logos
+		logo_uri: `${origin}${app.logo}`,
 		redirect_uris: [`${origin}/`],
 		scope: OAUTH_SCOPE,
 		grant_types: ['authorization_code', 'refresh_token'],
