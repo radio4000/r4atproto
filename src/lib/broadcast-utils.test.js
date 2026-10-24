@@ -1,5 +1,6 @@
 import {describe, expect, test} from 'vitest'
 import {
+	broadcastPosition,
 	calculateSeekTime,
 	pickBroadcastFields,
 	composeBroadcastDeckState
@@ -106,13 +107,13 @@ describe('calculateSeekTime', () => {
 		expect(typeof result).toBe('number')
 	})
 
-	test('returns undefined if seeked_at is in future', () => {
+	test('reads a seeked_at slightly in the future (clock skew) as just now', () => {
 		const broadcast = {
 			seek_position: 10,
 			seeked_at: new Date(Date.now() + 5_000).toISOString(),
 			is_playing: true
 		}
-		expect(calculateSeekTime(broadcast, makeTrack())).toBeUndefined()
+		expect(calculateSeekTime(broadcast, makeTrack())).toBe(10)
 	})
 })
 
@@ -192,5 +193,26 @@ describe('composeBroadcastDeckState', () => {
 			speed: 1.5,
 			...ephemeralPayload
 		})
+	})
+})
+
+describe('broadcastPosition', () => {
+	const now = Date.parse('2026-01-01T00:01:00Z')
+	const deck = {seek_position: 0, seeked_at: '2026-01-01T00:00:50Z', speed: 1}
+
+	test("caps a previous track's time reported mid-switch", () => {
+		expect(broadcastPosition(deck, 245, now)).toBe(12)
+	})
+
+	test('keeps the media time when it is plausible', () => {
+		expect(broadcastPosition(deck, 9.5, now)).toBe(9.5)
+	})
+
+	test('counts from the last seek, at the deck speed', () => {
+		expect(broadcastPosition({...deck, seek_position: 100, speed: 2}, 200, now)).toBe(122)
+	})
+
+	test('trusts the media without a seek reference', () => {
+		expect(broadcastPosition({}, 245, now)).toBe(245)
 	})
 })

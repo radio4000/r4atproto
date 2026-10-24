@@ -33,6 +33,7 @@ import {
 	upsertBroadcast
 } from '#lib/collections/broadcasts.js'
 import {
+	broadcastPosition,
 	calculateSeekTime,
 	DRIFT_TOLERANCE_SECONDS,
 	pickBroadcastFields,
@@ -68,7 +69,7 @@ function deckRecords(): BroadcastDeckRecord[] {
 		const deck = appState.decks[id]
 		const track = deck?.playlist_track ? tracksCollection.get(deck.playlist_track) : undefined
 		if (!deck || !track) return []
-		const position = getMediaPlayer(id)?.currentTime ?? deck.media_current_time ?? 0
+		const position = broadcastPosition(deck, getMediaPlayer(id)?.currentTime)
 		return [
 			{
 				track: track.id,

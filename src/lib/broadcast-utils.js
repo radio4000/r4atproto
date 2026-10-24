@@ -61,6 +61,27 @@ export function composeBroadcastDeckState(index, trackId, deck, ephemeralPayload
 	}
 }
 
+/** Leeway for the position cap: the media element's clock and ours tick separately */
+const POSITION_SLACK_SECONDS = 2
+
+/**
+ * Seconds into a deck's track. Right after a track change a media element can still
+ * report the previous track's time, so it is capped by the time since the track started
+ * (or was last seeked), at the deck's speed.
+ *
+ * @param {{seek_position?: number | null, seeked_at?: string | null, speed?: number, media_current_time?: number}} deck
+ * @param {number | undefined} mediaTime
+ * @param {number} [now]
+ * @returns {number}
+ */
+export function broadcastPosition(deck, mediaTime, now = Date.now()) {
+	const reported = mediaTime ?? deck.media_current_time ?? 0
+	if (!deck.seeked_at) return reported
+	const elapsed = Math.max(0, now - new Date(deck.seeked_at).getTime()) / 1000
+	const latest = (deck.seek_position ?? 0) + elapsed * (deck.speed ?? 1) + POSITION_SLACK_SECONDS
+	return Math.min(reported, latest)
+}
+
 /**
  * Calculate expected playback position for a broadcast listener.
  * Accounts for playback speed, seek position, and time elapsed.
@@ -73,8 +94,8 @@ export function calculateSeekTime(broadcast, track) {
 	const speed = broadcast.speed ?? 1
 	if (broadcast.seek_position != null) {
 		if (broadcast.seeked_at) {
-			const elapsed = (Date.now() - new Date(broadcast.seeked_at).getTime()) / 1000
-			if (elapsed < 0) return undefined
+			// A listener clock slightly behind the broadcaster's reads as "just now"
+			const elapsed = Math.max(0, (Date.now() - new Date(broadcast.seeked_at).getTime()) / 1000)
 			const base = broadcast.is_playing
 				? broadcast.seek_position + elapsed * speed
 				: broadcast.seek_position

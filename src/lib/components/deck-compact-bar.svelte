@@ -7,7 +7,7 @@
 		togglePlayPause,
 		next,
 		previous,
-		getMediaPlayer,
+		seekTo,
 		resyncAutoRadio,
 		leaveAutoRadio,
 		rejoinAutoRadio,
@@ -113,8 +113,7 @@
 			disabled={Boolean(deck?.listening_to_channel_id)}
 			onseek={(val) => {
 				if (deck) deck.media_current_time = val
-				const mediaElement = getMediaPlayer(deckId)
-				if (mediaElement) mediaElement.currentTime = val
+				seekTo(deckId, val)
 			}}
 		/>
 	{/if}

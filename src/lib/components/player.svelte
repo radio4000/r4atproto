@@ -16,6 +16,7 @@
 		leaveAutoRadio,
 		rejoinAutoRadio,
 		recordSeekPosition,
+		seekTo,
 		toggleShuffle
 	} from '#lib/api.js'
 	import {requestPlaybackWakeLock, releasePlaybackWakeLock} from '#lib/wake-lock.js'
@@ -24,6 +25,7 @@
 	import {sortedListeningDeckIds, sortedDeckIds, isGroupControlDeck} from '#lib/deck.js'
 	import {playbackState, toAutoTracks, AUTO_RADIO_SYNC_GRACE_MS} from '#lib/player/auto-radio.js'
 	import {getBroadcastingChannelId, notifyBroadcastState} from '#lib/broadcast.js'
+	import {broadcastPosition} from '#lib/broadcast-utils.js'
 	import {calculateSeekTime, DRIFT_TOLERANCE_SECONDS} from '#lib/broadcast-utils.js'
 	import {createDeckDisplay} from '#lib/player/deck-display.svelte.js'
 	import {createMediaSession} from '#lib/player/media-session.svelte.js'
@@ -61,6 +63,8 @@
 	/** @typedef {import('#lib/types.js').Channel} Channel */
 
 	const log = logger.ns('player').seal()
+	/** Listening time after which the media's duration is trusted as the track's */
+	const DURATION_TRUST_MS = 10000
 
 	// Lazy: these define custom elements at module scope, which needs `HTMLElement`.
 	onMount(async () => {
@@ -231,22 +235,7 @@
 		if (deck && mediaElement && 'playbackRate' in mediaElement) {
 			mediaElement.playbackRate = deck.speed ?? 1
 		}
-		if (mediaElement) recordSeekPosition(deckId, mediaElement.currentTime ?? 0)
-		// Update track duration if missing (only for owned channels, once per track)
-		if (
-			track &&
-			isRecord(track.id) &&
-			channel &&
-			canEditChannel(channel.id) &&
-			!track.duration &&
-			mediaElement?.duration
-		) {
-			const duration = Math.round(mediaElement.duration)
-			const existing = tracksCollection.state.get(track.id)
-			if (duration > 0 && !existing?.duration) {
-				updateTrack(channel, track.id, {duration})
-			}
-		}
+		if (mediaElement && deck) recordSeekPosition(deckId, trackPosition())
 	}
 
 	/** A flagged track that plays again clears its own flag; owner only, like handleError. */
@@ -261,10 +250,13 @@
 		)
 	}
 
+	/** The media's position, minus a previous track's time it can report mid-switch */
+	const trackPosition = () => (deck ? broadcastPosition(deck, mediaElement?.currentTime) : 0)
+
 	function handlePause() {
 		log.log('handlePause')
 		if (deck) deck.is_playing = false
-		if (mediaElement) recordSeekPosition(deckId, mediaElement.currentTime ?? 0)
+		if (mediaElement && deck) recordSeekPosition(deckId, trackPosition())
 	}
 
 	/** @param {any} event */
@@ -371,13 +363,13 @@
 			}
 			prevTime = currentTime
 			deck.media_current_time = currentTime
+			// After a while on this track its duration is its own, not the previous one's
+			if ((deck.ms_listened ?? 0) > DURATION_TRUST_MS) rememberTrackDuration(trackId, el.duration)
 		}
 		const onDuration = () => {
 			if (!deck || deck.playlist_track !== trackId) return
 			const d = el.duration
-			const known = Number.isFinite(d) && d > 0
-			deck.media_duration = known ? d : NaN
-			if (known) rememberTrackDuration(trackId, d)
+			deck.media_duration = Number.isFinite(d) && d > 0 ? d : NaN
 		}
 		el.addEventListener('timeupdate', onTime)
 		el.addEventListener('durationchange', onDuration)
@@ -622,7 +614,7 @@
 				disabled={isListeningToBroadcast}
 				onseek={(val) => {
 					if (deck) deck.media_current_time = val
-					if (mediaElement) mediaElement.currentTime = val
+					seekTo(deckId, val)
 				}}
 			/>
 		{/if}
