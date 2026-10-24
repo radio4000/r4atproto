@@ -2,8 +2,11 @@
 	import {page} from '$app/state'
 	import {onMount} from 'svelte'
 	import {MediaQuery} from 'svelte/reactivity'
-	import {session} from '#lib/state/session.js'
+	import {appState} from '#lib/app-state.svelte.js'
 	import Icon from '#lib/components/icon.svelte'
+	import ChannelAvatar from '#lib/components/channel-avatar.svelte'
+	import AddTrackDialog from '#lib/components/track-add-dialog.svelte'
+	import {authHref, channelHref} from '#lib/links.js'
 	import ui from '#lib/config/ui.json' with {type: 'json'}
 	import * as m from '#lib/paraglide/messages.js'
 
@@ -17,7 +20,7 @@
 	let labelsVisible = $state(true)
 	const labels = $derived(labelsVisible ? (mobile.current ? 'below' : 'right') : 'none')
 
-	const handle = $derived($session?.handle)
+	const handle = $derived(appState.session?.handle)
 	const path = $derived(page.url.pathname)
 
 	/** aria-current for a nav link: exact match, or any sub page when `prefix` */
@@ -59,29 +62,24 @@
 
 	<menu>
 		<li>
-			<a href="/add" aria-current={current('/add')} title={m.track_add_title()}>
-				<Icon icon={icons.add} />
-				<span>{m.track_add_title()}</span>
-			</a>
+			<AddTrackDialog label={m.track_add_title()} />
 		</li>
 		{#if handle}
 			<li>
 				<a
-					href={`/@${handle}`}
-					aria-current={current(`/@${handle}`, true)}
+					href={channelHref(handle)}
+					aria-current={current(channelHref(handle), true)}
 					title={m.header_go_to_channel()}
 				>
-					<Icon icon={icons.user} />
+					<r4-header-avatar>
+						<ChannelAvatar src={appState.channel?.image} alt={appState.channel?.name ?? handle} />
+					</r4-header-avatar>
 					<span>@{handle}</span>
 				</a>
 			</li>
 		{:else}
 			<li>
-				<a
-					href="/settings/account"
-					aria-current={current('/settings/account')}
-					title={m.nav_sign_in()}
-				>
+				<a href={authHref(path)} aria-current={current('/auth')} title={m.nav_sign_in()}>
 					<Icon icon={icons.user} />
 					<span>{m.nav_sign_in()}</span>
 				</a>
@@ -129,7 +127,8 @@
 		margin-block-start: auto;
 	}
 
-	a {
+	a,
+	li > :global(button) {
 		justify-content: flex-start;
 		min-height: var(--nav-size);
 		min-width: var(--nav-size);
@@ -141,12 +140,20 @@
 		border-color: transparent;
 	}
 
-	a :global(svg) {
+	r4-header-avatar {
+		display: block;
+		width: var(--nav-glyph);
+		height: var(--nav-glyph);
+		flex-shrink: 0;
+	}
+
+	:is(a, button) :global(svg) {
 		width: var(--nav-glyph);
 		height: var(--nav-glyph);
 	}
 
-	span {
+	span,
+	li > :global(button span) {
 		font-size: var(--font-3);
 		max-width: var(--header-label-width);
 		overflow: hidden;
@@ -155,17 +162,19 @@
 	}
 
 	[data-labels='none'] {
-		span {
+		span,
+		:global(button span) {
 			display: none;
 		}
 
-		a {
+		a,
+		li > :global(button) {
 			justify-content: center;
 			width: var(--nav-size);
 		}
 	}
 
-	[data-labels='below'] a {
+	[data-labels='below'] :is(a, li > :global(button)) {
 		flex-direction: column;
 		justify-content: center;
 		gap: 0;
@@ -197,7 +206,8 @@
 
 	/* Smallest phones: icons only, across the whole bar */
 	@media (max-width: 520px) {
-		span {
+		span,
+		li > :global(button span) {
 			display: none;
 		}
 	}

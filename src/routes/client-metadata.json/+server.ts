@@ -1,5 +1,5 @@
 import {json} from '@sveltejs/kit'
-import {dev} from '$app/environment'
+import {dev} from '$app/env'
 import {APP_ORIGIN, clientMetadata} from '#lib/oauth.js'
 
 export const prerender = true

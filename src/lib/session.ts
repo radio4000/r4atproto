@@ -19,3 +19,30 @@ export async function syncSession() {
 	appState.channel = channel
 	loadUserFollows().catch(() => {})
 }
+
+const REDIRECT_KEY = 'r4-auth-redirect'
+
+/** Start OAuth for `handle`; after the round trip the app returns to `redirect`. */
+export async function signIn(handle: string, redirect?: string) {
+	try {
+		sessionStorage.setItem(REDIRECT_KEY, redirect || '/')
+	} catch {}
+	const result = await bskyOAuth.signIn(handle.trim().replace(/^@/, ''))
+	if (result.error) throw new Error(result.error.message)
+}
+
+export async function signOut() {
+	await bskyOAuth.signOut()
+	await syncSession()
+}
+
+/** Where to go after signing in, once */
+export function takeAuthRedirect(): string | undefined {
+	try {
+		const redirect = sessionStorage.getItem(REDIRECT_KEY) ?? undefined
+		sessionStorage.removeItem(REDIRECT_KEY)
+		return redirect
+	} catch {
+		return undefined
+	}
+}

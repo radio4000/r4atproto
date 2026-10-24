@@ -25,7 +25,7 @@ describe('trackFromRecord', () => {
 	})
 
 	test('derives tags, mentions and media from url and description', () => {
-		expect(track.tags).toEqual(['#pop'])
+		expect(track.tags).toEqual(['pop'])
 		expect(track.mentions).toEqual(['@rick.bsky.social'])
 		expect(track.provider).toBe('youtube')
 		expect(track.media_id).toBe('dQw4w9WgXcQ')

@@ -14,7 +14,8 @@
 	import {toggleDeckCompact} from '#lib/api.js'
 	import {leaveBroadcast} from '#lib/broadcast.js'
 	import {initializeKeyboardShortcuts} from '#lib/keyboard.js'
-	import {syncSession} from '#lib/session.js'
+	import {syncSession, takeAuthRedirect} from '#lib/session.js'
+	import {goto} from '$app/navigation'
 	import {isMobileViewport} from '#lib/utils.js'
 	import ToastContainer from '#lib/components/ui/toast/ToastContainer.svelte'
 	import SeoHead from '#lib/components/legacy/SeoHead.svelte'
@@ -22,13 +23,14 @@
 	import DeckStrip from '#lib/components/deck-strip.svelte'
 	import DeckCompactBar from '#lib/components/deck-compact-bar.svelte'
 	import ToolTip from '#lib/components/tool-tip.svelte'
+	import EditTrackDialog from '#lib/components/track-edit-dialog.svelte'
 	import Icon from '#lib/components/icon.svelte'
 	import TracksKeepalive from '#lib/components/tracks-keepalive.svelte'
 	import {tracksCollection} from '#lib/collections/tracks.js'
 	import {queuePinTargets} from '#lib/collections/keepalive.js'
 	import * as m from '#lib/paraglide/messages.js'
 	import {getLocale} from '#lib/paraglide/runtime.js'
-	import {dev} from '$app/environment'
+	import {dev} from '$app/env'
 
 	let {children} = $props()
 	let ready = $state(false)
@@ -55,6 +57,9 @@
 			}
 			session.refresh()
 			await syncSession()
+			// Back from the OAuth round trip: return to where sign-in started
+			const redirect = appState.session ? takeAuthRedirect() : undefined
+			if (redirect) goto(redirect, {replace: true})
 		} catch (error) {
 			console.error('OAuth initialization error:', error)
 		} finally {
@@ -164,6 +169,7 @@
 	<r4-loading role="status">{m.common_loading()}</r4-loading>
 {:else}
 	<ToolTip />
+	<EditTrackDialog />
 	{#each allDeckIds as deckId (deckId)}
 		<!-- Two pins per deck, the whole queue and the current track, so the playing row
 		     stays resident while the other swaps. See collections/keepalive.ts. -->

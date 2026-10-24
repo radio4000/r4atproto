@@ -1,6 +1,6 @@
 <script lang="ts">
 	import {onMount} from 'svelte'
-	import {browser} from '$app/environment'
+	import {browser} from '$app/env'
 	import {getNetworkLatestTracks, type NetworkRadio} from '#lib/services/r4-service.js'
 	import NetworkRadioCard from '#lib/components/legacy/NetworkRadioCard.svelte'
 	import TrackListSkeleton from '#lib/components/ui/skeleton/TrackListSkeleton.svelte'

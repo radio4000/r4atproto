@@ -55,8 +55,13 @@
 		color: var(--gray-11);
 	}
 
+	span :global(r4-icon) {
+		width: 45%;
+		height: 45%;
+	}
+
 	span :global(svg) {
-		width: 55%;
-		height: 55%;
+		width: 100%;
+		height: 100%;
 	}
 </style>

@@ -54,3 +54,15 @@ export async function unfollowChannel(did: string) {
 		throw error
 	}
 }
+
+/** DIDs any radio follows (not only the signed-in account), newest first */
+export function fetchFollowing(did: string): Promise<string[]> {
+	return queryClient.query({
+		queryKey: ['following', did],
+		staleTime: 5 * 60 * 1000,
+		queryFn: async () => {
+			const records = await listAllRecords<FollowRecord>(did, FOLLOW)
+			return [...new Set(records.map((r) => r.value.subject))]
+		}
+	})
+}

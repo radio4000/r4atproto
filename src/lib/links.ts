@@ -6,10 +6,6 @@ export const channelHref = (slug: string) => `/@${slug}`
 export const trackHref = (track: {id: string; slug: string}) =>
 	`/@${track.slug}/tracks/${parseAtUri(track.id).rkey}`
 
-/** A tag filter on a radio, e.g. /@alice.test?tags=dub */
-export const channelTagHref = (slug: string, tag: string) =>
-	`/@${slug}?tags=${encodeURIComponent(tag.replace(/^#/, ''))}`
-
 /** A radio's full track list, optionally filtered (tags, mention, search) */
 export const channelTracksHref = (
 	slug: string,

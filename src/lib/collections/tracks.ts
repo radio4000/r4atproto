@@ -12,9 +12,9 @@ import {parseUrl} from 'media-now'
 import {TRACK} from '#lib/lexicons.js'
 import {resolveIdentity} from '#lib/atproto/identity.js'
 import {getRecord, listAllRecords, parseAtUri} from '#lib/atproto/repo.js'
-import {trackFromRecord, trackToRecord, type TrackRecord} from '#lib/atproto/records.js'
+import {bareTags, trackFromRecord, trackToRecord, type TrackRecord} from '#lib/atproto/records.js'
 import {createRecord, deleteRecord, myDid, putRecord} from '#lib/atproto/write.js'
-import {extractHashtags, extractMentions} from '#lib/utils.js'
+import {extractMentions} from '#lib/utils.js'
 import type {ChannelRef, Track} from '#lib/types.js'
 import {queryClient} from './query-client'
 
@@ -134,7 +134,7 @@ function derived(input: {url?: string; description?: string | null}) {
 		out.media_id = parsed?.id ?? null
 	}
 	if (input.description !== undefined) {
-		out.tags = input.description ? extractHashtags(input.description) : []
+		out.tags = input.description ? bareTags(input.description) : []
 		out.mentions = input.description ? extractMentions(input.description) : []
 	}
 	return out

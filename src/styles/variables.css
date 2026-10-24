@@ -15,6 +15,7 @@
 	--floating-border: 1px solid var(--color-interface-border);
 	--track-artwork-size: 2.5rem;
 	--control-size: 2.25rem;
+	--control-size-small: 1.85rem;
 	--control-padding: 0 0.625rem;
 	--measure: 44rem;
 	--measure-narrow: 22rem;
@@ -28,6 +29,7 @@
 	--deck-min-width: 280px;
 	--deck-default-width: 400px;
 	--deck-compact-min-height: 49px;
+	--channel-header-avatar-size: 5rem;
 	--tooltip-width: 200px;
 	--popover-min-width: 10rem;
 	--dialog-width: 640px;

@@ -1,61 +1,51 @@
-<script lang="ts">
-	import {createTrack} from '#lib/services/r4-service.js'
-	import TrackForm from '#lib/components/legacy/TrackForm.svelte'
-	import {
-		Card,
-		CardContent,
-		CardDescription,
-		CardHeader,
-		CardTitle
-	} from '#lib/components/ui/card/index.js'
-	import {parseAtUri} from '#lib/services/track-uri.js'
-	import {CheckCircle2} from 'lucide-svelte'
-	import StateCard from '#lib/components/ui/state-card.svelte'
-	import {Button} from '#lib/components/ui/button/index.js'
-	import {locale, translate} from '#lib/i18n/index.js'
-	import {session} from '#lib/state/session.js'
+<script>
 	import {goto} from '$app/navigation'
+	import {page} from '$app/state'
+	import {appState} from '#lib/app-state.svelte.js'
+	import {authHref, channelHref} from '#lib/links.js'
+	import TrackForm from '#lib/components/track-form.svelte'
+	import Seo from '#lib/components/seo.svelte'
+	import * as m from '#lib/paraglide/messages.js'
 
-	let savedUri = $state('')
-	const savedAt = $derived(savedUri ? parseAtUri(savedUri) : null)
-	const t = (key, vars = {}) => translate($locale, key, vars)
-	const userHandle = $derived($session?.handle || '')
+	// Prefill from ?url=&title=&description=&discogs_url= (bookmarklets, "add to my radio")
+	const params = $derived(page.url.searchParams)
+	const rawUrl = $derived(params.get('url') || '')
+	const isDiscogsUrl = $derived.by(() => {
+		try {
+			return new URL(rawUrl).hostname.includes('discogs.com')
+		} catch {
+			return false
+		}
+	})
+	const channel = $derived(
+		appState.session ? {id: appState.session.did, slug: appState.session.handle} : undefined
+	)
 
-	function viewTrack() {
-		if (!savedAt || !userHandle) return
-		goto(`/@${encodeURIComponent(userHandle)}/${encodeURIComponent(savedAt.rkey)}`)
-	}
-
-	async function onCreate({url, title, description, discogs_url}) {
-		const res = await createTrack({url, title, description, discogs_url})
-		savedUri = res?.data?.uri || res?.uri || ''
-		return res
+	function handleSubmit({data, error}) {
+		if (error || !data || !channel) return
+		goto(channelHref(channel.slug))
 	}
 </script>
 
-<div class="container max-w-2xl py-8">
-	<Card>
-		<CardHeader>
-			<CardTitle>{t('add.title')}</CardTitle>
-		</CardHeader>
-		<CardContent>
-			<TrackForm submitLabel={t('forms.publish')} onSubmit={onCreate} />
+<Seo title={m.page_title_add_track()} />
 
-			{#if savedAt}
-				<div class="mt-6">
-					<StateCard
-						icon={CheckCircle2}
-						title={t('add.successTitle')}
-						description={t('add.successDescription')}
-					>
-						{#snippet actions()}
-							<Button variant="outline" onclick={viewTrack}>
-								{t('add.viewTrack')}
-							</Button>
-						{/snippet}
-					</StateCard>
-				</div>
-			{/if}
-		</CardContent>
-	</Card>
-</div>
+<r4-page>
+	{#if channel}
+		<r4-page-header>
+			<h1>{m.track_add_title()} <a href={channelHref(channel.slug)}>@{channel.slug}</a></h1>
+		</r4-page-header>
+		<TrackForm
+			mode="create"
+			{channel}
+			url={isDiscogsUrl ? '' : rawUrl}
+			title={params.get('title') || ''}
+			description={params.get('description') || ''}
+			discogs_url={params.get('discogs_url') || (isDiscogsUrl ? rawUrl : '')}
+			onsubmit={handleSubmit}
+		/>
+	{:else}
+		<r4-empty>
+			<p><a href={authHref(page.url.pathname + page.url.search)}>{m.auth_sign_in_to_add()}</a></p>
+		</r4-empty>
+	{/if}
+</r4-page>

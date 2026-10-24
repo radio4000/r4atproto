@@ -35,6 +35,11 @@ export interface ChannelRecord {
 	updatedAt?: string
 }
 
+/** #tags of a description, without the #, as r4 stores them */
+export function bareTags(description: string): string[] {
+	return [...new Set(extractHashtags(description).map((tag) => tag.slice(1)))]
+}
+
 export function trackFromRecord(
 	record: RepoRecord<TrackRecord>,
 	owner: {did: string; handle: string}
@@ -52,7 +57,7 @@ export function trackFromRecord(
 		discogs_url: v.discogsUrl ?? null,
 		duration: v.duration ?? null,
 		playback_error: v.playbackError ?? null,
-		tags: description ? extractHashtags(description) : [],
+		tags: description ? bareTags(description) : [],
 		mentions: description ? extractMentions(description) : [],
 		provider: parsed?.provider ?? null,
 		media_id: parsed?.id ?? null,

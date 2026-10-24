@@ -3,6 +3,6 @@
 	import {onMount} from 'svelte'
 
 	onMount(() => {
-		goto('/settings/account', {replaceState: true})
+		goto('/settings/account', {replace: true})
 	})
 </script>
