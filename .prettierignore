@@ -1,0 +1,11 @@
+# Package Managers
+bun.lock
+static/*.json
+src/lib/paraglide/
+dist/
+
+# Biome owns source JavaScript and TypeScript.
+src/**/*.js
+src/**/*.ts
+
+.claude/

@@ -1,14 +1,14 @@
 <script lang="ts">
-  import { searchActors, getProfiles } from '$lib/services/r4-service';
-  import { Button } from '$lib/components/ui/button';
-  import { Card, CardContent } from '$lib/components/ui/card';
-  import { Input } from '$lib/components/ui/input';
+  import { searchActors, getProfiles } from '#lib/services/r4-service.js';
+  import { Button } from '#lib/components/ui/button/index.js';
+  import { Card, CardContent } from '#lib/components/ui/card/index.js';
+  import { Input } from '#lib/components/ui/input/index.js';
   import { Search, Loader2, User, AlertCircle } from 'lucide-svelte';
-  import StateCard from '$lib/components/ui/state-card.svelte';
-  import { locale, translate } from '$lib/i18n';
-  import { cn } from '$lib/utils';
-  import ProfileHeader from '$lib/components/ProfileHeader.svelte';
-  import { FEATURED_PROFILES } from '$lib/config/featured-profiles';
+  import StateCard from '#lib/components/ui/state-card.svelte';
+  import { locale, translate } from '#lib/i18n/index.js';
+  import { cn } from '#lib/utils/index.js';
+  import ProfileHeader from '#lib/components/ProfileHeader.svelte';
+  import { FEATURED_PROFILES } from '#lib/config/featured-profiles.js';
 
   import { onMount } from 'svelte';
 

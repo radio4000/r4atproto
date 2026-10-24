@@ -1,23 +1,23 @@
 <script lang="ts">
-  import { createTrack, getTrackByUri } from '$lib/services/r4-service';
-  import TrackForm from '$lib/components/TrackForm.svelte';
-  import TrackListItem from '$lib/components/TrackListItem.svelte';
-  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$lib/components/ui/card';
-  import { parseAtUri } from '$lib/services/track-uri';
+  import { createTrack, getTrackByUri } from '#lib/services/r4-service.js';
+  import TrackForm from '#lib/components/TrackForm.svelte';
+  import TrackListItem from '#lib/components/TrackListItem.svelte';
+  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#lib/components/ui/card/index.js';
+  import { parseAtUri } from '#lib/services/track-uri.js';
   import { CheckCircle2 } from 'lucide-svelte';
-  import StateCard from '$lib/components/ui/state-card.svelte';
-  import { Button } from '$lib/components/ui/button';
-  import { locale, translate } from '$lib/i18n';
-  import { session } from '$lib/state/session';
+  import StateCard from '#lib/components/ui/state-card.svelte';
+  import { Button } from '#lib/components/ui/button/index.js';
+  import { locale, translate } from '#lib/i18n/index.js';
+  import { session } from '#lib/state/session.js';
   import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   let savedUri = $state('');
   let savedTrack = $state(null);
   const savedAt = $derived(savedUri ? parseAtUri(savedUri) : null);
   const t = (key, vars = {}) => translate($locale, key, vars);
   const userHandle = $derived($session?.handle || '');
-  const pageHandle = $derived($page.params.handle?.replace(/^@/, '') || '');
+  const pageHandle = $derived(page.params.handle?.replace(/^@/, '') || '');
 
   function viewTrack() {
     if (!savedAt || !pageHandle) return;

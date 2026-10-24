@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { bskyOAuth } from '$lib/services/bsky-oauth';
-  import { Button } from '$lib/components/ui/button';
-  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$lib/components/ui/card';
+  import { bskyOAuth } from '#lib/services/bsky-oauth.js';
+  import { Button } from '#lib/components/ui/button/index.js';
+  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#lib/components/ui/card/index.js';
   import { Loader2, Shield } from 'lucide-svelte';
-  import { locale, translate } from '$lib/i18n';
+  import { locale, translate } from '#lib/i18n/index.js';
 
   let working = $state(false);
   let permissionError = $state('');

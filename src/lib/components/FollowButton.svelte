@@ -5,11 +5,11 @@
     findFollowUri,
     createR4Favorite,
     deleteR4Favorite,
-  } from '$lib/services/r4-service';
-  import { session } from '$lib/state/session';
-  import { Button } from '$lib/components/ui/button';
+  } from '#lib/services/r4-service.js';
+  import { session } from '#lib/state/session.js';
+  import { Button } from '#lib/components/ui/button/index.js';
   import { Star } from 'lucide-svelte';
-  import { locale, translate } from '$lib/i18n';
+  import { locale, translate } from '#lib/i18n/index.js';
   const { actorDid = '' } = $props();
   let followUri = $state(null);
   let error = $state('');

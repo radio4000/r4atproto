@@ -1,6 +1,6 @@
 import { createCollection, localStorageCollectionOptions } from '@tanstack/svelte-db'
-import { listTracksByDid, createTrack as apiCreateTrack, updateTrackByUri as apiUpdateTrack, deleteTrackByUri as apiDeleteTrack } from '$lib/services/r4-service'
-import type { Track } from '$lib/types'
+import { listTracksByDid, createTrack as apiCreateTrack, updateTrackByUri as apiUpdateTrack, deleteTrackByUri as apiDeleteTrack } from '#lib/services/r4-service.js'
+import type { Track } from '#lib/types/index.js'
 import { writable, get } from 'svelte/store'
 
 export type { Track }

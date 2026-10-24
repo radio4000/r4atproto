@@ -1,14 +1,14 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { browser } from '$app/environment';
-  import { getNetworkLatestTracks, type NetworkRadio } from '$lib/services/r4-service';
-  import NetworkRadioCard from '$lib/components/NetworkRadioCard.svelte';
-  import TrackListSkeleton from '$lib/components/ui/skeleton/TrackListSkeleton.svelte';
-  import StateCard from '$lib/components/ui/state-card.svelte';
-  import { Button } from '$lib/components/ui/button';
+  import { getNetworkLatestTracks, type NetworkRadio } from '#lib/services/r4-service.js';
+  import NetworkRadioCard from '#lib/components/NetworkRadioCard.svelte';
+  import TrackListSkeleton from '#lib/components/ui/skeleton/TrackListSkeleton.svelte';
+  import StateCard from '#lib/components/ui/state-card.svelte';
+  import { Button } from '#lib/components/ui/button/index.js';
   import { Loader2, AlertCircle, Compass, RefreshCw } from 'lucide-svelte';
-  import { locale, translate } from '$lib/i18n';
-  import SeoHead from '$lib/components/SeoHead.svelte';
+  import { locale, translate } from '#lib/i18n/index.js';
+  import SeoHead from '#lib/components/SeoHead.svelte';
 
   const TRACKS_PER_USER = 10;
   // Discover radios in small pages so the first paint stays light and the

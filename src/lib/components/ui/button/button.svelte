@@ -12,7 +12,7 @@
 
 <script lang="ts">
 	import { resolve } from "$app/paths";
-	import { cn } from "$lib/utils";
+	import { cn } from "#lib/utils/index.js";
 
 	let {
 		class: className,

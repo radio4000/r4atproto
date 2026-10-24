@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { session } from '$lib/state/session';
-  import { theme, DEFAULT_LIGHT_COLORS, DEFAULT_DARK_COLORS } from '$lib/state/theme';
-  import { setR4Profile } from '$lib/services/r4-service';
-  import { Button } from '$lib/components/ui/button';
-  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$lib/components/ui/card';
-  import { Input } from '$lib/components/ui/input';
-  import { Label } from '$lib/components/ui/label';
+  import { session } from '#lib/state/session.js';
+  import { theme, DEFAULT_LIGHT_COLORS, DEFAULT_DARK_COLORS } from '#lib/state/theme.js';
+  import { setR4Profile } from '#lib/services/r4-service.js';
+  import { Button } from '#lib/components/ui/button/index.js';
+  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#lib/components/ui/card/index.js';
+  import { Input } from '#lib/components/ui/input/index.js';
+  import { Label } from '#lib/components/ui/label/index.js';
   import { Loader2, Palette, Sun, Moon, MonitorSmartphone, RotateCcw } from 'lucide-svelte';
-  import { locale, translate } from '$lib/i18n';
+  import { locale, translate } from '#lib/i18n/index.js';
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
 

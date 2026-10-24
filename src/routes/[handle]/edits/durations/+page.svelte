@@ -2,12 +2,12 @@
   import { onMount, onDestroy } from 'svelte';
   import { getContext } from 'svelte';
   import { useLiveQuery } from '@tanstack/svelte-db';
-  import { tracksCollection, loadTracksForDid, updateTrack } from '$lib/stores/tracks-db';
-  import { parseTrackUrl } from '$lib/services/url-patterns';
-  import { Button } from '$lib/components/ui/button';
-  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$lib/components/ui/card';
-  import StateCard from '$lib/components/ui/state-card.svelte';
-  import { session } from '$lib/state/session';
+  import { tracksCollection, loadTracksForDid, updateTrack } from '#lib/stores/tracks-db.js';
+  import { parseTrackUrl } from '#lib/services/url-patterns.js';
+  import { Button } from '#lib/components/ui/button/index.js';
+  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#lib/components/ui/card/index.js';
+  import StateCard from '#lib/components/ui/state-card.svelte';
+  import { session } from '#lib/state/session.js';
   import { Loader2, Clock3, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-svelte';
 
   const profileContext = getContext('profile');

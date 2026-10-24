@@ -3,8 +3,8 @@
 	import X from "@lucide/svelte/icons/x";
 	import type { Snippet } from "svelte";
 	import * as Dialog from "./index";
-	import { cn } from "$lib/utils";
-	import { locale, translate } from "$lib/i18n";
+	import { cn } from "#lib/utils/index.js";
+	import { locale, translate } from "#lib/i18n/index.js";
 
 	let {
 		ref = $bindable(null),

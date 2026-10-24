@@ -19,7 +19,7 @@
  * ```
  */
 
-import { toast } from '$lib/stores/toast.svelte'
+import { toast } from '#lib/stores/toast.svelte.js'
 
 export interface LoadingState {
   isLoading: boolean

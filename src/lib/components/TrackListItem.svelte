@@ -1,23 +1,23 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { parseTrackUrl } from '$lib/services/url-patterns';
-  import { deleteTrackByUri } from '$lib/services/r4-service';
-  import { setPlaylist } from '$lib/player/store';
-  import { session } from '$lib/state/session';
-  import { buildEditHash, buildViewHash } from '$lib/services/track-uri';
-  import { Button, buttonVariants } from '$lib/components/ui/button';
-  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$lib/components/ui/card';
+  import { parseTrackUrl } from '#lib/services/url-patterns.js';
+  import { deleteTrackByUri } from '#lib/services/r4-service.js';
+  import { setPlaylist } from '#lib/player/store.js';
+  import { session } from '#lib/state/session.js';
+  import { buildEditHash, buildViewHash } from '#lib/services/track-uri.js';
+  import { Button, buttonVariants } from '#lib/components/ui/button/index.js';
+  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#lib/components/ui/card/index.js';
   import { Play, MoreVertical, Pencil, Trash2, ExternalLink, Disc as DiscIcon, Pause, Eye, AlertTriangle } from 'lucide-svelte';
-  import { cn, menuTriggerClass } from '$lib/utils';
-  import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+  import { cn, menuTriggerClass } from '#lib/utils/index.js';
+  import * as DropdownMenu from '#lib/components/ui/dropdown-menu/index.js';
   import { resolve } from '$app/paths';
   import { goto } from '$app/navigation';
-  import { locale, translate } from '$lib/i18n';
-  import Link from '$lib/components/Link.svelte';
-  import { player } from '$lib/player/store';
+  import { locale, translate } from '#lib/i18n/index.js';
+  import Link from '#lib/components/Link.svelte';
+  import { player } from '#lib/player/store.js';
   import { onDestroy } from 'svelte';
-  import Dialog from '$lib/components/ui/Dialog.svelte';
-  import { updateTrackByUri } from '$lib/services/r4-service';
+  import Dialog from '#lib/components/ui/Dialog.svelte';
+  import { updateTrackByUri } from '#lib/services/r4-service.js';
 
   const {
     item,

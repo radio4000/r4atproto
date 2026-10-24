@@ -1,10 +1,10 @@
 <script lang="ts">
-  import TrackEditDialogContent from '$lib/components/TrackEditDialogContent.svelte';
-  import { Dialog } from '$lib/components/ui/dialog/index';
+  import TrackEditDialogContent from '#lib/components/TrackEditDialogContent.svelte';
+  import { Dialog } from '#lib/components/ui/dialog/index.js';
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
-  import { session } from '$lib/state/session';
-  import { locale, translate } from '$lib/i18n';
+  import { session } from '#lib/state/session.js';
+  import { locale, translate } from '#lib/i18n/index.js';
   import { onMount } from 'svelte';
 
   let { data, handle = '', rkey = '', repo = '' } = $props();

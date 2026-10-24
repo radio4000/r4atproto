@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { updateTrackByUri } from '$lib/services/r4-service'
+  import { updateTrackByUri } from '#lib/services/r4-service.js'
   import TrackForm from './TrackForm.svelte'
   const props = $props()
   const uri = $derived(props.uri || '')

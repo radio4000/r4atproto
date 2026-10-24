@@ -1,16 +1,16 @@
 <script lang="ts">
-  import { tracksCollection, loadTracksForDid, loadMoreTracksForDid, getPaginationState, removeTrack } from '$lib/stores/tracks-db';
+  import { tracksCollection, loadTracksForDid, loadMoreTracksForDid, getPaginationState, removeTrack } from '#lib/stores/tracks-db.js';
   import { getContext, tick, onMount } from 'svelte';
   import { useLiveQuery } from '@tanstack/svelte-db';
-  import TrackListItem from '$lib/components/TrackListItem.svelte';
-  import TrackDetail from '$lib/components/TrackDetail.svelte';
-  import TrackEditDialogContent from '$lib/components/TrackEditDialogContent.svelte';
-  import Dialog from '$lib/components/ui/Dialog.svelte';
-  import { session } from '$lib/state/session';
-  import { Button } from '$lib/components/ui/button';
+  import TrackListItem from '#lib/components/TrackListItem.svelte';
+  import TrackDetail from '#lib/components/TrackDetail.svelte';
+  import TrackEditDialogContent from '#lib/components/TrackEditDialogContent.svelte';
+  import Dialog from '#lib/components/ui/Dialog.svelte';
+  import { session } from '#lib/state/session.js';
+  import { Button } from '#lib/components/ui/button/index.js';
   import { Loader2, AlertCircle, RefreshCw } from 'lucide-svelte';
-  import StateCard from '$lib/components/ui/state-card.svelte';
-  import { locale, translate } from '$lib/i18n';
+  import StateCard from '#lib/components/ui/state-card.svelte';
+  import { locale, translate } from '#lib/i18n/index.js';
   import { browser } from '$app/environment';
 
   const { data } = $props();

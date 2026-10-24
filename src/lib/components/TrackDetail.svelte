@@ -2,9 +2,9 @@
   import { Clock } from 'lucide-svelte';
   import TrackListItem from './TrackListItem.svelte';
   import DiscogsResource from './DiscogsResource.svelte';
-  import { locale, translate } from '$lib/i18n';
-  import { cn } from '$lib/utils';
-  import type { Track } from '$lib/types';
+  import { locale, translate } from '#lib/i18n/index.js';
+  import { cn } from '#lib/utils/index.js';
+  import type { Track } from '#lib/types/index.js';
 
   let { track, handle = '', items = [], index = 0, context = null, editable = false, class: className = '' } = $props<{
     track: Track;

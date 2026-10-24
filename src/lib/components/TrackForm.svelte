@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { fetchOEmbed } from '$lib/services/oembed';
-  import { parseDiscogsUrl, fetchDiscogs, extractSuggestions } from '$lib/services/discogs.service';
-  import { Button } from '$lib/components/ui/button';
-  import { Input } from '$lib/components/ui/input';
-  import { Label } from '$lib/components/ui/label';
-  import { Textarea } from '$lib/components/ui/textarea';
+  import { fetchOEmbed } from '#lib/services/oembed.js';
+  import { parseDiscogsUrl, fetchDiscogs, extractSuggestions } from '#lib/services/discogs.service.js';
+  import { Button } from '#lib/components/ui/button/index.js';
+  import { Input } from '#lib/components/ui/input/index.js';
+  import { Label } from '#lib/components/ui/label/index.js';
+  import { Textarea } from '#lib/components/ui/textarea/index.js';
   import { Loader2 } from 'lucide-svelte';
-  import { locale, translate } from '$lib/i18n';
+  import { locale, translate } from '#lib/i18n/index.js';
 
   const props = $props();
   const t = (key, vars = {}) => translate($locale, key, vars);

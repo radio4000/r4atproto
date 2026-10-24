@@ -1,0 +1,78 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.6.2/schema.json",
+	"vcs": {
+		"enabled": true,
+		"clientKind": "git",
+		"useIgnoreFile": true
+	},
+	"files": {
+		"includes": ["src/**", "!src/lib/paraglide", "!**/*.svelte"]
+	},
+	"formatter": {
+		"enabled": true,
+		"lineWidth": 100
+	},
+	"assist": {"actions": {"source": {"organizeImports": "off"}}},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"preset": "recommended",
+			"style": {
+				"noDescendingSpecificity": "off"
+			}
+		}
+	},
+	"html": {
+		"experimentalFullSupportEnabled": true
+		// "formatter": {
+		// 	"indentScriptAndStyle": true
+		// }
+	},
+	"json": {
+		"formatter": {
+			"bracketSpacing": false
+		}
+	},
+	"css": {
+		"formatter": {
+			"quoteStyle": "single"
+		},
+		"parser": {
+			"cssModules": true
+		}
+	},
+	"javascript": {
+		"formatter": {
+			"bracketSpacing": false,
+			"quoteStyle": "single",
+			"semicolons": "asNeeded",
+			"trailingCommas": "none"
+		}
+	},
+	// svelte excluded for now - biome doesn't support Svelte 5 syntax yet (keyed each, {:then}, :global selectors)
+	// keeping overrides ready for when support improves
+	"overrides": [
+		{
+			"includes": ["**/*.svelte"],
+			"linter": {
+				"rules": {
+					"style": {
+						"useConst": "off"
+					},
+					"correctness": {
+						"noUnusedVariables": "off", // biome doesn't understand svelte template usage
+						"noUnusedImports": "off", // biome doesn't understand svelte template usage
+						"noSelfAssign": "off" // svelte reactivity trigger pattern: x = x
+					},
+					"complexity": {
+						"noCommaOperator": "off", // svelte reactivity pattern: (void dep, value)
+						"noImportantStyles": "off" // sometimes needed to override third-party styles
+					},
+					"suspicious": {
+						"noDuplicateProperties": "off" // css fallbacks like vh/dvh
+					}
+				}
+			}
+		}
+	]
+}

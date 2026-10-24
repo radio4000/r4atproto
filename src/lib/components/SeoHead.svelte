@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   const {
     title = 'Radio4000',
@@ -14,7 +14,7 @@
   const resolvedTitle = $derived(title ? `${title} | ${siteName}` : siteName);
   const safeDescription = $derived(description || 'Share and discover music tracks on the AT Protocol.');
   const canonical = $derived(() => {
-    const url = $page?.url;
+    const url = page?.url;
     if (!url) return '';
     const { origin, pathname, search } = url;
 

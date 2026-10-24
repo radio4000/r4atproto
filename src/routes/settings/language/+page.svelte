@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$lib/components/ui/card';
-  import { Label } from '$lib/components/ui/label';
+  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#lib/components/ui/card/index.js';
+  import { Label } from '#lib/components/ui/label/index.js';
   import { Languages } from 'lucide-svelte';
-  import { locale as localeStore, translate, availableLocales } from '$lib/i18n';
+  import { locale as localeStore, translate, availableLocales } from '#lib/i18n/index.js';
 
   const t = (key, vars = {}) => translate($localeStore, key, vars);
 </script>

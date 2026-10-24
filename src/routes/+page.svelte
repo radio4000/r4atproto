@@ -1,15 +1,15 @@
 <script lang="ts">
-  import { session } from '$lib/state/session';
-  import { getProfile, listR4FavoritesByDid, getProfiles } from '$lib/services/r4-service';
-  import { Button } from '$lib/components/ui/button';
-  import { Input } from '$lib/components/ui/input';
-  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$lib/components/ui/card';
-  import StateCard from '$lib/components/ui/state-card.svelte';
-  import ProfileHeader from '$lib/components/ProfileHeader.svelte';
-  import SignInForm from '$lib/components/SignInForm.svelte';
+  import { session } from '#lib/state/session.js';
+  import { getProfile, listR4FavoritesByDid, getProfiles } from '#lib/services/r4-service.js';
+  import { Button } from '#lib/components/ui/button/index.js';
+  import { Input } from '#lib/components/ui/input/index.js';
+  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#lib/components/ui/card/index.js';
+  import StateCard from '#lib/components/ui/state-card.svelte';
+  import ProfileHeader from '#lib/components/ProfileHeader.svelte';
+  import SignInForm from '#lib/components/SignInForm.svelte';
   import { Loader2, Users, Search } from 'lucide-svelte';
-  import { locale, translate } from '$lib/i18n';
-  import SeoHead from '$lib/components/SeoHead.svelte';
+  import { locale, translate } from '#lib/i18n/index.js';
+  import SeoHead from '#lib/components/SeoHead.svelte';
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
 

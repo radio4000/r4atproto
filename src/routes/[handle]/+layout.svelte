@@ -1,25 +1,25 @@
 <script lang="ts">
-  import { resolveHandle } from '$lib/services/r4-service';
+  import { resolveHandle } from '#lib/services/r4-service.js';
   import { setContext } from 'svelte';
   import { useLiveQuery } from '@tanstack/svelte-db';
-  import { profilesCollection, loadProfile, getProfileFromCache } from '$lib/stores/profiles-db';
-  import FollowButton from '$lib/components/FollowButton.svelte';
-  import ProfileHeader from '$lib/components/ProfileHeader.svelte';
-  import ProfileNav from '$lib/components/ProfileNav.svelte';
-  import TrackEditDialogContent from '$lib/components/TrackEditDialogContent.svelte';
-  import Dialog from '$lib/components/ui/Dialog.svelte';
-  import { session } from '$lib/state/session';
-  import { Button } from '$lib/components/ui/button';
-  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$lib/components/ui/card';
-  import { Input } from '$lib/components/ui/input';
-  import { Label } from '$lib/components/ui/label';
+  import { profilesCollection, loadProfile, getProfileFromCache } from '#lib/stores/profiles-db.js';
+  import FollowButton from '#lib/components/FollowButton.svelte';
+  import ProfileHeader from '#lib/components/ProfileHeader.svelte';
+  import ProfileNav from '#lib/components/ProfileNav.svelte';
+  import TrackEditDialogContent from '#lib/components/TrackEditDialogContent.svelte';
+  import Dialog from '#lib/components/ui/Dialog.svelte';
+  import { session } from '#lib/state/session.js';
+  import { Button } from '#lib/components/ui/button/index.js';
+  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#lib/components/ui/card/index.js';
+  import { Input } from '#lib/components/ui/input/index.js';
+  import { Label } from '#lib/components/ui/label/index.js';
   import { Loader2, AlertCircle } from 'lucide-svelte';
-  import StateCard from '$lib/components/ui/state-card.svelte';
-  import { locale, translate } from '$lib/i18n';
-  import { page } from '$app/stores';
+  import StateCard from '#lib/components/ui/state-card.svelte';
+  import { locale, translate } from '#lib/i18n/index.js';
+  import { page } from '$app/state';
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
-  import SeoHead from '$lib/components/SeoHead.svelte';
+  import SeoHead from '#lib/components/SeoHead.svelte';
 
   const { data, children } = $props();
   const handle = $derived(data?.handle ? data.handle.replace(/^@/, '') : '');
@@ -31,12 +31,12 @@
 
   // Check if we're on an edit route (segment equals "edit")
   const isEditRoute = $derived.by(() => {
-    const parts = ($page.url.pathname || '').split('/').filter(Boolean);
+    const parts = (page.url.pathname || '').split('/').filter(Boolean);
     return parts.includes('edit');
   });
   const editRkey = $derived.by(() => {
     if (!isEditRoute) return '';
-    const parts = $page.url.pathname.split('/');
+    const parts = page.url.pathname.split('/');
     const editIndex = parts.indexOf('edit');
     return editIndex > 0 ? parts[editIndex - 1] : '';
   });

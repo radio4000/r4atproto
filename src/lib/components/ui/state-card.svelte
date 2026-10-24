@@ -8,7 +8,7 @@
 		CardHeader,
 		CardTitle,
 	} from "./card";
-	import { cn } from "$lib/utils";
+	import { cn } from "#lib/utils/index.js";
 
 	type IconComponent = ComponentType<{ class?: string }>;
 

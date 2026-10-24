@@ -1,14 +1,14 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-  import { session } from '$lib/state/session';
-  import NavTabs from '$lib/components/NavTabs.svelte';
+  import { page } from '$app/state';
+  import { session } from '#lib/state/session.js';
+  import NavTabs from '#lib/components/NavTabs.svelte';
   import { User, Palette, Languages, RefreshCw } from 'lucide-svelte';
-  import { locale, translate } from '$lib/i18n';
+  import { locale, translate } from '#lib/i18n/index.js';
 
   const { children } = $props();
   const t = (key, vars = {}) => translate($locale, key, vars);
 
-  const currentPath = $derived($page.url.pathname);
+  const currentPath = $derived(page.url.pathname);
   const isAuthenticated = $derived($session?.did);
 
   // Filter nav items based on authentication

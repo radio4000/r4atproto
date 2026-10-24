@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { createTrack } from '$lib/services/r4-service';
-  import TrackForm from '$lib/components/TrackForm.svelte';
-  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$lib/components/ui/card';
-  import { parseAtUri } from '$lib/services/track-uri';
+  import { createTrack } from '#lib/services/r4-service.js';
+  import TrackForm from '#lib/components/TrackForm.svelte';
+  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#lib/components/ui/card/index.js';
+  import { parseAtUri } from '#lib/services/track-uri.js';
   import { CheckCircle2 } from 'lucide-svelte';
-  import StateCard from '$lib/components/ui/state-card.svelte';
-  import { Button } from '$lib/components/ui/button';
-  import { locale, translate } from '$lib/i18n';
-  import { session } from '$lib/state/session';
+  import StateCard from '#lib/components/ui/state-card.svelte';
+  import { Button } from '#lib/components/ui/button/index.js';
+  import { locale, translate } from '#lib/i18n/index.js';
+  import { session } from '#lib/state/session.js';
   import { goto } from '$app/navigation';
 
   let savedUri = $state('');

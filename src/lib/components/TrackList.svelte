@@ -1,8 +1,8 @@
 <script lang="ts">
   import TrackListItem from './TrackListItem.svelte';
-  import StateCard from '$lib/components/ui/state-card.svelte';
+  import StateCard from '#lib/components/ui/state-card.svelte';
   import { Music4 } from 'lucide-svelte';
-  import { locale, translate } from '$lib/i18n';
+  import { locale, translate } from '#lib/i18n/index.js';
 
   const { tracks = [], context = null, editable = false } = $props();
 

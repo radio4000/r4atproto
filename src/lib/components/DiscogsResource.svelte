@@ -1,12 +1,12 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { parseDiscogsUrl, fetchDiscogs, resourceTrackToR4Track } from '$lib/services/discogs.service';
-  import { play } from '$lib/player/store';
-  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$lib/components/ui/card';
-  import { Button } from '$lib/components/ui/button';
+  import { parseDiscogsUrl, fetchDiscogs, resourceTrackToR4Track } from '#lib/services/discogs.service.js';
+  import { play } from '#lib/player/store.js';
+  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#lib/components/ui/card/index.js';
+  import { Button } from '#lib/components/ui/button/index.js';
   import { ExternalLink, Play, Disc } from 'lucide-svelte';
-  import { locale, translate } from '$lib/i18n';
-  import TrackListItem from '$lib/components/TrackListItem.svelte';
+  import { locale, translate } from '#lib/i18n/index.js';
+  import TrackListItem from '#lib/components/TrackListItem.svelte';
 
   let { url = '', handle = '', sourceTrackUri = '' } = $props();
 

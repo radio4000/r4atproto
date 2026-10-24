@@ -1,24 +1,23 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { page } from '$app/stores';
-  import { bskyOAuth } from '$lib/services/bsky-oauth';
+  import { page } from '$app/state';
+  import { bskyOAuth } from '#lib/services/bsky-oauth.js';
   import { buildLoopbackClientId } from '@atproto/oauth-client-browser';
-  import { session } from '$lib/state/session';
-  import { theme } from '$lib/state/theme';
-  import { getR4Profile } from '$lib/services/r4-service';
-  import Player from '$lib/components/Player.svelte';
+  import { session } from '#lib/state/session.js';
+  import { theme } from '#lib/state/theme.js';
+  import { getR4Profile } from '#lib/services/r4-service.js';
+  import Player from '#lib/components/Player.svelte';
   import '../app.css';
-  import StateCard from '$lib/components/ui/state-card.svelte';
+  import StateCard from '#lib/components/ui/state-card.svelte';
   import { Loader2, Menu, X, Home, Plus, User, Settings, AtSign, Play, Pause, LayoutList, Compass } from 'lucide-svelte';
-  import { player, toggle } from '$lib/player/store';
-  import { locale, translate } from '$lib/i18n';
-  import { cn } from '$lib/utils';
-  import { resolveHandle } from '$lib/services/r4-service';
-  import NavTabs from '$lib/components/NavTabs.svelte';
-  import { base } from '$app/paths';
+  import { player, toggle } from '#lib/player/store.js';
+  import { locale, translate } from '#lib/i18n/index.js';
+  import { cn } from '#lib/utils/index.js';
+  import { resolveHandle } from '#lib/services/r4-service.js';
+  import NavTabs from '#lib/components/NavTabs.svelte';
   import { browser } from '$app/environment';
-  import ToastContainer from '$lib/components/ui/toast/ToastContainer.svelte';
-  import SeoHead from '$lib/components/SeoHead.svelte';
+  import ToastContainer from '#lib/components/ui/toast/ToastContainer.svelte';
+  import SeoHead from '#lib/components/SeoHead.svelte';
 
   let { children } = $props();
   let ready = $state(false);
@@ -45,7 +44,7 @@
       // Determine which client ID to use
       if (window.location.protocol === 'https:') {
         // For HTTPS, first check if we can reach the metadata
-        const metadataUrl = new URL(metadataFile, window.location.origin + base + '/').href;
+        const metadataUrl = new URL(metadataFile, window.location.origin + '/').href;
 
         try {
           // Quick check if metadata is accessible
@@ -239,12 +238,12 @@
   const addPath = $derived(userHandle ? `/@${encodeURIComponent(userHandle)}/add` : '/');
 
   const navItems = $derived.by(() => {
-    const currentPath = $page.url.pathname;
-    const checkActive = (href: string) => currentPath === (base + href) || currentPath === href;
+    const currentPath = page.url.pathname;
+    const checkActive = (href: string) => currentPath === href;
 
     const baseItems = [
       { href: '/', label: t('nav.links.home'), icon: Home, isActive: checkActive('/') },
-      { href: '/explore', label: t('nav.links.explore'), icon: Compass, isActive: currentPath.startsWith(base + '/explore') || currentPath.startsWith('/explore') }
+      { href: '/explore', label: t('nav.links.explore'), icon: Compass, isActive: currentPath.startsWith('/explore') }
     ];
 
     if ($session?.did && userHandle) {

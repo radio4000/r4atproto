@@ -2,9 +2,9 @@
 	import Avatar from './Avatar.svelte'
 	import { Card, CardHeader, CardTitle, CardDescription } from './ui/card'
 	import { Button, buttonVariants } from './ui/button'
-	import { cn, menuItemClass, menuTriggerClass } from '$lib/utils'
-	import Link from '$lib/components/Link.svelte'
-	import Dialog from '$lib/components/ui/Dialog.svelte'
+	import { cn, menuItemClass, menuTriggerClass } from '#lib/utils/index.js'
+	import Link from '#lib/components/Link.svelte'
+	import Dialog from '#lib/components/ui/Dialog.svelte'
 	import { PlayCircle, Loader2, MoreVertical, ExternalLink, Copy, Eye, Star, Maximize2 } from 'lucide-svelte'
 	import {
 		resolveHandle,
@@ -12,11 +12,11 @@
 		createR4Favorite,
 		deleteR4Favorite,
 		findR4FavoriteUri,
-	} from '$lib/services/r4-service'
-	import { setPlaylist, player } from '$lib/player/store'
+	} from '#lib/services/r4-service.js'
+	import { setPlaylist, player } from '#lib/player/store.js'
 	import { onMount, onDestroy } from 'svelte'
-	import { locale, translate } from '$lib/i18n'
-	import { session } from '$lib/state/session'
+	import { locale, translate } from '#lib/i18n/index.js'
+	import { session } from '#lib/state/session.js'
 
 	const {
 		profile,

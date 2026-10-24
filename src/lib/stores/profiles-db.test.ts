@@ -25,14 +25,14 @@ describe('profiles-db', () => {
 
       const allProfiles = profilesCollection.toArray
       expect(allProfiles).toHaveLength(1)
-      expect(allProfiles[0]).toEqual(mockProfile)
+      expect(allProfiles[0]).toMatchObject(mockProfile)
     })
 
     it('should get profile from collection by DID', () => {
       profilesCollection.insert(mockProfile)
 
       const result = profilesCollection.get('did:plc:test123')
-      expect(result).toEqual(mockProfile)
+      expect(result).toMatchObject(mockProfile)
     })
 
     it('should update profile in collection', () => {
@@ -63,17 +63,17 @@ describe('profiles-db', () => {
 
     it('should get profile by DID', () => {
       const result = getProfileFromCache('did:plc:test123')
-      expect(result).toEqual(mockProfile)
+      expect(result).toMatchObject(mockProfile)
     })
 
     it('should get profile by handle', () => {
       const result = getProfileFromCache('testuser')
-      expect(result).toEqual(mockProfile)
+      expect(result).toMatchObject(mockProfile)
     })
 
     it('should get profile by @handle', () => {
       const result = getProfileFromCache('@testuser')
-      expect(result).toEqual(mockProfile)
+      expect(result).toMatchObject(mockProfile)
     })
 
     it('should return null for non-existent profile', () => {

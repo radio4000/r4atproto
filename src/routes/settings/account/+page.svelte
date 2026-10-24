@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { bskyOAuth } from '$lib/services/bsky-oauth';
-  import { session } from '$lib/state/session';
-  import { Button } from '$lib/components/ui/button';
-  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$lib/components/ui/card';
-  import { Input } from '$lib/components/ui/input';
-  import { Label } from '$lib/components/ui/label';
-  import SignInForm from '$lib/components/SignInForm.svelte';
+  import { bskyOAuth } from '#lib/services/bsky-oauth.js';
+  import { session } from '#lib/state/session.js';
+  import { Button } from '#lib/components/ui/button/index.js';
+  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#lib/components/ui/card/index.js';
+  import { Input } from '#lib/components/ui/input/index.js';
+  import { Label } from '#lib/components/ui/label/index.js';
+  import SignInForm from '#lib/components/SignInForm.svelte';
   import {
     Dialog,
     DialogContent,
@@ -13,18 +13,18 @@
     DialogFooter,
     DialogHeader,
     DialogTitle,
-  } from '$lib/components/ui/dialog';
+  } from '#lib/components/ui/dialog/index.js';
   import { LogOut, Loader2, Download, Trash2, AlertCircle, Shield } from 'lucide-svelte';
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
-  import { locale, translate } from '$lib/i18n';
+  import { locale, translate } from '#lib/i18n/index.js';
   import {
     listTracksByDid,
     getMyDid,
     deleteAllTracks,
     getR4Profile,
-  } from '$lib/services/r4-service';
-  import { withDpopRetry } from '$lib/utils/atproto-client';
+  } from '#lib/services/r4-service.js';
+  import { withDpopRetry } from '#lib/utils/atproto-client.js';
   import { AtUri } from '@atproto/api';
 
   let isExporting = $state(false);

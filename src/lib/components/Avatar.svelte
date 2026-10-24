@@ -1,6 +1,6 @@
 <script lang="ts">
   import { User } from 'lucide-svelte';
-  import { cn } from '$lib/utils';
+  import { cn } from '#lib/utils/index.js';
 
   const {
     src = '',

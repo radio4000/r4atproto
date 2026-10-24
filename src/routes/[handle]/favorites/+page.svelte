@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { listR4FavoritesByDid, getProfiles } from '$lib/services/r4-service';
+  import { listR4FavoritesByDid, getProfiles } from '#lib/services/r4-service.js';
   import { getContext } from 'svelte';
-  import ProfileHeader from '$lib/components/ProfileHeader.svelte';
-  import { Button } from '$lib/components/ui/button';
+  import ProfileHeader from '#lib/components/ProfileHeader.svelte';
+  import { Button } from '#lib/components/ui/button/index.js';
   import { Loader2, AlertCircle, Users } from 'lucide-svelte';
-  import StateCard from '$lib/components/ui/state-card.svelte';
-  import { locale, translate } from '$lib/i18n';
+  import StateCard from '#lib/components/ui/state-card.svelte';
+  import { locale, translate } from '#lib/i18n/index.js';
 
   const { data } = $props();
 

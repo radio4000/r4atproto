@@ -3,7 +3,7 @@
  * Provides standardized error handling for Svelte components
  */
 
-import { toast } from '$lib/stores/toast.svelte'
+import { toast } from '#lib/stores/toast.svelte.js'
 import { handleServiceError } from './errors'
 import { AppError } from '../errors'
 

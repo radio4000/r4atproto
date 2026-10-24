@@ -7,19 +7,19 @@
 bun install
 
 # Start dev server
-bun dev
+bun run dev
 
 # Run tests
-bun test
+bun run test
 ```
 
-The app runs at `http://localhost:5173` by default.
+The app runs at `http://127.0.0.1:5173` (atproto OAuth loopback clients need 127.0.0.1, not localhost).
 
 ---
 
 ## Stack
 
-- **Framework:** SvelteKit 2 + Svelte 5 (runes syntax)
+- **Framework:** SvelteKit 3 + Svelte 5 (runes syntax)
 - **Styling:** Tailwind CSS + shadcn-svelte component library
 - **Protocol:** AT Protocol via `@atproto/api`
 - **Auth:** AT Protocol OAuth (`@atproto/oauth-client-browser`)

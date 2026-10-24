@@ -1,10 +1,10 @@
 <script lang="ts">
-  import SearchProfiles from '$lib/components/SearchProfiles.svelte';
-  import { locale, translate } from '$lib/i18n';
-  import { page } from '$app/stores';
+  import SearchProfiles from '#lib/components/SearchProfiles.svelte';
+  import { locale, translate } from '#lib/i18n/index.js';
+  import { page } from '$app/state';
 
   const t = (key, vars = {}) => translate($locale, key, vars);
-  const initialQuery = $derived($page.url.searchParams.get('q') ?? '');
+  const initialQuery = $derived(page.url.searchParams.get('q') ?? '');
 </script>
 
 <div class="container max-w-4xl py-8 lg:py-12 space-y-8">

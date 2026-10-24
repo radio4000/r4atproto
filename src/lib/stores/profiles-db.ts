@@ -1,5 +1,5 @@
 import { createCollection, localOnlyCollectionOptions } from '@tanstack/svelte-db'
-import { getProfile } from '$lib/services/r4-service'
+import { getProfile } from '#lib/services/r4-service.js'
 import type { AppBskyActorDefs } from '@atproto/api'
 
 // Use AT Protocol's ProfileViewDetailed type

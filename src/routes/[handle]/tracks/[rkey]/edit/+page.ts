@@ -1,5 +1,5 @@
 import type { PageLoad } from './$types';
-import { resolveHandle } from '$lib/services/r4-service';
+import { resolveHandle } from '#lib/services/r4-service.js';
 
 export const ssr = false;
 export const prerender = false;

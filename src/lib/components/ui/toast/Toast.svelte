@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { removeToast, type Toast } from '$lib/stores/toast.svelte'
+	import { removeToast, type Toast } from '#lib/stores/toast.svelte.js'
 	import { CircleCheck, CircleAlert, Info, X } from 'lucide-svelte'
 	import { fly } from 'svelte/transition'
 

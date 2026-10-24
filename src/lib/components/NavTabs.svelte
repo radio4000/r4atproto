@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Link from '$lib/components/Link.svelte';
-  import { cn } from '$lib/utils';
+  import Link from '#lib/components/Link.svelte';
+  import { cn } from '#lib/utils/index.js';
   import type { ComponentType } from 'svelte';
 
   interface NavItem {

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { resolveHandle, getTrackByUri } from '$lib/services/r4-service';
-  import TrackEditForm from '$lib/components/TrackEditForm.svelte';
+  import { resolveHandle, getTrackByUri } from '#lib/services/r4-service.js';
+  import TrackEditForm from '#lib/components/TrackEditForm.svelte';
 
   let {
     handle = '',

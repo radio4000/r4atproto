@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { bskyOAuth } from '$lib/services/bsky-oauth';
-  import { session } from '$lib/state/session';
-  import { Button } from '$lib/components/ui/button';
-  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$lib/components/ui/card';
-  import { Input } from '$lib/components/ui/input';
-  import { Label } from '$lib/components/ui/label';
+  import { bskyOAuth } from '#lib/services/bsky-oauth.js';
+  import { session } from '#lib/state/session.js';
+  import { Button } from '#lib/components/ui/button/index.js';
+  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#lib/components/ui/card/index.js';
+  import { Input } from '#lib/components/ui/input/index.js';
+  import { Label } from '#lib/components/ui/label/index.js';
   import { Loader2 } from 'lucide-svelte';
-  import { locale, translate } from '$lib/i18n';
+  import { locale, translate } from '#lib/i18n/index.js';
 
   interface Props {
     variant?: 'default' | 'settings';

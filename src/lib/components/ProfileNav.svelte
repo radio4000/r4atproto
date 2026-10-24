@@ -1,27 +1,24 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-  import NavTabs from '$lib/components/NavTabs.svelte';
-  import { locale, translate } from '$lib/i18n';
+  import { page } from '$app/state';
+  import NavTabs from '#lib/components/NavTabs.svelte';
+  import { locale, translate } from '#lib/i18n/index.js';
   import { Music, Heart, Plus } from 'lucide-svelte';
-  import { base } from '$app/paths';
-  import { session } from '$lib/state/session';
+  import { session } from '#lib/state/session.js';
 
   const { handle } = $props();
   const t = (key, vars = {}) => translate($locale, key, vars);
 
-  const currentPath = $derived($page.url.pathname);
+  const currentPath = $derived(page.url.pathname);
   const profilePath = `/@${handle}`;
   const followingPath = `/@${handle}/favorites`;
   const addPath = `/@${handle}/add`;
 
   const isTracksActive = $derived(
-    currentPath === (base + profilePath) ||
     currentPath === profilePath ||
-    currentPath.startsWith(`${base}/@${handle}/tracks/`) ||
     currentPath.startsWith(`/@${handle}/tracks/`)
   );
-  const isFollowingActive = $derived(currentPath === (base + followingPath) || currentPath === followingPath);
-  const isAddActive = $derived(currentPath === (base + addPath) || currentPath === addPath);
+  const isFollowingActive = $derived(currentPath === followingPath);
+  const isAddActive = $derived(currentPath === addPath);
 
   const isOwnProfile = $derived($session?.handle === handle);
 

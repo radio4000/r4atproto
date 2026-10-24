@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$lib/components/ui/card';
-  import { Label } from '$lib/components/ui/label';
-  import { Input } from '$lib/components/ui/input';
-  import { Button } from '$lib/components/ui/button';
+  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#lib/components/ui/card/index.js';
+  import { Label } from '#lib/components/ui/label/index.js';
+  import { Input } from '#lib/components/ui/input/index.js';
+  import { Button } from '#lib/components/ui/button/index.js';
   import { RefreshCw, Database, CheckCircle2, AlertCircle } from 'lucide-svelte';
-  import { locale as localeStore, translate } from '$lib/i18n';
-  import { session } from '$lib/state/session';
+  import { locale as localeStore, translate } from '#lib/i18n/index.js';
+  import { session } from '#lib/state/session.js';
   import { goto } from '$app/navigation';
   import {
     getR4SyncConfig,
@@ -15,8 +15,8 @@
     importRadio4000Tracks,
     listTracksByDid,
     getMyDid,
-  } from '$lib/services/r4-service';
-  import { loadTracksForDid } from '$lib/stores/tracks-db';
+  } from '#lib/services/r4-service.js';
+  import { loadTracksForDid } from '#lib/stores/tracks-db.js';
   import { onMount } from 'svelte';
 
   const t = (key: string, vars = {}) => translate($localeStore, key, vars);

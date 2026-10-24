@@ -1,12 +1,12 @@
 <script lang="ts">
-  import Avatar from '$lib/components/Avatar.svelte';
-  import Link from '$lib/components/Link.svelte';
-  import TrackListItem from '$lib/components/TrackListItem.svelte';
-  import { Button } from '$lib/components/ui/button';
+  import Avatar from '#lib/components/Avatar.svelte';
+  import Link from '#lib/components/Link.svelte';
+  import TrackListItem from '#lib/components/TrackListItem.svelte';
+  import { Button } from '#lib/components/ui/button/index.js';
   import { PlayCircle } from 'lucide-svelte';
-  import { setPlaylist } from '$lib/player/store';
-  import { locale, translate } from '$lib/i18n';
-  import type { NetworkRadio } from '$lib/services/r4-service';
+  import { setPlaylist } from '#lib/player/store.js';
+  import { locale, translate } from '#lib/i18n/index.js';
+  import type { NetworkRadio } from '#lib/services/r4-service.js';
 
   const { radio }: { radio: NetworkRadio } = $props();
 
