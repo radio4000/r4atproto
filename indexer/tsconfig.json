@@ -1,0 +1,17 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig",
+	"compilerOptions": {
+		"target": "es2024",
+		"module": "esnext",
+		"moduleResolution": "bundler",
+		"lib": ["es2024"],
+		"types": ["./worker-configuration.d.ts"],
+		"paths": {"#lib/*": ["../src/lib/*"]},
+		"resolveJsonModule": true,
+		"allowImportingTsExtensions": false,
+		"strict": true,
+		"noEmit": true,
+		"skipLibCheck": true
+	},
+	"include": ["src", "worker-configuration.d.ts"]
+}

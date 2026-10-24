@@ -1,0 +1,36 @@
+# The 4000.radio index: follows Jetstream, serves radio.4000.* queries at api.4000.radio.
+# Deploy: bunx wrangler deploy -c indexer/wrangler.toml (after creating the database and queue)
+name = "r4-index"
+main = "src/index.ts"
+account_id = "46bcc6e9a78b2e839068c0685143e1a2"
+compatibility_date = "2026-10-01"
+routes = [{ pattern = "api.4000.radio", custom_domain = true }]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "r4-index"
+# Set after `wrangler d1 create r4-index`
+database_id = "00000000-0000-0000-0000-000000000000"
+migrations_dir = "migrations"
+
+[[durable_objects.bindings]]
+name = "INGEST"
+class_name = "Ingest"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Ingest"]
+
+[[queues.producers]]
+binding = "BACKFILL"
+queue = "r4-index-backfill"
+
+[[queues.consumers]]
+queue = "r4-index-backfill"
+max_batch_size = 1
+max_concurrency = 4
+max_retries = 3
+
+# Restarts the ingest if it stopped
+[triggers]
+crons = ["*/5 * * * *"]

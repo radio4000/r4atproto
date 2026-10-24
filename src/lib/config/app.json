@@ -14,7 +14,8 @@
 		"jetstream": "wss://jetstream2.us-east.bsky.network/subscribe",
 		"constellation": "https://constellation.microcosm.blue",
 		"slingshot": "https://slingshot.microcosm.blue",
-		"youtubeEmbed": "https://www.youtube-nocookie.com"
+		"youtubeEmbed": "https://www.youtube-nocookie.com",
+		"index": "https://api.4000.radio"
 	},
 	"oauth": {
 		"permissionSet": "authFull",
@@ -40,6 +41,13 @@
 	},
 	"feed": {
 		"perRadio": 5
+	},
+	"indexer": {
+		"maxTracksPerRadio": 20000,
+		"cacheSeconds": 60,
+		"flushMs": 1000,
+		"flushSize": 200,
+		"cursorRewindSeconds": 5
 	},
 	"csp": {
 		"scripts": ["https://www.youtube.com", "https://w.soundcloud.com"],

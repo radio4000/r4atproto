@@ -31,6 +31,12 @@ export default ts.config(
 		}
 	},
 	{
-		ignores: ['dist/', '.svelte-kit/', '.wrangler/', 'src/lib/paraglide/']
+		ignores: [
+			'dist/',
+			'.svelte-kit/',
+			'**/.wrangler/',
+			'src/lib/paraglide/',
+			'indexer/worker-configuration.d.ts'
+		]
 	}
 )

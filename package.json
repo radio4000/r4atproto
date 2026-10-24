@@ -23,6 +23,9 @@
 		"i18n:check": "node i18n/check.js",
 		"i18n:prune-unused": "node i18n/prune-unused.js",
 		"i18n:apply": "node i18n/apply-batch.js",
+		"indexer:types": "cd indexer && wrangler types",
+		"indexer:check": "bun run indexer:types && tsc -p indexer",
+		"indexer:dev": "cd indexer && wrangler dev",
 		"lexicons:lint": "goat lex lint --ignore-lint large-string",
 		"lexicons:publish": "goat lex publish"
 	},

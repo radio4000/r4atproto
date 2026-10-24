@@ -1,6 +1,6 @@
 # Indexer (draft for review)
 
-Status: proposal, nothing built. For the launch on Bluesky, sized for 10,000 radios.
+Status: built and tested locally (`indexer/`), not deployed. For the launch on Bluesky, sized for 10,000 radios.
 
 ## Why
 
@@ -38,7 +38,6 @@ All on Cloudflare, next to the app, in this repository (`indexer/`, its own `wra
 - `tracks`: uri, did, rkey, url, title, description, discogs url, duration, provider, media id, created/updated.
 - `track_tags`: uri, tag (from #tags in descriptions, as the app derives them).
 - `tracks_fts`, `radios_fts`: full-text search over titles, descriptions, names.
-- `follows`: uri, did, subject, created (for followers and following lists).
 - `broadcasts`: did, decks, updated (live now; stale after `broadcast.staleSeconds`).
 - `chat_messages`: uri, did, subject (the radio), text, track, created.
 - `cursor`: Jetstream position.
@@ -71,12 +70,18 @@ Workers paid plan ($5/month). At this size D1 storage, reads and writes, the Que
 
 ## Steps
 
-1. Query lexicons, reviewed by you before code.
-2. Indexer: ingest, backfill, tables, API, with tests.
+1. ✅ Query lexicons.
+2. ✅ Indexer: ingest, backfill, tables, API, with tests (`indexer/test`, on node:sqlite).
 3. Load test: 10,000 synthetic radios in a local D1, measure response times.
 4. App: home, explore, search, feed and broadcasts read from the indexer; radio pages from the indexer with the PDS as fallback.
 5. Deploy `api.4000.radio`, backfill the real network, compare against direct reads.
 6. Publish the query lexicons. Then promote.
+
+## Running it
+
+- `bun run indexer:check`: generate Worker types and type-check.
+- Locally: `cd indexer && wrangler d1 migrations apply r4-index --local`, put `ADMIN_TOKEN=…` in `indexer/.dev.vars`, then `bun run indexer:dev`. `POST /admin/backfill` (with `Authorization: Bearer <token>`) reads every repo the relay lists and starts the ingest; `GET /admin/ingest` shows whether it is connected and its Jetstream position.
+- Deploying needs, once: `wrangler d1 create r4-index` (its id goes in `indexer/wrangler.toml`), `wrangler queues create r4-index-backfill`, `wrangler d1 migrations apply r4-index --remote`, `wrangler secret put ADMIN_TOKEN`, then `wrangler deploy` from `indexer/`.
 
 ## Decided
 
