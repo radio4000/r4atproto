@@ -5,13 +5,14 @@
 	import Seo from '#lib/components/seo.svelte'
 	import * as m from '#lib/paraglide/messages.js'
 
-	const current = getLocale()
+	const current = $derived(appState.language ?? getLocale())
 	// Each language named in itself
 	const name = (locale) => new Intl.DisplayNames([locale], {type: 'language'}).of(locale) ?? locale
 
 	function choose(locale) {
+		// No reload: the layout re-renders the page in the new language
+		setLocale(locale, {reload: false})
 		appState.language = locale
-		setLocale(locale)
 	}
 </script>
 

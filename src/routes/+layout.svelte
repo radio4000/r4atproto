@@ -2,9 +2,9 @@
 	import {onMount} from 'svelte'
 	import {fly} from 'svelte/transition'
 	import {cubicOut} from 'svelte/easing'
-	import {MediaQuery} from 'svelte/reactivity'
 	import '../styles/style.css'
 	import {appState, deckAccent} from '#lib/app-state.svelte.js'
+	import {applyAppearance} from '#lib/appearance.svelte.js'
 	import {sortedDeckIds} from '#lib/deck.js'
 	import {toggleDeckCompact} from '#lib/api.js'
 	import {leaveBroadcast} from '#lib/broadcast.js'
@@ -26,7 +26,7 @@
 	import {queuePinTargets} from '#lib/collections/keepalive.js'
 	import {watchBroadcasts} from '#lib/collections/broadcasts.js'
 	import * as m from '#lib/paraglide/messages.js'
-	import {getLocale} from '#lib/paraglide/runtime.js'
+	import {getLocale, isLocale, setLocale} from '#lib/paraglide/runtime.js'
 	import {dev} from '$app/env'
 
 	let {children} = $props()
@@ -93,25 +93,17 @@
 		compactDeckIds.filter((id) => !appState.decks[id]?.listening_to_channel_id)
 	)
 
-	// Theme: the saved preference, else the system's
-	const prefersLight = new MediaQuery('(prefers-color-scheme: light)')
-	const theme = $derived(appState.theme ?? (prefersLight.current ? 'light' : 'dark'))
-	$effect(() => {
-		document.documentElement.setAttribute('theme', theme)
-	})
+	applyAppearance()
 
-	$effect(() => {
-		document.documentElement.lang = getLocale()
-	})
+	// The saved language wins, before any message renders
+	if (appState.language && isLocale(appState.language) && getLocale() !== appState.language) {
+		setLocale(appState.language, {reload: false})
+	}
 
-	// Appearance settings: custom CSS variables (e.g. the accent) on :root
-	let appliedVariables: string[] = []
+	// Changing language re-renders the shell and page (keyed below), without a reload
+	const uiLocale = $derived(appState.language ?? getLocale())
 	$effect(() => {
-		const vars = appState.custom_css_variables ?? {}
-		const root = document.documentElement.style
-		for (const name of appliedVariables) if (!(name in vars)) root.removeProperty(name)
-		for (const [name, value] of Object.entries(vars)) root.setProperty(name, value)
-		appliedVariables = Object.keys(vars)
+		document.documentElement.lang = uiLocale
 	})
 
 	// On mobile an expanded deck fills the screen like a dialog: "back" should close it,
@@ -167,13 +159,17 @@
 		/>
 	{/each}
 	<r4-layout deck-expanded={anyDeckExpanded} deck-active={anyDeckActive}>
-		<LayoutHeader />
+		{#key uiLocale}
+			<LayoutHeader />
+		{/key}
 		<r4-content-wrapper>
 			<r4-content>
 				<r4-scroll-area>
-					<main>
-						{@render children()}
-					</main>
+					{#key uiLocale}
+						<main>
+							{@render children()}
+						</main>
+					{/key}
 				</r4-scroll-area>
 				<DeckStrip />
 			</r4-content>

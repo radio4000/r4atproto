@@ -29,6 +29,9 @@
 	--deck-min-width: 280px;
 	--deck-default-width: 400px;
 	--deck-compact-min-height: 49px;
+	/* deck transport */
+	--volume-width: 7rem;
+	--player-icon-size: 1rem;
 	--channel-header-avatar-size: 5rem;
 	--map-min-height: 300px;
 	--map-picker-height: 18rem;
@@ -115,4 +118,24 @@
 
 :root[theme='dark'] {
 	color-scheme: dark;
+}
+
+/* Appearance settings, applied as attributes on <html> (lib/appearance.svelte.ts) */
+
+/* Floating UI off: the shell's panels sit flush, without padding between them */
+:root[floating='false'] {
+	--floating-padding: 0;
+	--floating-gap: 0;
+}
+
+/* Borders off: fade the border color, not the width, so nothing reflows */
+:root[borders='false'] {
+	--color-interface-border: transparent;
+	--color-control-border: transparent;
+	--color-control-border-hover: transparent;
+}
+
+/* Pointer cursor off: controls keep the default arrow */
+:root[pointer-cursor='false'] {
+	--interactive-cursor: default;
 }

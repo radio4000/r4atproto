@@ -42,6 +42,10 @@
 		flex-direction: column;
 		align-items: stretch;
 
+		li {
+			display: grid;
+		}
+
 		a {
 			justify-content: flex-start;
 		}
