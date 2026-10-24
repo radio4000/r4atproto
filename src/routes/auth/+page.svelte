@@ -2,12 +2,15 @@
 	import {page} from '$app/state'
 	import {appState} from '#lib/app-state.svelte.js'
 	import {signIn, signOut} from '#lib/session.js'
-	import {channelHref} from '#lib/links.js'
+	import {channelHref, isAppPath} from '#lib/links.js'
 	import IconR4 from '#lib/components/icon-r4.svelte'
 	import Seo from '#lib/components/seo.svelte'
 	import * as m from '#lib/paraglide/messages.js'
 
-	const redirect = $derived(page.url.searchParams.get('redirect') ?? undefined)
+	const redirect = $derived.by(() => {
+		const value = page.url.searchParams.get('redirect')
+		return isAppPath(value) ? value : undefined
+	})
 	let handle = $state('')
 	let submitting = $state(false)
 	let error = $state('')

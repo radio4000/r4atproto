@@ -12,6 +12,7 @@
 	import {initializeKeyboardShortcuts} from '#lib/keyboard.js'
 	import {initSession} from '#lib/session.js'
 	import {goto} from '$app/navigation'
+	import {isAppPath} from '#lib/links.js'
 	import {isMobileViewport} from '#lib/utils.js'
 	import Seo from '#lib/components/seo.svelte'
 	import app from '#lib/config/app.json' with {type: 'json'}
@@ -37,7 +38,7 @@
 		try {
 			// Back from an OAuth round trip: return to where sign-in started
 			const returnTo = await initSession()
-			if (returnTo && returnTo !== location.pathname) goto(returnTo, {replace: true})
+			if (isAppPath(returnTo) && returnTo !== location.pathname) goto(returnTo, {replace: true})
 		} catch (error) {
 			console.error('Session error:', error)
 		} finally {

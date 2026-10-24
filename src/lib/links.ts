@@ -18,6 +18,10 @@ export const channelTracksHref = (
 
 export const searchHref = (q: string) => `/search?q=${encodeURIComponent(q)}`
 
+/** A path inside the app (/…), never another site (//host, /\host) */
+export const isAppPath = (value: unknown): value is string =>
+	typeof value === 'string' && value.startsWith('/') && !/^\/[/\\]/.test(value)
+
 /** Sign in, then come back to `redirect` */
 export const authHref = (redirect?: string) =>
 	redirect ? `/auth?redirect=${encodeURIComponent(redirect)}` : '/auth'

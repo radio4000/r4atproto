@@ -45,6 +45,13 @@
 
 		tooltipElement.showPopover()
 	})
+
+	// Text only, never HTML: a shortcut hint (keyboard.js shortcutHint) is the one
+	// piece of markup, a trailing <kbd>key</kbd>, rendered as an element
+	const hint = $derived.by(() => {
+		const match = /^([\s\S]*?)(?: <kbd>(.+)<\/kbd>)?$/.exec(tooltipState.content ?? '')
+		return {label: match?.[1] ?? '', key: match?.[2]}
+	})
 </script>
 
 {#if supportsAnchorCss}
@@ -55,7 +62,7 @@
 		role="tooltip"
 		position={tooltipState.position}
 	>
-		{@html tooltipState.content}
+		{hint.label}{#if hint.key}<kbd>{hint.key}</kbd>{/if}
 	</r4-tooltip>
 {/if}
 
