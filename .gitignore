@@ -7,3 +7,9 @@ coverage
 .svelte-kit/
 .wrangler/
 wrangler.log
+
+# Paraglide output, compiled by the Vite plugin
+src/lib/paraglide/
+i18n/project.inlang/cache/
+i18n/project.inlang/project_id
+i18n/batches/*.json

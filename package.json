@@ -15,13 +15,21 @@
 		"biome": "biome check --write .",
 		"lint": "eslint .",
 		"check": "bun run format && bun run biome && bun run lint",
-		"knip": "knip-bun"
+		"knip": "knip-bun",
+		"i18n": "node i18n/sync.js && bunx @inlang/paraglide-js compile --project ./i18n/project.inlang --outdir ./src/lib/paraglide",
+		"i18n:stats": "node i18n/stats.js",
+		"i18n:extract": "node i18n/extract.js",
+		"i18n:review": "node i18n/review.js",
+		"i18n:check": "node i18n/check.js",
+		"i18n:prune-unused": "node i18n/prune-unused.js",
+		"i18n:apply": "node i18n/apply-batch.js"
 	},
 	"dependencies": {
 		"@atproto/api": "^0.29.4",
 		"@atproto/common-web": "^0.5.15",
 		"@atproto/oauth-client-browser": "^0.5.10",
 		"@atproto/oauth-types": "^0.7.7",
+		"@inlang/paraglide-js": "^2.29.1",
 		"@tanstack/svelte-db": "^0.1.48",
 		"lucide-svelte": "^0.554.0"
 	},

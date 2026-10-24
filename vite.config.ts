@@ -2,6 +2,7 @@ import {sveltekit} from '@sveltejs/kit/vite'
 import {vitePreprocess} from '@sveltejs/vite-plugin-svelte'
 import adapterStatic from '@sveltejs/adapter-static'
 import {defineConfig} from 'vitest/config'
+import {paraglideVitePlugin} from '@inlang/paraglide-js'
 
 export default defineConfig({
 	plugins: [
@@ -21,6 +22,12 @@ export default defineConfig({
 					async: true
 				}
 			}
+		}),
+		paraglideVitePlugin({
+			project: './i18n/project.inlang',
+			outdir: './src/lib/paraglide',
+			// The locale is chosen in the app and remembered in localStorage; no URL prefixes
+			strategy: ['localStorage', 'preferredLanguage', 'baseLocale']
 		})
 	],
 	server: {
