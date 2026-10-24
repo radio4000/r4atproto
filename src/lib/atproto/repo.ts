@@ -9,6 +9,7 @@
  */
 import app from '../config/app.json' with {type: 'json'}
 import {resolvePds} from './identity'
+import {isValidRecord} from './schemas'
 import {xrpcGet, type XrpcParams} from './xrpc'
 
 const cache = new Map<string, {at: number; promise: Promise<unknown>}>()
@@ -67,13 +68,18 @@ export async function listRecords<T>(
 	collection: string,
 	{limit = 100, cursor, reverse}: ListRecordsOptions = {}
 ): Promise<{records: RepoRecord<T>[]; cursor?: string}> {
-	return cachedGet(did, collection, 'com.atproto.repo.listRecords', {
-		repo: did,
+	const page = await cachedGet<{records: RepoRecord<T>[]; cursor?: string}>(
+		did,
 		collection,
-		limit,
-		cursor,
-		reverse
-	})
+		'com.atproto.repo.listRecords',
+		{repo: did, collection, limit, cursor, reverse}
+	)
+	// Records not matching their lexicon are dropped; the cursor still pages on,
+	// until a page comes back empty
+	return {
+		records: page.records.filter((r) => isValidRecord(collection, r.value)),
+		cursor: page.records.length ? page.cursor : undefined
+	}
 }
 
 /** Every record of a collection, newest first */
@@ -83,7 +89,7 @@ export async function listAllRecords<T>(did: string, collection: string): Promis
 	do {
 		const page = await listRecords<T>(did, collection, {cursor})
 		all.push(...page.records)
-		cursor = page.records.length ? page.cursor : undefined
+		cursor = page.cursor
 	} while (cursor)
 	return all
 }
@@ -95,11 +101,12 @@ export async function getRecord<T>(
 	rkey: string
 ): Promise<RepoRecord<T> | null> {
 	try {
-		return await cachedGet(did, collection, 'com.atproto.repo.getRecord', {
+		const record = await cachedGet<RepoRecord<T>>(did, collection, 'com.atproto.repo.getRecord', {
 			repo: did,
 			collection,
 			rkey
 		})
+		return isValidRecord(collection, record.value) ? record : null
 	} catch (err) {
 		if (isNotFound(err)) return null
 		throw err

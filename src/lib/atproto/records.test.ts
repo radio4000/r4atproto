@@ -1,5 +1,13 @@
 import {describe, expect, test} from 'vitest'
-import {channelFrom, channelToRecord, followRkey, trackFromRecord, trackToRecord} from './records'
+import {
+	broadcastFromRecord,
+	channelFrom,
+	channelToRecord,
+	followRkey,
+	trackFromRecord,
+	trackToRecord
+} from './records'
+import type {Track} from '#lib/types.js'
 
 const owner = {did: 'did:plc:abc', handle: 'alice.test', pds: 'https://pds.test'}
 
@@ -16,7 +24,7 @@ describe('trackFromRecord', () => {
 			}
 		},
 		owner
-	)
+	) as Track
 
 	test('keys the track by its URI and its radio by handle', () => {
 		expect(track.id).toBe('at://did:plc:abc/radio.4000.track/3kabc')
@@ -114,4 +122,41 @@ describe('channelToRecord', () => {
 
 test('followRkey is a valid record key derived from the DID', () => {
 	expect(followRkey('did:plc:ABC123')).toBe('did-plc-abc123')
+})
+
+describe('unsafe links in records', () => {
+	const owner = {did: 'did:plc:x', handle: 'x.test', pds: 'https://pds.test'}
+
+	test('a track whose link is not http(s) is dropped', () => {
+		const record = {
+			uri: 'at://did:plc:x/radio.4000.track/1',
+			cid: 'c',
+			value: {url: 'javascript:alert(1)', title: 'Evil', createdAt: '2026-01-01T00:00:00Z'}
+		}
+		expect(trackFromRecord(record, owner)).toBeNull()
+	})
+
+	test('channel links that are not http(s) are dropped', () => {
+		const channel = channelFrom(owner, {
+			name: 'X',
+			links: [{url: 'javascript:alert(1)'}, {url: 'https://ok.test'}],
+			createdAt: '2026-01-01T00:00:00Z'
+		} as never)
+		expect(channel.links).toEqual([{url: 'https://ok.test'}])
+	})
+
+	test('a broadcast opens a bounded number of decks', () => {
+		const deck = {
+			track: 'at://did:plc:x/radio.4000.track/1',
+			url: 'https://youtu.be/x',
+			positionMs: 0,
+			positionAt: '2026-01-01T00:00:00Z',
+			playing: true
+		}
+		const broadcast = broadcastFromRecord('did:plc:x', {
+			decks: Array.from({length: 50}, () => deck),
+			updatedAt: '2026-01-01T00:00:00Z'
+		})
+		expect(broadcast.decks.length).toBe(4)
+	})
 })

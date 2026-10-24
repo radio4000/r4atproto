@@ -24,7 +24,8 @@
 		"heartbeatSeconds": 60,
 		"staleSeconds": 300,
 		"writeDebounceMs": 800,
-		"idleStopSeconds": 600
+		"idleStopSeconds": 600,
+		"maxDecks": 4
 	},
 	"chat": {
 		"historySize": 50

@@ -49,7 +49,7 @@ function getTrackQueryKey({slugs, ids}: TrackQueryParams): string[] {
 export async function fetchTracksBySlug(handleOrDid: string): Promise<Track[]> {
 	const owner = await resolveIdentity(handleOrDid)
 	const records = await listAllRecords<TrackRecord>(owner.did, TRACK)
-	return records.map((r) => trackFromRecord(r, owner))
+	return records.flatMap((r) => trackFromRecord(r, owner) ?? [])
 }
 
 async function fetchTracksByIds(ids: string[]): Promise<Track[]> {

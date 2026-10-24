@@ -8,6 +8,8 @@ import {extractHashtags, extractMentions} from '#lib/utils.js'
 import type {Broadcast, Channel, Track} from '#lib/types.js'
 import type {Profile} from './profiles'
 import type {RepoRecord} from './repo'
+import {safeUrl} from './validate'
+import app from '#lib/config/app.json' with {type: 'json'}
 
 export interface TrackRecord {
 	$type?: string
@@ -58,21 +60,24 @@ export function bareTags(description: string): string[] {
 	return [...new Set(extractHashtags(description).map((tag) => tag.slice(1)))]
 }
 
+/** A track from its record, or null when its link isn't http(s) */
 export function trackFromRecord(
 	record: RepoRecord<TrackRecord>,
 	owner: {did: string; handle: string}
-): Track {
+): Track | null {
 	const v = record.value
-	const parsed = parseUrl(v.url)
+	const url = safeUrl(v.url)
+	if (!url) return null
+	const parsed = parseUrl(url)
 	const description = v.description ?? null
 	return {
 		id: record.uri,
 		did: owner.did,
 		slug: owner.handle,
-		url: v.url,
+		url,
 		title: v.title,
 		description,
-		discogs_url: v.discogsUrl ?? null,
+		discogs_url: safeUrl(v.discogsUrl),
 		duration: v.duration ?? null,
 		playback_error: v.playbackError ?? null,
 		tags: description ? bareTags(description) : [],
@@ -123,7 +128,9 @@ export function channelFrom(
 		name: record?.name || profile?.displayName || owner.handle,
 		description: record?.description ?? profile?.description ?? null,
 		image,
-		links: record?.links ?? (record?.url ? [{url: record.url}] : []),
+		links: (record?.links ?? (record?.url ? [{url: record.url}] : [])).filter((link) =>
+			safeUrl(link.url)
+		),
 		latitude: Number.isFinite(latitude) ? latitude : null,
 		longitude: Number.isFinite(longitude) ? longitude : null,
 		theme: record?.theme,
@@ -190,10 +197,11 @@ export function broadcastFromRecord(did: string, record: BroadcastRecord): Broad
 	return {
 		channel_id: did,
 		updated_at: record.updatedAt,
-		decks: record.decks.map((d, index) => ({
+		// A listener opens one deck per broadcast deck: keep that bounded
+		decks: record.decks.slice(0, app.broadcast.maxDecks).map((d, index) => ({
 			index,
 			track_id: d.track,
-			track_url: d.url,
+			track_url: safeUrl(d.url) ?? '',
 			track_title: d.title ?? null,
 			track_media_id: null,
 			track_played_at: null,

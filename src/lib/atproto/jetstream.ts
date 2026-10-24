@@ -3,6 +3,7 @@
  * filtered to some collections. One socket per subscription, reconnecting with backoff.
  */
 import app from '../config/app.json' with {type: 'json'}
+import {isValidRecord} from './schemas'
 
 export interface CommitEvent<T = unknown> {
 	did: string
@@ -28,8 +29,17 @@ export function subscribe<T>(collections: string[], onEvent: (event: CommitEvent
 		socket = new WebSocket(url)
 		socket.onopen = () => (retry = 0)
 		socket.onmessage = (message) => {
-			const event = JSON.parse(message.data)
-			if (event.kind === 'commit') onEvent(event)
+			let event: CommitEvent<T>
+			try {
+				event = JSON.parse(message.data)
+			} catch {
+				return
+			}
+			if (event.kind !== 'commit' || typeof event.did !== 'string' || !event.commit) return
+			// Creates and updates must match their lexicon; deletes carry no record
+			const {operation, collection, record} = event.commit
+			if (operation !== 'delete' && !isValidRecord(collection, record)) return
+			onEvent(event)
 		}
 		socket.onclose = () => {
 			if (closed) return

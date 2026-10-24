@@ -18,7 +18,7 @@ async function latestOf(did: string, limit: number): Promise<Track[]> {
 		resolveIdentity(did),
 		listRecords<TrackRecord>(did, TRACK, {limit})
 	])
-	return page.records.map((r) => trackFromRecord(r, owner))
+	return page.records.flatMap((r) => trackFromRecord(r, owner) ?? [])
 }
 
 /** The latest `perRadio` tracks of each radio (optionally only `dids`), merged newest first */
