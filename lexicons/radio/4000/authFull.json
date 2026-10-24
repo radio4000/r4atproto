@@ -1,0 +1,41 @@
+{
+	"lexicon": 1,
+	"id": "radio.4000.authFull",
+	"defs": {
+		"main": {
+			"type": "permission-set",
+			"title": "Radio4000: manage your radio",
+			"title:lang": {"fr": "Radio4000 : gérer votre radio"},
+			"detail": "Add, edit and remove tracks of your radio, update its profile, follow other radios and broadcast what you play. Nothing else in your account.",
+			"detail:lang": {
+				"fr": "Ajouter, modifier et retirer les morceaux de votre radio, mettre à jour son profil, suivre d'autres radios et diffuser ce que vous jouez. Rien d'autre dans votre compte."
+			},
+			"permissions": [
+				{
+					"type": "permission",
+					"resource": "repo",
+					"collection": ["radio.4000.track"],
+					"action": ["create", "update", "delete"]
+				},
+				{
+					"type": "permission",
+					"resource": "repo",
+					"collection": ["radio.4000.channel"],
+					"action": ["create", "update"]
+				},
+				{
+					"type": "permission",
+					"resource": "repo",
+					"collection": ["radio.4000.follow"],
+					"action": ["create", "update", "delete"]
+				},
+				{
+					"type": "permission",
+					"resource": "repo",
+					"collection": ["radio.4000.broadcast"],
+					"action": ["create", "update", "delete"]
+				}
+			]
+		}
+	}
+}

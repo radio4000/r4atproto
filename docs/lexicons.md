@@ -17,8 +17,17 @@ Imported radio4000.com tracks get TIDs made from their original add date, so the
 
 ## OAuth
 
-`src/lib/oauth.ts` builds the granular scope (`repo:` per collection, `blob:image/*`) and the client metadata from the same config. `/client-metadata.json` is a prerendered route, so there is no hand-maintained metadata file. Plain-HTTP dev uses a loopback client id carrying the same scope.
+`src/lib/oauth.ts` builds the scope from config and the permission set `radio.4000.authFull` (`lexicons/radio/4000/authFull.json`): the four collections with only the actions the app uses, plus `blob:image/*` for radio images (blobs can't be part of a set). `/client-metadata.json` is a prerendered route built from the same values. Plain-HTTP dev uses a loopback client id carrying the same scope.
+
+Until the permission set is published, the app asks for its permissions as raw scopes (`repo:radio.4000.track …`), which consent screens show as collection names. Once published, it asks for `include:radio.4000.authFull`, and the PDS shows the set's title and description ("Radio4000: manage your radio"), translated where the PDS supports it.
 
 ## Publishing the schemas
 
-Not done yet. Lexicon resolution needs a DNS TXT record `_lexicon.4000.radio` with `did=<did of the account holding the schemas>`, and the schemas as `com.atproto.lexicon.schema` records (rkey = NSID) in that repo.
+A PDS finds `radio.4000.*` lexicons, and the permission set, through DNS and a repository:
+
+1. Pick the account that holds the schemas (for example one with the handle `4000.radio`) and note its DID.
+2. Add a DNS TXT record on 4000.radio: `_lexicon.4000.radio` with the value `did=<that DID>`.
+3. Publish with [goat](https://github.com/bluesky-social/goat): `goat account login` as that account, then `bun run lexicons:publish` (runs `goat lex publish` over `lexicons/`).
+4. In `src/lib/config/app.json`, set `oauth.permissionSetPublished` to `true` and deploy. Users signing in from then on see the permission set; existing sessions keep their scopes until they renew permissions in Settings.
+
+`bun run lexicons:lint` checks the schemas.

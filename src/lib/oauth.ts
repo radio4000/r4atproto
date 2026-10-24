@@ -1,12 +1,41 @@
 // OAuth client metadata and scopes, derived from config/app.json and our lexicons.
 import app from './config/app.json' with {type: 'json'}
-import {BROADCAST, CHANNEL, FOLLOW, TRACK} from './lexicons'
+import {AUTH} from './lexicons'
 
-/** Granular permissions: write our own collections, follow on Bluesky, upload channel images. */
+type RepoPermission = {resource: string; collection: string[]; action?: string[]}
+
+// The permission set schema, wherever the namespace puts it under /lexicons
+const schemas = import.meta.glob<{id: string; defs: {main: {permissions: RepoPermission[]}}}>(
+	'../../lexicons/**/*.json',
+	{eager: true, import: 'default'}
+)
+const authSet = Object.values(schemas).find((schema) => schema.id === AUTH)
+if (!authSet) throw new Error(`No lexicon for the permission set ${AUTH}`)
+
+/** Raw scopes for a permission set's repo permissions, e.g. repo:radio.4000.channel?action=create&action=update */
+export function repoScopes(permissions: RepoPermission[]): string[] {
+	return permissions
+		.filter((p) => p.resource === 'repo')
+		.flatMap((p) =>
+			p.collection.map((collection) => {
+				const actions = p.action?.length === 3 ? [] : (p.action ?? [])
+				const query = actions.map((action) => `action=${action}`).join('&')
+				return `repo:${collection}${query ? `?${query}` : ''}`
+			})
+		)
+}
+
+/**
+ * What the app asks for at sign-in: the radio.4000 permission set once it is published
+ * (users then see its title and description), the same permissions as raw scopes before.
+ * Blob uploads (channel images) can't be part of a set and are always asked separately.
+ */
 export const OAUTH_SCOPE = [
 	'atproto',
-	...[TRACK, CHANNEL, FOLLOW, BROADCAST, 'app.bsky.graph.follow'].map((nsid) => `repo:${nsid}`),
-	'blob:image/*'
+	...(app.oauth.permissionSetPublished
+		? [`include:${AUTH}`]
+		: repoScopes(authSet.defs.main.permissions)),
+	...app.oauth.blobAccept.map((accept) => `blob:${accept}`)
 ].join(' ')
 
 export const CLIENT_METADATA_PATH = '/client-metadata.json'

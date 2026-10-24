@@ -11,5 +11,10 @@
 		"plcDirectory": "https://plc.directory",
 		"relay": "https://relay1.us-west.bsky.network",
 		"jetstream": "wss://jetstream2.us-east.bsky.network/subscribe"
+	},
+	"oauth": {
+		"permissionSet": "authFull",
+		"permissionSetPublished": false,
+		"blobAccept": ["image/*"]
 	}
 }
