@@ -1,8 +1,8 @@
-export const ssr = false;
-export const prerender = false;
+export const ssr = false
+export const prerender = false
 
-export function load({ params }: { params: { handle: string } }) {
-  return {
-    handle: params.handle
-  };
+export function load({params}: {params: {handle: string}}) {
+	return {
+		handle: params.handle
+	}
 }

@@ -12,10 +12,10 @@ A static list of AT Protocol handles (or DIDs) shown on the `/search` page befor
 
 ```ts
 export const FEATURED_PROFILES: string[] = [
-  'lucho1112.bsky.social',
-  '0sk.ar',
-  'radio4000.com',
-  'hwww.org',
+	'lucho1112.bsky.social',
+	'0sk.ar',
+	'radio4000.com',
+	'hwww.org'
 ]
 ```
 
@@ -41,6 +41,7 @@ These are HSL values used when a user has not customised their appearance or cli
 **File:** `src/lib/i18n/locales/`
 
 Add a new locale by:
+
 1. Copying `en.ts` to `[lang].ts` and translating all strings
 2. Adding the locale code to the available locales list in `src/lib/i18n/index.ts`
 3. The language will appear in `/settings/language` automatically

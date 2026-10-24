@@ -31,12 +31,13 @@ works and its scaling ceiling.
 Form to publish a new music track to the AT Protocol network.
 
 **Fields:**
-| Field | Required | Notes |
-|---|---|---|
-| URL | yes | YouTube, Vimeo, SoundCloud, direct audio files |
-| Title | yes | Auto-filled from oEmbed if left empty |
-| Description | no | Free-text notes |
-| Discogs URL | no | Links to a Discogs release or master for metadata |
+
+| Field       | Required | Notes                                             |
+| ----------- | -------- | ------------------------------------------------- |
+| URL         | yes      | YouTube, Vimeo, SoundCloud, direct audio files    |
+| Title       | yes      | Auto-filled from oEmbed if left empty             |
+| Description | no       | Free-text notes                                   |
+| Discogs URL | no       | Links to a Discogs release or master for metadata |
 
 On success the user is redirected to the new track's detail page.
 
@@ -93,6 +94,7 @@ Same fields as `/add`, pre-filled with the existing track data.
 Batch tool that finds tracks missing a `duration_seconds` value and fetches it automatically.
 
 **Supported sources:**
+
 - YouTube (iframe API)
 - Vimeo (Player API)
 - Direct audio files (HTML5 `Audio`)

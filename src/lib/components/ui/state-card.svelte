@@ -1,45 +1,40 @@
 <script lang="ts">
-	import type { ComponentType, Snippet } from "svelte";
-	import {
-		Card,
-		CardContent,
-		CardDescription,
-		CardFooter,
-		CardHeader,
-		CardTitle,
-	} from "./card";
-	import { cn } from "#lib/utils/index.js";
+	import type {ComponentType, Snippet} from 'svelte'
+	import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from './card'
+	import {cn} from '#lib/utils/index.js'
 
-	type IconComponent = ComponentType<{ class?: string }>;
+	type IconComponent = ComponentType<{class?: string}>
 
 	let {
-		title = "",
-		description = "",
+		title = '',
+		description = '',
 		icon: Icon = null,
 		loading = false,
 		children,
 		actions,
-		class: className,
+		class: className
 	}: {
-		title: string;
-		description?: string;
-		icon?: IconComponent | null;
-		loading?: boolean;
-		children?: Snippet;
-		actions?: Snippet;
-		class?: string;
-	} = $props();
+		title: string
+		description?: string
+		icon?: IconComponent | null
+		loading?: boolean
+		children?: Snippet
+		actions?: Snippet
+		class?: string
+	} = $props()
 </script>
 
-<Card class={cn(
-	"text-center max-w-md mx-auto",
-	loading && "border-none border-0 shadow-none bg-transparent",
-	className
-)}>
+<Card
+	class={cn(
+		'text-center max-w-md mx-auto',
+		loading && 'border-none border-0 shadow-none bg-transparent',
+		className
+	)}
+>
 	<CardHeader class="items-center text-center space-y-4 pb-6">
 		{#if Icon}
 			<div class="rounded-full bg-muted p-4">
-				<Icon class={cn("h-8 w-8 text-muted-foreground", loading && "animate-spin")} />
+				<Icon class={cn('h-8 w-8 text-muted-foreground', loading && 'animate-spin')} />
 			</div>
 		{/if}
 		<div class="space-y-2">

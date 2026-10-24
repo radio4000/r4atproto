@@ -1,6 +1,6 @@
-import { BrowserOAuthClient } from '@atproto/oauth-client-browser'
-import type { OAuthSession } from '@atproto/oauth-client-browser'
-import { Agent } from '@atproto/api'
+import {BrowserOAuthClient} from '@atproto/oauth-client-browser'
+import type {OAuthSession} from '@atproto/oauth-client-browser'
+import {Agent} from '@atproto/api'
 
 interface Session {
 	did: string
@@ -50,10 +50,18 @@ class BskyOAuthService {
 
 	#authorizationDetails() {
 		return [
-			{ type: 'atproto_repo', actions: ['create','update','delete'], identifier: 'com.radio4000.track' },
-			{ type: 'atproto_repo', actions: ['create','update','delete'], identifier: 'com.radio4000.favorite' },
-			{ type: 'atproto_repo', actions: ['create','update'], identifier: 'com.radio4000.profile' },
-			{ type: 'atproto_repo', actions: ['create','update'], identifier: 'com.radio4000.sync' },
+			{
+				type: 'atproto_repo',
+				actions: ['create', 'update', 'delete'],
+				identifier: 'com.radio4000.track'
+			},
+			{
+				type: 'atproto_repo',
+				actions: ['create', 'update', 'delete'],
+				identifier: 'com.radio4000.favorite'
+			},
+			{type: 'atproto_repo', actions: ['create', 'update'], identifier: 'com.radio4000.profile'},
+			{type: 'atproto_repo', actions: ['create', 'update'], identifier: 'com.radio4000.sync'}
 		]
 	}
 
@@ -85,19 +93,23 @@ class BskyOAuthService {
 		try {
 			this.client = await BrowserOAuthClient.load({
 				clientId: clientId,
-				handleResolver: 'https://bsky.social', // Default AT Protocol handle resolver
+				handleResolver: 'https://bsky.social' // Default AT Protocol handle resolver
 			})
 
 			// Process OAuth callback explicitly with persisted redirect if present
 			const params = this.client.readCallbackParams()
 			if (params) {
 				let savedRedirect: string | undefined
-				try { savedRedirect = localStorage.getItem('bsky-oauth-redirect') || undefined } catch {}
+				try {
+					savedRedirect = localStorage.getItem('bsky-oauth-redirect') || undefined
+				} catch {}
 				try {
 					const redirectUri = savedRedirect || this.#canonicalRedirectUri()
-					const { session } = await this.client.initCallback(params, redirectUri as any)
+					const {session} = await this.client.initCallback(params, redirectUri as any)
 					await this.#hydrateFromOAuthSession(session)
-					try { localStorage.removeItem('bsky-oauth-redirect') } catch {}
+					try {
+						localStorage.removeItem('bsky-oauth-redirect')
+					} catch {}
 				} catch (err) {
 					if (this.client.responseMode === 'fragment') {
 						history.replaceState(null, '', location.pathname + location.search)
@@ -140,31 +152,37 @@ class BskyOAuthService {
 				throw new Error('OAuth client not available')
 			}
 
-				const redirectUri = this.#canonicalRedirectUri()
-				try { localStorage.setItem('bsky-oauth-redirect', redirectUri || '') } catch {}
-				const baseOpts: any = {
-					state: window.location.pathname,
-					signal: new AbortController().signal,
-					prompt: 'consent' as const,
-					redirect_uri: redirectUri,
-				}
+			const redirectUri = this.#canonicalRedirectUri()
+			try {
+				localStorage.setItem('bsky-oauth-redirect', redirectUri || '')
+			} catch {}
+			const baseOpts: any = {
+				state: window.location.pathname,
+				signal: new AbortController().signal,
+				prompt: 'consent' as const,
+				redirect_uri: redirectUri
+			}
 
-				// Try fine-grained permissions first; if AS rejects, fall back to base scope
-				const withAuthz: any = {
-					...baseOpts,
-					authorization_details: this.#authorizationDetails(),
-				}
+			// Try fine-grained permissions first; if AS rejects, fall back to base scope
+			const withAuthz: any = {
+				...baseOpts,
+				authorization_details: this.#authorizationDetails()
+			}
 
-				try {
-					await this.client.signIn(handle, withAuthz)
-				} catch (e) {
-					const msg = String((e as Error)?.message || e)
-					if (msg.includes('invalid_request') || msg.includes('invalid_client_metadata') || msg.includes('invalid_scope')) {
-						await this.client.signIn(handle, baseOpts)
-					} else {
-						throw e
-					}
+			try {
+				await this.client.signIn(handle, withAuthz)
+			} catch (e) {
+				const msg = String((e as Error)?.message || e)
+				if (
+					msg.includes('invalid_request') ||
+					msg.includes('invalid_client_metadata') ||
+					msg.includes('invalid_scope')
+				) {
+					await this.client.signIn(handle, baseOpts)
+				} else {
+					throw e
 				}
+			}
 
 			return {
 				success: true,
@@ -200,11 +218,11 @@ class BskyOAuthService {
 		const baseOpts: any = {
 			state: window.location.pathname,
 			signal: new AbortController().signal,
-			prompt: 'consent' as const,
+			prompt: 'consent' as const
 		}
 		const withAuthz: any = {
 			...baseOpts,
-			authorization_details: this.#authorizationDetails(),
+			authorization_details: this.#authorizationDetails()
 		}
 
 		console.log('[requestScopes] Calling signIn with authorization_details...')
@@ -214,13 +232,20 @@ class BskyOAuthService {
 		} catch (e) {
 			console.error('[requestScopes] signIn failed:', e)
 			const msg = String((e as Error)?.message || e)
-			if (msg.includes('invalid_request') || msg.includes('invalid_client_metadata') || msg.includes('invalid_scope') || msg.includes('Invalid redirect_uri')) {
+			if (
+				msg.includes('invalid_request') ||
+				msg.includes('invalid_client_metadata') ||
+				msg.includes('invalid_scope') ||
+				msg.includes('Invalid redirect_uri')
+			) {
 				console.log('[requestScopes] Falling back to base scope...')
 				try {
 					await this.client.signIn(handle, baseOpts)
 				} catch (e2) {
 					console.error('[requestScopes] Base scope also failed:', e2)
-					throw new Error('Unable to request permissions. The authorization server may not support fine-grained permissions.')
+					throw new Error(
+						'Unable to request permissions. The authorization server may not support fine-grained permissions.'
+					)
 				}
 			} else {
 				throw e
@@ -232,11 +257,11 @@ class BskyOAuthService {
 	async resolveHandle(): Promise<string | undefined> {
 		if (!this.session?.did) return this.session?.handle
 		try {
-			const publicAgent = new Agent({ service: 'https://api.bsky.app' })
-			const profile = await publicAgent.getProfile({ actor: this.session.did })
+			const publicAgent = new Agent({service: 'https://api.bsky.app'})
+			const profile = await publicAgent.getProfile({actor: this.session.did})
 			const handle = profile.data?.handle || this.session.handle
 			if (handle && handle !== this.session.handle) {
-				this.session = { ...this.session, handle }
+				this.session = {...this.session, handle}
 			}
 			return handle
 		} catch {
@@ -260,16 +285,20 @@ class BskyOAuthService {
 			// Only attempt callback handling if URL has OAuth params
 			const params = this.client.readCallbackParams()
 			if (!params) {
-				return { session: null, error: null }
+				return {session: null, error: null}
 			}
 
 			let savedRedirect: string | undefined
-			try { savedRedirect = localStorage.getItem('bsky-oauth-redirect') || undefined } catch {}
+			try {
+				savedRedirect = localStorage.getItem('bsky-oauth-redirect') || undefined
+			} catch {}
 			const redirectUri = savedRedirect || this.#canonicalRedirectUri()
-			const { session } = await this.client.initCallback(params, redirectUri as any)
-			try { localStorage.removeItem('bsky-oauth-redirect') } catch {}
+			const {session} = await this.client.initCallback(params, redirectUri as any)
+			try {
+				localStorage.removeItem('bsky-oauth-redirect')
+			} catch {}
 			await this.#hydrateFromOAuthSession(session)
-			return { session: this.session, error: null }
+			return {session: this.session, error: null}
 		} catch (error) {
 			console.error('OAuth callback error:', error)
 			return {
@@ -330,10 +359,10 @@ class BskyOAuthService {
 
 			const result = await this.agent.post({
 				text,
-				createdAt: new Date().toISOString(),
+				createdAt: new Date().toISOString()
 			})
 
-			return { data: result, error: null }
+			return {data: result, error: null}
 		} catch (error) {
 			console.error('Post error:', error)
 			return {
@@ -384,15 +413,13 @@ class BskyOAuthService {
 		// Provide a SessionManager-like object so Agent knows the DID
 		this.agent = new Agent({
 			fetchHandler: (url, init) => oauthSession.fetchHandler(url, init),
-			did: oauthSession.did,
+			did: oauthSession.did
 		})
-
-
 
 		// Set initial handle from cache if available, else DID placeholder
 		const cached = localStorage.getItem(`bsky-handle:${oauthSession.did}`)
 		const initialHandle = cached || oauthSession.did
-		this.session = { did: oauthSession.did, handle: initialHandle }
+		this.session = {did: oauthSession.did, handle: initialHandle}
 		localStorage.setItem('bsky-oauth-did', oauthSession.did)
 	}
 }

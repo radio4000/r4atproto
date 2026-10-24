@@ -76,12 +76,12 @@ Edit `src/lib/config/featured-profiles.ts`. See [configuration.md](./configurati
 All user-visible strings must use the `translate()` helper:
 
 ```ts
-import { locale, translate } from '$lib/i18n'
+import {locale, translate} from '$lib/i18n'
 const t = (key, vars = {}) => translate($locale, key, vars)
 
 // Usage
 t('search.placeholder')
-t('search.emptyDescription', { query: q })
+t('search.emptyDescription', {query: q})
 ```
 
 Add keys to both `src/lib/i18n/locales/en.ts` and `fr.ts` when adding new UI.

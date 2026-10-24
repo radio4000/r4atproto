@@ -5,9 +5,9 @@
 		count?: number
 	}
 
-	let { count = 5 }: Props = $props()
+	let {count = 5}: Props = $props()
 
-	const items = Array.from({ length: count }, (_, i) => i)
+	const items = Array.from({length: count}, (_, i) => i)
 </script>
 
 <div class="flex flex-col gap-3" aria-label="Loading tracks...">

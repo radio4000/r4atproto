@@ -3,37 +3,37 @@
  * Provides standardized error handling for Svelte components
  */
 
-import { toast } from '#lib/stores/toast.svelte.js'
-import { handleServiceError } from './errors'
-import { AppError } from '../errors'
+import {toast} from '#lib/stores/toast.svelte.js'
+import {handleServiceError} from './errors'
+import type {AppError} from '../errors'
 
 export interface ComponentErrorOptions {
-  /**
-   * Show toast notification on error
-   */
-  showToast?: boolean
+	/**
+	 * Show toast notification on error
+	 */
+	showToast?: boolean
 
-  /**
-   * Log error to console
-   */
-  logToConsole?: boolean
+	/**
+	 * Log error to console
+	 */
+	logToConsole?: boolean
 
-  /**
-   * Custom error message prefix
-   */
-  messagePrefix?: string
+	/**
+	 * Custom error message prefix
+	 */
+	messagePrefix?: string
 
-  /**
-   * Fallback message if error cannot be parsed
-   */
-  fallbackMessage?: string
+	/**
+	 * Fallback message if error cannot be parsed
+	 */
+	fallbackMessage?: string
 }
 
 const defaultOptions: Required<ComponentErrorOptions> = {
-  showToast: true,
-  logToConsole: true,
-  messagePrefix: '',
-  fallbackMessage: 'An unexpected error occurred'
+	showToast: true,
+	logToConsole: true,
+	messagePrefix: '',
+	fallbackMessage: 'An unexpected error occurred'
 }
 
 /**
@@ -56,35 +56,35 @@ const defaultOptions: Required<ComponentErrorOptions> = {
  * ```
  */
 export function handleComponentError(
-  error: unknown,
-  options: ComponentErrorOptions = {}
+	error: unknown,
+	options: ComponentErrorOptions = {}
 ): AppError {
-  const opts = { ...defaultOptions, ...options }
+	const opts = {...defaultOptions, ...options}
 
-  // Convert to AppError
-  const appError = handleServiceError(error)
+	// Convert to AppError
+	const appError = handleServiceError(error)
 
-  // Construct user-facing message
-  let userMessage = appError.userMessage || appError.message || opts.fallbackMessage
-  if (opts.messagePrefix) {
-    userMessage = `${opts.messagePrefix}: ${userMessage}`
-  }
+	// Construct user-facing message
+	let userMessage = appError.userMessage || appError.message || opts.fallbackMessage
+	if (opts.messagePrefix) {
+		userMessage = `${opts.messagePrefix}: ${userMessage}`
+	}
 
-  // Log to console
-  if (opts.logToConsole) {
-    console.error('[Component Error]', {
-      message: userMessage,
-      code: appError.code,
-      original: error
-    })
-  }
+	// Log to console
+	if (opts.logToConsole) {
+		console.error('[Component Error]', {
+			message: userMessage,
+			code: appError.code,
+			original: error
+		})
+	}
 
-  // Show toast
-  if (opts.showToast) {
-    toast.error(userMessage)
-  }
+	// Show toast
+	if (opts.showToast) {
+		toast.error(userMessage)
+	}
 
-  return appError
+	return appError
 }
 
 /**
@@ -101,17 +101,17 @@ export function handleComponentError(
  * ```
  */
 export function withErrorHandling<T>(
-  fn: () => Promise<T>,
-  options: ComponentErrorOptions = {}
+	fn: () => Promise<T>,
+	options: ComponentErrorOptions = {}
 ): () => Promise<T | undefined> {
-  return async () => {
-    try {
-      return await fn()
-    } catch (error) {
-      handleComponentError(error, options)
-      return undefined
-    }
-  }
+	return async () => {
+		try {
+			return await fn()
+		} catch (error) {
+			handleComponentError(error, options)
+			return undefined
+		}
+	}
 }
 
 /**
@@ -134,7 +134,7 @@ export function withErrorHandling<T>(
  * ```
  */
 export function createErrorHandler(options: ComponentErrorOptions = {}) {
-  return (error: unknown) => handleComponentError(error, options)
+	return (error: unknown) => handleComponentError(error, options)
 }
 
 /**
@@ -152,10 +152,6 @@ export function createErrorHandler(options: ComponentErrorOptions = {}) {
  * ```
  */
 export function handleSilentError(error: unknown, context?: string) {
-  const appError = handleServiceError(error)
-  console.warn(
-    `[Silent Error${context ? `: ${context}` : ''}]`,
-    appError.message,
-    error
-  )
+	const appError = handleServiceError(error)
+	console.warn(`[Silent Error${context ? `: ${context}` : ''}]`, appError.message, error)
 }

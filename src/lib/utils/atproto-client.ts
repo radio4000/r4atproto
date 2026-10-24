@@ -3,21 +3,21 @@
  * Reusable utilities for working with AT Protocol agents
  */
 
-import { Agent } from '@atproto/api';
-import { bskyOAuth } from '../services/bsky-oauth';
-import { isDpopNonceError } from './errors';
+import {Agent} from '@atproto/api'
+import {bskyOAuth} from '../services/bsky-oauth'
+import {isDpopNonceError} from './errors'
 
 // Public agent singleton
-let publicAgent: Agent | undefined;
+let publicAgent: Agent | undefined
 
 /**
  * Get or create public agent for AppView access
  */
 export function getPublicAgent(): Agent {
-  if (!publicAgent) {
-    publicAgent = new Agent({ service: 'https://api.bsky.app' });
-  }
-  return publicAgent;
+	if (!publicAgent) {
+		publicAgent = new Agent({service: 'https://api.bsky.app'})
+	}
+	return publicAgent
 }
 
 /**
@@ -25,62 +25,62 @@ export function getPublicAgent(): Agent {
  * @throws Error if not authenticated
  */
 export function assertAgent(): Agent {
-  if (!bskyOAuth.agent) {
-    throw new Error('Not authenticated');
-  }
-  return bskyOAuth.agent;
+	if (!bskyOAuth.agent) {
+		throw new Error('Not authenticated')
+	}
+	return bskyOAuth.agent
 }
 
 /**
  * Check if authenticated
  */
 export function isAuthenticated(): boolean {
-  return !!bskyOAuth.agent && !!bskyOAuth.session;
+	return !!bskyOAuth.agent && !!bskyOAuth.session
 }
 
 /**
  * Get current user's DID
  */
 export async function getMyDid(): Promise<string> {
-  const agent = assertAgent();
-  return agent.did!;
+	const agent = assertAgent()
+	return agent.did!
 }
 
 // PDS resolution cache
-const pdsCache = new Map<string, string>();
+const pdsCache = new Map<string, string>()
 
 /**
  * Resolve a DID to its PDS endpoint via PLC directory
  * Results are cached for performance
  */
 export async function getPdsForDid(did: string): Promise<string> {
-  if (pdsCache.has(did)) {
-    return pdsCache.get(did)!;
-  }
+	if (pdsCache.has(did)) {
+		return pdsCache.get(did)!
+	}
 
-  const url = `https://plc.directory/${encodeURIComponent(did)}`;
-  const res = await fetch(url, { headers: { accept: 'application/json' } });
+	const url = `https://plc.directory/${encodeURIComponent(did)}`
+	const res = await fetch(url, {headers: {accept: 'application/json'}})
 
-  if (!res.ok) {
-    throw new Error(`Failed to resolve PDS for ${did}`);
-  }
+	if (!res.ok) {
+		throw new Error(`Failed to resolve PDS for ${did}`)
+	}
 
-  const doc = await res.json();
-  const services = doc?.service || [];
-  const pds = services.find(
-    (s: Record<string, unknown>) =>
-      (s?.id === '#atproto_pds' || /atproto.*pds/i.test(String(s?.type))) &&
-      (s?.serviceEndpoint || s?.endpoint)
-  );
+	const doc = await res.json()
+	const services = doc?.service || []
+	const pds = services.find(
+		(s: Record<string, unknown>) =>
+			(s?.id === '#atproto_pds' || /atproto.*pds/i.test(String(s?.type))) &&
+			(s?.serviceEndpoint || s?.endpoint)
+	)
 
-  const endpoint = (pds?.serviceEndpoint || pds?.endpoint) as string | undefined;
+	const endpoint = (pds?.serviceEndpoint || pds?.endpoint) as string | undefined
 
-  if (!endpoint) {
-    throw new Error(`No PDS endpoint in DID doc for ${did}`);
-  }
+	if (!endpoint) {
+		throw new Error(`No PDS endpoint in DID doc for ${did}`)
+	}
 
-  pdsCache.set(did, endpoint);
-  return endpoint;
+	pdsCache.set(did, endpoint)
+	return endpoint
 }
 
 /**
@@ -88,29 +88,29 @@ export async function getPdsForDid(did: string): Promise<string> {
  * AT Protocol uses DPoP nonces which may need to be refreshed
  */
 export async function withDpopRetry<T>(fn: () => Promise<T>): Promise<T> {
-  try {
-    return await fn();
-  } catch (e) {
-    if (isDpopNonceError(e)) {
-      // Retry once after nonce update
-      try {
-        return await fn();
-      } catch (e2) {
-        throw e2;
-      }
-    }
-    throw e;
-  }
+	try {
+		return await fn()
+	} catch (e) {
+		if (isDpopNonceError(e)) {
+			// Retry once after nonce update
+			try {
+				return await fn()
+			} catch (e2) {
+				throw e2
+			}
+		}
+		throw e
+	}
 }
 
 /**
  * Agent fallback strategy options
  */
 export interface AgentFallbackOptions {
-  /** DID of the target user */
-  did: string;
-  /** Use authenticated agent if accessing own data */
-  useAuthForOwn?: boolean;
+	/** DID of the target user */
+	did: string
+	/** Use authenticated agent if accessing own data */
+	useAuthForOwn?: boolean
 }
 
 /**
@@ -126,49 +126,49 @@ export interface AgentFallbackOptions {
  * @returns Result from the fetch function
  */
 export async function fetchWithAgentFallback<T>(
-  fetchFn: (agent: Agent) => Promise<T>,
-  options: AgentFallbackOptions
+	fetchFn: (agent: Agent) => Promise<T>,
+	options: AgentFallbackOptions
 ): Promise<T> {
-  const { did, useAuthForOwn = true } = options;
+	const {did, useAuthForOwn = true} = options
 
-  // Check if we should use authenticated agent for own data
-  let useAuth = false;
-  let myAgent: Agent | undefined;
+	// Check if we should use authenticated agent for own data
+	let useAuth = false
+	let myAgent: Agent | undefined
 
-  try {
-    myAgent = assertAgent();
-    useAuth = useAuthForOwn && (myAgent.accountDid === did || myAgent.did === did);
-  } catch {
-    // Not authenticated, will use public agent
-  }
+	try {
+		myAgent = assertAgent()
+		useAuth = useAuthForOwn && (myAgent.accountDid === did || myAgent.did === did)
+	} catch {
+		// Not authenticated, will use public agent
+	}
 
-  // Try primary agent (authenticated for own data, public for others)
-  try {
-    const primaryAgent = useAuth ? myAgent! : getPublicAgent();
-    return await fetchFn(primaryAgent);
-  } catch (primaryError) {
-    // If we already tried auth agent, no fallback needed
-    if (useAuth) {
-      throw primaryError;
-    }
+	// Try primary agent (authenticated for own data, public for others)
+	try {
+		const primaryAgent = useAuth ? myAgent! : getPublicAgent()
+		return await fetchFn(primaryAgent)
+	} catch (primaryError) {
+		// If we already tried auth agent, no fallback needed
+		if (useAuth) {
+			throw primaryError
+		}
 
-    // Fallback 1: Try direct PDS access via PLC resolution
-    try {
-      const pds = await getPdsForDid(did);
-      const pdsAgent = new Agent({ service: pds });
-      return await fetchFn(pdsAgent);
-    } catch (pdsError) {
-      // Fallback 2: Try authenticated agent as last resort
-      // (may work if user's PDS can proxy or if they have special access)
-      try {
-        const authAgent = assertAgent();
-        return await fetchFn(authAgent);
-      } catch {
-        // Throw the PDS error since it's more informative than auth error
-        throw pdsError;
-      }
-    }
-  }
+		// Fallback 1: Try direct PDS access via PLC resolution
+		try {
+			const pds = await getPdsForDid(did)
+			const pdsAgent = new Agent({service: pds})
+			return await fetchFn(pdsAgent)
+		} catch (pdsError) {
+			// Fallback 2: Try authenticated agent as last resort
+			// (may work if user's PDS can proxy or if they have special access)
+			try {
+				const authAgent = assertAgent()
+				return await fetchFn(authAgent)
+			} catch {
+				// Throw the PDS error since it's more informative than auth error
+				throw pdsError
+			}
+		}
+	}
 }
 
 /**
@@ -180,40 +180,40 @@ export async function fetchWithAgentFallback<T>(
  * @returns Result from the function
  */
 export async function withRetry<T>(
-  fn: () => Promise<T>,
-  maxRetries = 3,
-  delayMs = 1000,
-  backoffMultiplier = 2
+	fn: () => Promise<T>,
+	maxRetries = 3,
+	delayMs = 1000,
+	backoffMultiplier = 2
 ): Promise<T> {
-  let lastError: unknown;
+	let lastError: unknown
 
-  for (let attempt = 0; attempt <= maxRetries; attempt++) {
-    try {
-      return await fn();
-    } catch (error) {
-      lastError = error;
+	for (let attempt = 0; attempt <= maxRetries; attempt++) {
+		try {
+			return await fn()
+		} catch (error) {
+			lastError = error
 
-      // Don't retry on last attempt
-      if (attempt === maxRetries) {
-        break;
-      }
+			// Don't retry on last attempt
+			if (attempt === maxRetries) {
+				break
+			}
 
-      // Calculate delay with exponential backoff
-      const delay = delayMs * Math.pow(backoffMultiplier, attempt);
+			// Calculate delay with exponential backoff
+			const delay = delayMs * backoffMultiplier ** attempt
 
-      // Wait before retrying
-      await new Promise((resolve) => setTimeout(resolve, delay));
-    }
-  }
+			// Wait before retrying
+			await new Promise((resolve) => setTimeout(resolve, delay))
+		}
+	}
 
-  throw lastError;
+	throw lastError
 }
 
 /**
  * Resolve handle to DID
  */
 export async function resolveHandle(handle: string): Promise<string | undefined> {
-  const agent = getPublicAgent();
-  const res = await agent.resolveHandle({ handle });
-  return res.data?.did;
+	const agent = getPublicAgent()
+	const res = await agent.resolveHandle({handle})
+	return res.data?.did
 }

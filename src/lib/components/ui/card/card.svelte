@@ -1,19 +1,19 @@
 <script lang="ts">
-	import type { WithElementRef } from "bits-ui";
-	import type { HTMLAttributes } from "svelte/elements";
-	import { cn } from "#lib/utils/index.js";
+	import type {WithElementRef} from 'bits-ui'
+	import type {HTMLAttributes} from 'svelte/elements'
+	import {cn} from '#lib/utils/index.js'
 
 	let {
 		ref = $bindable(null),
 		class: className,
 		children,
 		...restProps
-	}: WithElementRef<HTMLAttributes<HTMLDivElement>> = $props();
+	}: WithElementRef<HTMLAttributes<HTMLDivElement>> = $props()
 </script>
 
 <div
 	bind:this={ref}
-	class={cn("bg-background text-foreground rounded-xl border border-border shadow-sm", className)}
+	class={cn('bg-background text-foreground rounded-xl border border-border shadow-sm', className)}
 	{...restProps}
 >
 	{@render children?.()}

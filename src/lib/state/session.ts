@@ -1,5 +1,5 @@
-import { writable, type Writable } from 'svelte/store'
-import { bskyOAuth } from '../services/bsky-oauth'
+import {writable, type Writable} from 'svelte/store'
+import {bskyOAuth} from '../services/bsky-oauth'
 
 interface SessionData {
 	did: string | null
@@ -11,18 +11,18 @@ interface SessionStore extends Writable<SessionData> {
 }
 
 function createSessionStore(): SessionStore {
-  const { subscribe, set, update } = writable<SessionData>({ did: null, handle: null })
+	const {subscribe, set, update} = writable<SessionData>({did: null, handle: null})
 
-  function refresh(): void {
-    const did = bskyOAuth.session?.did || null
-    const handle = bskyOAuth.session?.handle || null
-    set({ did, handle })
-  }
+	function refresh(): void {
+		const did = bskyOAuth.session?.did || null
+		const handle = bskyOAuth.session?.handle || null
+		set({did, handle})
+	}
 
-  // initialize from current session
-  refresh()
+	// initialize from current session
+	refresh()
 
-  return { subscribe, refresh, set, update }
+	return {subscribe, refresh, set, update}
 }
 
 export const session = createSessionStore()

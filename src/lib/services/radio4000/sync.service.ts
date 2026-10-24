@@ -3,10 +3,10 @@
  * Handles syncing data from Radio4000 legacy platform to AT Protocol
  */
 
-import { AtUri } from '@atproto/api'
-import { assertAgent, withDpopRetry, withRetry } from '../../utils/atproto-client'
-import { listAllTracksByDid } from '../atproto/tracks.service'
-import type { R4SyncRecord, Radio4000Channel, Radio4000Track } from '../../types'
+import {AtUri} from '@atproto/api'
+import {assertAgent, withDpopRetry, withRetry} from '../../utils/atproto-client'
+import {listAllTracksByDid} from '../atproto/tracks.service'
+import type {R4SyncRecord, Radio4000Channel, Radio4000Track} from '../../types'
 
 export const R4_SYNC_COLLECTION = 'com.radio4000.sync'
 export const R4_COLLECTION = 'com.radio4000.track'
@@ -18,14 +18,16 @@ export async function getR4SyncConfig(): Promise<R4SyncRecord | null> {
 	const agent = assertAgent()
 	const did = agent.accountDid!
 	try {
-		const res = await withDpopRetry(() => agent.com.atproto.repo.listRecords({
-			repo: did,
-			collection: R4_SYNC_COLLECTION,
-			limit: 1,
-		}))
+		const res = await withDpopRetry(() =>
+			agent.com.atproto.repo.listRecords({
+				repo: did,
+				collection: R4_SYNC_COLLECTION,
+				limit: 1
+			})
+		)
 		if (res.data.records.length === 0) return null
 		const record = res.data.records[0]
-		return { uri: record.uri, cid: record.cid, ...record.value } as R4SyncRecord
+		return {uri: record.uri, cid: record.cid, ...record.value} as R4SyncRecord
 	} catch (err) {
 		console.error('Failed to get sync config:', err)
 		return null
@@ -35,7 +37,11 @@ export async function getR4SyncConfig(): Promise<R4SyncRecord | null> {
 /**
  * Set the Radio4000 sync configuration
  */
-export async function setR4SyncConfig(config: { apiEndpoint: string; apiKey: string; channelSlug: string }): Promise<void> {
+export async function setR4SyncConfig(config: {
+	apiEndpoint: string
+	apiKey: string
+	channelSlug: string
+}): Promise<void> {
 	const agent = assertAgent()
 	const did = agent.accountDid!
 	const existing = await getR4SyncConfig()
@@ -45,38 +51,46 @@ export async function setR4SyncConfig(config: { apiEndpoint: string; apiKey: str
 		const record = {
 			$type: R4_SYNC_COLLECTION,
 			...config,
-			updatedAt: new Date().toISOString(),
+			updatedAt: new Date().toISOString()
 		}
-		await withDpopRetry(() => agent.com.atproto.repo.putRecord({
-			repo: did,
-			collection: R4_SYNC_COLLECTION,
-			rkey: at.rkey!,
-			record,
-		}))
+		await withDpopRetry(() =>
+			agent.com.atproto.repo.putRecord({
+				repo: did,
+				collection: R4_SYNC_COLLECTION,
+				rkey: at.rkey!,
+				record
+			})
+		)
 	} else {
 		const record = {
 			$type: R4_SYNC_COLLECTION,
 			...config,
-			createdAt: new Date().toISOString(),
+			createdAt: new Date().toISOString()
 		}
-		await withDpopRetry(() => agent.com.atproto.repo.createRecord({
-			repo: did,
-			collection: R4_SYNC_COLLECTION,
-			record,
-		}))
+		await withDpopRetry(() =>
+			agent.com.atproto.repo.createRecord({
+				repo: did,
+				collection: R4_SYNC_COLLECTION,
+				record
+			})
+		)
 	}
 }
 
 /**
  * Fetch a Radio4000 channel from the legacy API
  */
-export async function fetchRadio4000Channel(apiEndpoint: string, apiKey: string, channelSlug: string): Promise<Radio4000Channel | null> {
+export async function fetchRadio4000Channel(
+	apiEndpoint: string,
+	apiKey: string,
+	channelSlug: string
+): Promise<Radio4000Channel | null> {
 	const url = `${apiEndpoint}/rest/v1/channels?slug=eq.${encodeURIComponent(channelSlug)}&select=id,slug,name,description`
 	const res = await fetch(url, {
 		headers: {
-			'apikey': apiKey,
-			'accept': 'application/json',
-		},
+			apikey: apiKey,
+			accept: 'application/json'
+		}
 	})
 	if (!res.ok) throw new Error(`Failed to fetch channel: ${res.statusText}`)
 	const data = await res.json()
@@ -87,7 +101,11 @@ export async function fetchRadio4000Channel(apiEndpoint: string, apiKey: string,
 /**
  * Fetch all tracks for a Radio4000 channel
  */
-export async function fetchRadio4000Tracks(apiEndpoint: string, apiKey: string, channelSlug: string): Promise<Radio4000Track[]> {
+export async function fetchRadio4000Tracks(
+	apiEndpoint: string,
+	apiKey: string,
+	channelSlug: string
+): Promise<Radio4000Track[]> {
 	// First get the channel to get its ID
 	const channel = await fetchRadio4000Channel(apiEndpoint, apiKey, channelSlug)
 	if (!channel) throw new Error('Channel not found')
@@ -97,9 +115,9 @@ export async function fetchRadio4000Tracks(apiEndpoint: string, apiKey: string, 
 	const url = `${apiEndpoint}/rest/v1/channels?slug=eq.${encodeURIComponent(channelSlug)}&select=tracks:channel_track(created_at,track:tracks(id,url,title,description,discogs_url,created_at,updated_at))&tracks.order=created_at.asc`
 	const res = await fetch(url, {
 		headers: {
-			'apikey': apiKey,
-			'accept': 'application/json',
-		},
+			apikey: apiKey,
+			accept: 'application/json'
+		}
 	})
 	if (!res.ok) throw new Error(`Failed to fetch tracks: ${res.statusText}`)
 	const data = await res.json()
@@ -111,14 +129,16 @@ export async function fetchRadio4000Tracks(apiEndpoint: string, apiKey: string, 
 	// Extract tracks from the nested structure
 	// Tracks are already ordered by channel_track.created_at ascending (oldest first)
 	// Preserve the channel_track.created_at as that's when the track was added to the channel
-	return channelData.tracks.map((item: { created_at: string; track: Radio4000Track | null }) => {
-		if (!item.track) return null
-		return {
-			...item.track,
-			// Override track.created_at with channel_track.created_at to preserve add order
-			created_at: item.created_at,
-		}
-	}).filter(Boolean) as Radio4000Track[]
+	return channelData.tracks
+		.map((item: {created_at: string; track: Radio4000Track | null}) => {
+			if (!item.track) return null
+			return {
+				...item.track,
+				// Override track.created_at with channel_track.created_at to preserve add order
+				created_at: item.created_at
+			}
+		})
+		.filter(Boolean) as Radio4000Track[]
 }
 
 /**
@@ -131,7 +151,7 @@ export async function importRadio4000Tracks(
 	channelSlug: string,
 	onProgress?: (current: number, total: number, skipped: number) => void,
 	onError?: (error: string) => void
-): Promise<{ imported: number; skipped: number }> {
+): Promise<{imported: number; skipped: number}> {
 	const agent = assertAgent()
 	const myDid = agent.accountDid!
 
@@ -140,10 +160,10 @@ export async function importRadio4000Tracks(
 
 	// Get existing tracks to check for duplicates
 	const existingTracks = await listAllTracksByDid(myDid)
-	const existingUrls = new Set(existingTracks.map(t => t.url.toLowerCase().trim()))
+	const existingUrls = new Set(existingTracks.map((t) => t.url.toLowerCase().trim()))
 
 	// Filter out duplicates
-	const tracksToImport = r4Tracks.filter(track => {
+	const tracksToImport = r4Tracks.filter((track) => {
 		const normalizedUrl = track.url.toLowerCase().trim()
 		return !existingUrls.has(normalizedUrl)
 	})
@@ -181,8 +201,8 @@ export async function importRadio4000Tracks(
 						discogs_url: track.discogs_url || undefined,
 						r4SupabaseId: track.id, // Save Radio4000 Supabase ID
 						created_at: track.created_at, // Preserve original created timestamp
-						updated_at: track.updated_at, // Preserve original updated timestamp
-					},
+						updated_at: track.updated_at // Preserve original updated timestamp
+					}
 				}
 			})
 
@@ -190,7 +210,7 @@ export async function importRadio4000Tracks(
 			await withRetry(() =>
 				agent.com.atproto.repo.applyWrites({
 					repo: myDid,
-					writes,
+					writes
 				})
 			)
 
@@ -203,5 +223,5 @@ export async function importRadio4000Tracks(
 		}
 	}
 
-	return { imported, skipped }
+	return {imported, skipped}
 }
