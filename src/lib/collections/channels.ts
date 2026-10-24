@@ -117,8 +117,10 @@ export function fetchRadioDids(): Promise<string[]> {
 export const channelsCollection = createCollection<Channel, string>({
 	...queryCollectionOptions({
 		queryKey: (opts) => {
+			// Every key extends the base key: ['channels'], browsing everything
 			const {actors, limit, geo} = parseChannelParams(opts)
 			if (actors.length) return ['channels', ...actors.toSorted()]
+			if (!limit && !geo) return ['channels']
 			return ['channels', 'browse', geo ? 'geo' : 'all', limit ?? 'all']
 		},
 		syncMode: 'on-demand',

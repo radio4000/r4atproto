@@ -1,150 +1,159 @@
-<script lang="ts">
-	import {session} from '#lib/state/session.js'
-	import {getProfile, listR4FavoritesByDid, getProfiles} from '#lib/services/r4-service.js'
-	import {Button} from '#lib/components/ui/button/index.js'
-	import {Input} from '#lib/components/ui/input/index.js'
-	import {
-		Card,
-		CardContent,
-		CardDescription,
-		CardHeader,
-		CardTitle
-	} from '#lib/components/ui/card/index.js'
-	import StateCard from '#lib/components/ui/state-card.svelte'
-	import ProfileHeader from '#lib/components/legacy/ProfileHeader.svelte'
-	import SignInForm from '#lib/components/legacy/SignInForm.svelte'
-	import {Loader2, Users, Search} from 'lucide-svelte'
-	import {locale, translate} from '#lib/i18n/index.js'
-	import SeoHead from '#lib/components/legacy/SeoHead.svelte'
+<script>
 	import {goto} from '$app/navigation'
-	import {resolve} from '$app/paths'
+	import {appState} from '#lib/app-state.svelte.js'
+	import {useLiveQuery} from '#lib/useLiveQuery.svelte.js'
+	import {channelsCollection} from '#lib/collections/channels.js'
+	import {followsCollection} from '#lib/collections/follows.js'
+	import {fetchLatestTracks} from '#lib/collections/feed.js'
+	import {authHref, channelHref, searchHref} from '#lib/links.js'
+	import app from '#lib/config/app.json' with {type: 'json'}
+	import ChannelCard from '#lib/components/channel-card.svelte'
+	import Tracklist from '#lib/components/tracklist.svelte'
+	import SearchInput from '#lib/components/search-input.svelte'
+	import IconR4 from '#lib/components/icon-r4.svelte'
+	import Seo from '#lib/components/seo.svelte'
+	import * as m from '#lib/paraglide/messages.js'
 
-	let myProfile = $state(null)
-	let follows = $state([])
-	let followProfiles = $state(new Map())
-	let loadingHome = $state(false)
-	let searchQuery = $state('')
-	const t = (key, vars = {}) => translate($locale, key, vars)
-
-	function goToSearch(event: SubmitEvent) {
-		event.preventDefault()
-		const query = searchQuery.trim()
-		goto(query ? `${resolve('/search')}?q=${encodeURIComponent(query)}` : resolve('/search'))
-	}
-
-	async function loadHomeData() {
-		if (!$session?.did || !$session?.handle) return
-		loadingHome = true
-		try {
-			const [profile, favoritesData] = await Promise.all([
-				getProfile($session.handle),
-				listR4FavoritesByDid($session.did, {limit: 10})
-			])
-			myProfile = profile
-			const uniqueFollows = new Map()
-			for (const follow of favoritesData.favorites || []) {
-				const key = follow?.subject || follow?.uri
-				if (key && !uniqueFollows.has(key)) {
-					uniqueFollows.set(key, follow)
-				}
-			}
-			follows = Array.from(uniqueFollows.values())
-
-			if (follows.length > 0) {
-				const dids = follows.map((f) => f.subject).filter(Boolean)
-				followProfiles = await getProfiles(dids)
-			}
-		} catch (err) {
-			console.error('Failed to load home data:', err)
-		} finally {
-			loadingHome = false
-		}
-	}
-
-	const isAuthenticated = $derived($session && $session.did)
-
+	let search = $state('')
 	$effect(() => {
-		if (isAuthenticated) {
-			loadHomeData()
-		}
+		const q = search.trim()
+		if (q) goto(searchHref(q))
 	})
+
+	const followsQuery = useLiveQuery(followsCollection)
+	const followedDids = $derived((followsQuery.data ?? []).map((f) => f.id))
+
+	// Signed in with follows: their latest; otherwise the whole network's
+	const feedDids = $derived(appState.session && followedDids.length ? followedDids : undefined)
+	let feed = $state(/** @type {import('#lib/types.js').Track[] | undefined} */ (undefined))
+	$effect(() => {
+		const dids = feedDids
+		fetchLatestTracks({perRadio: 4, dids}).then((tracks) => (feed = tracks.slice(0, 30)))
+	})
+
+	const RADIOS_ON_HOME = 12
+	const channelsQuery = useLiveQuery((q) =>
+		q
+			.from({c: channelsCollection})
+			.orderBy(({c}) => c.latest_track_at, 'desc')
+			.limit(RADIOS_ON_HOME)
+	)
+	const radios = $derived(channelsQuery.data ?? [])
 </script>
 
-<SeoHead title={t('home.title')} description={t('home.subtitle')} />
+<Seo title={m.home_title({appName: app.name})} description={m.welcome_tagline_channel()} plain />
 
-{#snippet searchBar()}
-	<form onsubmit={goToSearch} class="relative" role="search">
-		<Search
-			class="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none"
-		/>
-		<Input
-			type="search"
-			name="q"
-			bind:value={searchQuery}
-			placeholder={t('search.placeholder')}
-			class="pl-12 pr-24 h-12 text-base"
-			aria-label={t('search.title')}
-		/>
-		<Button type="submit" size="sm" class="absolute right-1.5 top-1/2 -translate-y-1/2">
-			{t('search.submit')}
-		</Button>
-	</form>
-{/snippet}
-
-{#if isAuthenticated}
-	<div class="container max-w-4xl py-4 space-y-6">
-		{@render searchBar()}
-		{#if loadingHome}
-			<div class="flex items-center justify-center min-h-[50vh]">
-				<StateCard
-					icon={Loader2}
-					loading={true}
-					title="Loading your profile"
-					description="Fetching your profile and favorites."
-				/>
-			</div>
-		{:else}
-			{#if myProfile && $session?.handle}
-				<ProfileHeader profile={myProfile} handle={$session.handle} size="lg" class="mb-6" />
-			{/if}
-
-			{#if follows.length > 0}
-				<div class="space-y-3" role="region" aria-label="Your favorite profiles">
-					{#each follows as follow (follow.uri || follow.subject)}
-						{@const profile = followProfiles.get(follow?.subject)}
-						<ProfileHeader {profile} handle={profile?.handle || follow?.subject} size="sm" />
-					{/each}
-				</div>
+<r4-page size="wide">
+	<r4-home-hero>
+		<IconR4 size={56} />
+		<hgroup>
+			<h1>{m.welcome_tagline_channel()}</h1>
+			<p>{m.home_atproto_note()}</p>
+		</hgroup>
+		<menu>
+			{#if appState.session}
+				<li><a href={channelHref(appState.session.handle)}>{m.home_your_channel()}</a></li>
 			{:else}
-				<Card class="border">
-					<CardHeader>
-						<CardTitle class="flex items-center gap-2">
-							<Users class="h-5 w-5" />
-							No favorites yet
-						</CardTitle>
-						<CardDescription>Start adding Radio4000 favorites to see them here.</CardDescription>
-					</CardHeader>
-					<CardContent class="flex flex-col sm:flex-row gap-2">
-						<Button href="/explore" class="w-full">
-							{t('explore.title')}
-						</Button>
-						<Button href="/search" variant="outline" class="w-full">
-							{t('home.exploreProfiles')}
-						</Button>
-					</CardContent>
-				</Card>
+				<li><a href={authHref('/')}>{m.home_start_radio()}</a></li>
 			{/if}
-		{/if}
-	</div>
-{:else}
-	<div class="container mx-auto max-w-2xl mt-10 px-3 space-y-8">
-		<div class="mb-8 text-center space-y-3 animate-in">
-			<h1 class="text-4xl font-bold text-gradient">{t('home.title')}</h1>
-			<p class="text-lg text-muted-foreground">{t('home.subtitle')}</p>
-		</div>
+			<li><a href="/explore">{m.home_explore_all()}</a></li>
+		</menu>
+		<search>
+			<SearchInput bind:value={search} placeholder={m.search_title()} />
+		</search>
+	</r4-home-hero>
 
-		{@render searchBar()}
+	<r4-home-columns>
+		<section>
+			<h2>{feedDids ? m.home_latest_following() : m.home_latest_network()}</h2>
+			{#if feed?.length}
+				<Tracklist
+					tracks={feed}
+					showSlug
+					playContext
+					playlistTitle={feedDids ? m.home_following() : m.home_latest_network()}
+				/>
+			{:else if feed}
+				<r4-empty><p>{m.channel_no_tracks()}</p></r4-empty>
+			{:else}
+				<r4-empty><p role="status">{m.common_loading()}</p></r4-empty>
+			{/if}
+		</section>
 
-		<SignInForm variant="default" />
-	</div>
-{/if}
+		<section>
+			<h2><a href="/explore">{m.home_radios()}</a></h2>
+			{#if radios.length}
+				<r4-grid>
+					{#each radios as channel (channel.id)}
+						<ChannelCard {channel} />
+					{/each}
+				</r4-grid>
+			{:else if !channelsQuery.isReady}
+				<r4-empty><p role="status">{m.common_loading()}</p></r4-empty>
+			{/if}
+		</section>
+	</r4-home-columns>
+</r4-page>
+
+<style>
+	r4-home-hero {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: var(--space-3);
+		padding-block: var(--space-3);
+		text-align: center;
+
+		hgroup {
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-2);
+			max-width: var(--measure);
+			margin: 0;
+		}
+
+		h1 {
+			font-size: var(--font-8);
+		}
+
+		p {
+			color: var(--gray-10);
+		}
+
+		menu {
+			justify-content: center;
+		}
+
+		search {
+			display: flex;
+			width: 100%;
+			max-width: var(--measure-narrow);
+		}
+	}
+
+	r4-home-columns {
+		display: grid;
+		grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+		gap: var(--space-3);
+		align-items: start;
+
+		@media (max-width: 1024px) {
+			grid-template-columns: minmax(0, 1fr);
+		}
+
+		section {
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-2);
+			min-width: 0;
+		}
+
+		h2 a {
+			text-decoration: none;
+		}
+	}
+
+	r4-home-columns r4-grid {
+		--grid-min: 150px;
+	}
+</style>

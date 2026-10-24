@@ -1,136 +1,195 @@
-<script lang="ts">
-	import {onMount} from 'svelte'
-	import {browser} from '$app/env'
-	import {getNetworkLatestTracks, type NetworkRadio} from '#lib/services/r4-service.js'
-	import NetworkRadioCard from '#lib/components/legacy/NetworkRadioCard.svelte'
-	import TrackListSkeleton from '#lib/components/ui/skeleton/TrackListSkeleton.svelte'
-	import StateCard from '#lib/components/ui/state-card.svelte'
-	import {Button} from '#lib/components/ui/button/index.js'
-	import {Loader2, AlertCircle, Compass, RefreshCw} from 'lucide-svelte'
-	import {locale, translate} from '#lib/i18n/index.js'
-	import SeoHead from '#lib/components/legacy/SeoHead.svelte'
+<script>
+	import {page} from '$app/state'
+	import {goto} from '$app/navigation'
+	import {useLiveQuery} from '#lib/useLiveQuery.svelte.js'
+	import {channelsCollection} from '#lib/collections/channels.js'
+	import {fetchLatestTracks} from '#lib/collections/feed.js'
+	import {fuzzySearch, getChannelTags} from '#lib/utils.js'
+	import app from '#lib/config/app.json' with {type: 'json'}
+	import ChannelCard from '#lib/components/channel-card.svelte'
+	import Tracklist from '#lib/components/tracklist.svelte'
+	import SearchInput from '#lib/components/search-input.svelte'
+	import FilterChips from '#lib/components/filter-chips.svelte'
+	import Seo from '#lib/components/seo.svelte'
+	import * as m from '#lib/paraglide/messages.js'
 
-	const TRACKS_PER_USER = 10
-	// Discover radios in small pages so the first paint stays light and the
-	// "Load more" pagination is exercised as the network grows.
-	const RADIOS_PER_PAGE = 12
+	const TABS = ['radios', 'tracks', 'tags']
+	const tab = $derived(
+		TABS.includes(page.url.searchParams.get('tab') ?? '')
+			? page.url.searchParams.get('tab')
+			: 'radios'
+	)
+	const q = $derived(page.url.searchParams.get('q') ?? '')
+	const tag = $derived(page.url.searchParams.get('tag') ?? '')
+	const order = $derived(page.url.searchParams.get('order') === 'name' ? 'name' : 'updated')
 
-	const t = (key: string, vars = {}) => translate($locale, key, vars)
-
-	let radios = $state<NetworkRadio[]>([])
-	let cursor = $state<string | undefined>(undefined)
-	let loading = $state(true)
-	let loadingMore = $state(false)
-	let error = $state('')
-	let loaded = $state(false)
-
-	async function loadInitial() {
-		loading = true
-		error = ''
-		try {
-			const res = await getNetworkLatestTracks({
-				tracksPerUser: TRACKS_PER_USER,
-				maxUsers: RADIOS_PER_PAGE
-			})
-			radios = res.radios
-			cursor = res.cursor
-			loaded = true
-		} catch (err) {
-			error = (err as Error)?.message || String(err)
-		} finally {
-			loading = false
+	/** Change URL params, keeping the rest */
+	function setParams(changes) {
+		const params = new URLSearchParams(page.url.search)
+		for (const [key, value] of Object.entries(changes)) {
+			if (value) params.set(key, value)
+			else params.delete(key)
 		}
+		goto(`/explore?${params}`, {replace: true, reset: false})
 	}
 
-	async function loadMore() {
-		if (!cursor || loadingMore) return
-		loadingMore = true
-		error = ''
-		try {
-			const res = await getNetworkLatestTracks({
-				tracksPerUser: TRACKS_PER_USER,
-				maxUsers: RADIOS_PER_PAGE,
-				cursor
-			})
-			// De-dupe in case a repo appears across pages.
-			const seen = new Set(radios.map((r) => r.did))
-			radios = [...radios, ...res.radios.filter((r) => !seen.has(r.did))]
-			cursor = res.cursor
-		} catch (err) {
-			error = (err as Error)?.message || String(err)
-		} finally {
-			loadingMore = false
-		}
-	}
+	const tabHref = (name) => (name === 'radios' ? '/explore' : `/explore?tab=${name}`)
 
-	onMount(() => {
-		if (browser) loadInitial()
+	// Radios: every repo the relay lists as holding tracks
+	const channelsQuery = useLiveQuery((query) => query.from({c: channelsCollection}))
+	const radios = $derived.by(() => {
+		const all = channelsQuery.data ?? []
+		const sorted =
+			order === 'name'
+				? all.toSorted((a, b) => a.name.localeCompare(b.name))
+				: all.toSorted((a, b) => (b.latest_track_at ?? '').localeCompare(a.latest_track_at ?? ''))
+		return q ? fuzzySearch(q, sorted, ['name', 'slug', 'description']) : sorted
 	})
+
+	// Tracks and tags: the latest of every radio
+	let feed = $state(/** @type {import('#lib/types.js').Track[] | undefined} */ (undefined))
+	$effect(() => {
+		if (tab !== 'radios' && !feed)
+			fetchLatestTracks({perRadio: 25}).then((tracks) => (feed = tracks))
+	})
+	const tracks = $derived.by(() => {
+		let list = feed ?? []
+		if (tag) list = list.filter((t) => t.tags.includes(tag))
+		return q ? fuzzySearch(q, list, ['title', 'description', 'slug']) : list
+	})
+	const tags = $derived(getChannelTags(feed ?? []))
 </script>
 
-<SeoHead title={t('explore.title')} description={t('explore.description')} />
+<Seo title={m.explore_title({appName: app.name})} plain />
 
-<div class="container max-w-3xl py-6 lg:py-10 space-y-6">
-	<header class="space-y-2 text-center">
-		<h1
-			class="flex items-center justify-center gap-2 text-3xl lg:text-4xl font-bold text-foreground"
-		>
-			<Compass class="h-7 w-7" />
-			{t('explore.title')}
-		</h1>
-		<p class="text-muted-foreground max-w-xl mx-auto">{t('explore.description')}</p>
-		{#if loaded && !loading && radios.length}
-			<Button
-				variant="ghost"
-				size="sm"
-				onclick={loadInitial}
-				class="gap-2 text-muted-foreground"
-				title={t('explore.refresh')}
-			>
-				<RefreshCw class="h-4 w-4" />
-				{t('explore.refresh')}
-			</Button>
+<r4-page size="wide">
+	<r4-page-header>
+		<h1>{m.nav_explore()}</h1>
+		<nav aria-label={m.nav_explore()}>
+			<menu>
+				<li>
+					<a href={tabHref('radios')} aria-current={tab === 'radios' ? 'page' : undefined}
+						>{m.home_radios()}</a
+					>
+				</li>
+				<li>
+					<a href={tabHref('tracks')} aria-current={tab === 'tracks' ? 'page' : undefined}
+						>{m.explore_tab_tracks()}</a
+					>
+				</li>
+				<li>
+					<a href={tabHref('tags')} aria-current={tab === 'tags' ? 'page' : undefined}
+						>{m.explore_tab_tags()}</a
+					>
+				</li>
+			</menu>
+		</nav>
+	</r4-page-header>
+
+	{#if tab !== 'tags'}
+		<search>
+			<SearchInput
+				bind:value={() => q, (value) => setParams({q: value})}
+				placeholder={tab === 'radios'
+					? m.channels_search_placeholder()
+					: m.search_tracks_placeholder()}
+				debounce={200}
+			/>
+			{#if tab === 'radios'}
+				<select
+					aria-label={m.sort_order_label()}
+					value={order}
+					onchange={(e) => setParams({order: e.currentTarget.value === 'name' ? 'name' : ''})}
+				>
+					<option value="updated">{m.channels_order_updated()}</option>
+					<option value="name">{m.channels_order_name()}</option>
+				</select>
+			{/if}
+		</search>
+	{/if}
+
+	{#if tab === 'radios'}
+		{#if radios.length}
+			<r4-grid>
+				{#each radios as channel (channel.id)}
+					<ChannelCard {channel} />
+				{/each}
+			</r4-grid>
+		{:else if channelsQuery.isReady}
+			<r4-empty><p>{q ? `${m.search_no_results()} "${q}"` : m.channel_no_tracks()}</p></r4-empty>
+		{:else}
+			<r4-empty><p role="status">{m.common_loading()}</p></r4-empty>
 		{/if}
-	</header>
-
-	{#if error && !radios.length}
-		<StateCard icon={AlertCircle} title={t('explore.errorTitle')} description={error}>
-			{#snippet actions()}
-				<Button variant="outline" onclick={loadInitial}>{t('buttons.tryAgain')}</Button>
-			{/snippet}
-		</StateCard>
-	{:else if loading}
-		<div class="space-y-3">
-			<TrackListSkeleton count={6} />
-		</div>
-	{:else if radios.length}
-		<div class="space-y-8">
-			{#each radios as radio (radio.did)}
-				<NetworkRadioCard {radio} />
-			{/each}
-		</div>
-
-		{#if error}
-			<p class="text-center text-sm text-destructive">{error}</p>
+	{:else if tab === 'tracks'}
+		{#if tag}
+			<FilterChips tags={[tag]} onRemoveTag={() => setParams({tag: ''})} />
 		{/if}
-
-		{#if cursor}
-			<div class="flex justify-center pt-2">
-				<Button variant="outline" onclick={loadMore} disabled={loadingMore} class="gap-2">
-					{#if loadingMore}
-						<Loader2 class="h-4 w-4 animate-spin" />
-						{t('explore.loadingMore')}
-					{:else}
-						{t('explore.loadMore')}
-					{/if}
-				</Button>
-			</div>
+		{#if tracks.length}
+			<Tracklist
+				{tracks}
+				showSlug
+				playContext
+				playlistTitle={tag ? `#${tag}` : m.home_latest_network()}
+				onTagClick={(t) => setParams({tag: t})}
+				selectedTags={tag ? [tag] : []}
+			/>
+		{:else if feed}
+			<r4-empty><p>{m.tracks_empty_filter()}</p></r4-empty>
+		{:else}
+			<r4-empty><p role="status">{m.common_loading()}</p></r4-empty>
 		{/if}
 	{:else}
-		<StateCard
-			icon={Compass}
-			title={t('explore.emptyTitle')}
-			description={t('explore.emptyDescription')}
-		/>
+		{#if tags.length}
+			<ul>
+				{#each tags as t (t.value)}
+					<li>
+						<a href="/explore?tab=tracks&tag={encodeURIComponent(t.value)}">#{t.value}</a>
+						<small>{t.count}</small>
+					</li>
+				{/each}
+			</ul>
+		{:else if feed}
+			<r4-empty><p>{m.tags_no_tags()}</p></r4-empty>
+		{:else}
+			<r4-empty><p role="status">{m.common_loading()}</p></r4-empty>
+		{/if}
 	{/if}
-</div>
+</r4-page>
+
+<style>
+	search {
+		display: flex;
+		gap: var(--space-1);
+
+		select {
+			flex: 0 0 auto;
+		}
+	}
+
+	ul {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-1);
+		padding: 0;
+		margin: 0;
+		list-style: none;
+	}
+
+	ul > li {
+		display: inline-flex;
+		align-items: baseline;
+		gap: var(--space-1);
+		padding: var(--space-1) var(--space-2);
+		background: var(--color-interface-elevated);
+		border: 1px solid var(--color-interface-border);
+		border-radius: calc(var(--border-radius) * 999);
+
+		a {
+			text-decoration: none;
+		}
+
+		small {
+			color: var(--gray-9);
+		}
+	}
+</style>

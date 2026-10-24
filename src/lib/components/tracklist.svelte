@@ -5,6 +5,7 @@
 	import {listboxNav} from '#lib/components/listbox-nav.svelte.js'
 	import {playTrack, setPlaylist} from '#lib/api.js'
 	import {appState} from '#lib/app-state.svelte.js'
+	import {tracksCollection} from '#lib/collections/tracks.js'
 	import {SvelteMap} from 'svelte/reactivity'
 	import {untrack} from 'svelte'
 	import {getLocale} from '#lib/paraglide/runtime.js'
@@ -119,6 +120,12 @@
 
 	const playFromList = (trackId) => {
 		const targetDeck = deckId ?? appState.active_deck_id
+		// Lists can show rows from anywhere (feeds, search): make sure the ones we play are loaded
+		const missing = contextTracks.filter((t) => !tracksCollection.has(t.id))
+		if (missing.length) {
+			if (!tracksCollection.isReady()) tracksCollection.startSyncImmediate()
+			tracksCollection.utils.writeUpsert(missing)
+		}
 		if (playContext && contextTrackIds.length) {
 			setPlaylist(targetDeck, contextTrackIds, {title: contextPlaylistTitle})
 		}

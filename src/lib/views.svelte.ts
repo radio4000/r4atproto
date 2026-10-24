@@ -95,11 +95,11 @@ export function queryView(getView: () => View) {
 	const global = $derived(strategy === 'tags-only' || strategy === 'search-only')
 
 	// Global strategies read every radio the relay knows
-	let radioDids = $state<string[]>(EMPTY_STRINGS)
+	let radioDids = $state.raw<string[] | undefined>(undefined)
 	$effect(() => {
-		if (global && radioDids === EMPTY_STRINGS) fetchRadioDids().then((dids) => (radioDids = dids))
+		if (global && !radioDids) fetchRadioDids().then((dids) => (radioDids = dids))
 	})
-	const radioDidsKey = $derived(radioDids.join(','))
+	const radioDidsKey = $derived(radioDids?.join(',') ?? '')
 
 	const channelsQuery = useLiveQuery(
 		(q) => {
@@ -113,7 +113,7 @@ export function queryView(getView: () => View) {
 	const tracksQuery = useLiveQuery(
 		(q) => {
 			if (global) {
-				if (!radioDids.length)
+				if (!radioDids?.length)
 					return q.from({tracks: tracksCollection}).where(({tracks}) => inArray(tracks.id, ['']))
 				return q
 					.from({tracks: tracksCollection})
@@ -149,7 +149,7 @@ export function queryView(getView: () => View) {
 		},
 		get loading() {
 			if (strategy === 'empty') return false
-			if (global && !radioDids.length) return true
+			if (global && !radioDids) return true
 			return !tracksQuery.isReady
 		}
 	}
