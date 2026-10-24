@@ -176,9 +176,6 @@
 	}
 
 	search {
-		display: flex;
-		gap: var(--space-1);
-
 		select {
 			flex: 0 0 auto;
 		}

@@ -88,13 +88,4 @@
 		flex-direction: column;
 		gap: var(--space-2);
 	}
-
-	search {
-		display: flex;
-		position: sticky;
-		top: 0;
-		z-index: 2;
-		padding-block: var(--space-1);
-		background: var(--color-interface);
-	}
 </style>

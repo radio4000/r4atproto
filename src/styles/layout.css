@@ -43,6 +43,17 @@ r4-page-header {
 	}
 }
 
+/* A page's search bar stays at the top of the scroll area */
+search {
+	display: flex;
+	gap: var(--space-1);
+	position: sticky;
+	top: 0;
+	z-index: 2;
+	padding-block: var(--space-1);
+	background: var(--color-interface);
+}
+
 /* Cards in a responsive grid */
 r4-grid {
 	display: grid;

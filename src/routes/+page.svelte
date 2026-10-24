@@ -208,10 +208,6 @@
 </r4-page>
 
 <style>
-	search {
-		display: flex;
-	}
-
 	r4-home-radio {
 		display: grid;
 		grid-template-columns: var(--home-avatar-size) 1fr auto;

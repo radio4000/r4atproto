@@ -89,15 +89,6 @@
 </r4-page>
 
 <style>
-	search {
-		display: flex;
-		position: sticky;
-		top: 0;
-		z-index: 2;
-		padding-block: var(--space-1);
-		background: var(--color-interface);
-	}
-
 	section {
 		display: flex;
 		flex-direction: column;
