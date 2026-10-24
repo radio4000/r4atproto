@@ -1,0 +1,40 @@
+{
+	"lexicon": 1,
+	"id": "radio.4000.getRadios",
+	"defs": {
+		"main": {
+			"type": "query",
+			"description": "Radios by account. Does not require auth.",
+			"parameters": {
+				"type": "params",
+				"properties": {
+					"dids": {
+						"type": "array",
+						"maxLength": 25,
+						"items": {
+							"type": "string",
+							"format": "did"
+						}
+					}
+				},
+				"required": ["dids"]
+			},
+			"output": {
+				"encoding": "application/json",
+				"schema": {
+					"type": "object",
+					"required": ["radios"],
+					"properties": {
+						"radios": {
+							"type": "array",
+							"items": {
+								"type": "ref",
+								"ref": "radio.4000.defs#radioView"
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

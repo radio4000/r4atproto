@@ -1,0 +1,59 @@
+{
+	"lexicon": 1,
+	"id": "radio.4000.listRadios",
+	"defs": {
+		"main": {
+			"type": "query",
+			"description": "Radios of the network, paged. Does not require auth.",
+			"parameters": {
+				"type": "params",
+				"properties": {
+					"q": {
+						"type": "string",
+						"maxLength": 300,
+						"description": "Words to find in names, handles and descriptions."
+					},
+					"sort": {
+						"type": "string",
+						"knownValues": ["latest", "new", "tracks"],
+						"default": "latest",
+						"description": "latest: by latest track; new: by creation; tracks: by number of tracks."
+					},
+					"bbox": {
+						"type": "string",
+						"maxLength": 100,
+						"description": "Only radios located in this area: 'west,south,east,north' in decimal degrees."
+					},
+					"limit": {
+						"type": "integer",
+						"minimum": 1,
+						"maximum": 100,
+						"default": 50
+					},
+					"cursor": {
+						"type": "string"
+					}
+				}
+			},
+			"output": {
+				"encoding": "application/json",
+				"schema": {
+					"type": "object",
+					"required": ["radios"],
+					"properties": {
+						"cursor": {
+							"type": "string"
+						},
+						"radios": {
+							"type": "array",
+							"items": {
+								"type": "ref",
+								"ref": "radio.4000.defs#radioView"
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

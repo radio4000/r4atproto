@@ -14,7 +14,9 @@ function schemaIds(path: string): string[] {
 }
 
 test('every lexicon schema lives under the configured namespace', () => {
+	// Records, the sign-in permission set, and the index's queries with their views
+	const queries = ['defs', 'listRadios', 'getRadios', 'listTracks', 'listBroadcasts', 'chat.listMessages']
 	expect(schemaIds(dir).sort()).toEqual(
-		[AUTH, BROADCAST, CHANNEL, CHAT_MESSAGE, FOLLOW, TRACK].sort()
+		[AUTH, BROADCAST, CHANNEL, CHAT_MESSAGE, FOLLOW, TRACK, ...queries.map((q) => `${NAMESPACE}.${q}`)].sort()
 	)
 })

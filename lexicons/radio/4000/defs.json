@@ -1,0 +1,127 @@
+{
+	"lexicon": 1,
+	"id": "radio.4000.defs",
+	"description": "Views of records served by the 4000.radio index. Each view carries the record as it is in its repo.",
+	"defs": {
+		"author": {
+			"type": "object",
+			"description": "The account a record belongs to.",
+			"required": ["did", "handle"],
+			"properties": {
+				"did": {
+					"type": "string",
+					"format": "did"
+				},
+				"handle": {
+					"type": "string",
+					"format": "handle"
+				}
+			}
+		},
+		"radioView": {
+			"type": "object",
+			"required": ["did", "handle", "trackCount", "indexedAt"],
+			"properties": {
+				"did": {
+					"type": "string",
+					"format": "did"
+				},
+				"handle": {
+					"type": "string",
+					"format": "handle"
+				},
+				"record": {
+					"type": "unknown",
+					"description": "The radio.4000.channel record, when the account has one."
+				},
+				"image": {
+					"type": "string",
+					"format": "uri",
+					"description": "URL of the radio's image blob on its PDS."
+				},
+				"trackCount": {
+					"type": "integer",
+					"minimum": 0
+				},
+				"latestTrackAt": {
+					"type": "string",
+					"format": "datetime"
+				},
+				"indexedAt": {
+					"type": "string",
+					"format": "datetime"
+				}
+			}
+		},
+		"trackView": {
+			"type": "object",
+			"required": ["uri", "cid", "author", "record", "indexedAt"],
+			"properties": {
+				"uri": {
+					"type": "string",
+					"format": "at-uri"
+				},
+				"cid": {
+					"type": "string",
+					"format": "cid"
+				},
+				"author": {
+					"type": "ref",
+					"ref": "#author"
+				},
+				"record": {
+					"type": "unknown",
+					"description": "The radio.4000.track record."
+				},
+				"indexedAt": {
+					"type": "string",
+					"format": "datetime"
+				}
+			}
+		},
+		"broadcastView": {
+			"type": "object",
+			"required": ["author", "record", "indexedAt"],
+			"properties": {
+				"author": {
+					"type": "ref",
+					"ref": "#author"
+				},
+				"record": {
+					"type": "unknown",
+					"description": "The radio.4000.broadcast record."
+				},
+				"indexedAt": {
+					"type": "string",
+					"format": "datetime"
+				}
+			}
+		},
+		"chatMessageView": {
+			"type": "object",
+			"required": ["uri", "cid", "author", "record", "indexedAt"],
+			"properties": {
+				"uri": {
+					"type": "string",
+					"format": "at-uri"
+				},
+				"cid": {
+					"type": "string",
+					"format": "cid"
+				},
+				"author": {
+					"type": "ref",
+					"ref": "#author"
+				},
+				"record": {
+					"type": "unknown",
+					"description": "The radio.4000.chat.message record."
+				},
+				"indexedAt": {
+					"type": "string",
+					"format": "datetime"
+				}
+			}
+		}
+	}
+}

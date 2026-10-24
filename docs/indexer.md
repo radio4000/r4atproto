@@ -21,7 +21,7 @@ With one radio on the network this is ~10–35 requests a page. It grows with ev
 - Records live in each person's repo; the app writes to their PDS, as now. The indexer never writes, and holds nothing that isn't already public.
 - It is a cache of the network: it can be deleted and rebuilt from the network at any time, and anyone can run their own from this repository.
 - A radio's own page can still read its PDS directly, so the app keeps working if the indexer is down.
-- Chat history keeps using Constellation (one request per room), blocks keep using Bluesky's AppView. Neither grows with the number of radios.
+- Chat is indexed too, so the app no longer depends on Constellation or Slingshot. What stays outside: Jetstream, the PLC directory, and Bluesky's AppView for profiles and blocks, which is how any atproto app reads them.
 
 ## Pieces
 
@@ -40,23 +40,23 @@ All on Cloudflare, next to the app, in this repository (`indexer/`, its own `wra
 - `tracks_fts`, `radios_fts`: full-text search over titles, descriptions, names.
 - `follows`: uri, did, subject, created (for followers and following lists).
 - `broadcasts`: did, decks, updated (live now; stale after `broadcast.staleSeconds`).
+- `chat_messages`: uri, did, subject (the radio), text, track, created.
 - `cursor`: Jetstream position.
 
 10,000 radios × a few hundred tracks is a few million rows, about 1–3 GB. D1 allows 10 GB per database.
 
 ## Queries
 
-Defined as lexicons (`type: query`) in `lexicons/radio/4000/`, published like the record schemas. Top-level names under `radio.4000`, so the existing `_lexicon.4000.radio` record covers them.
+Defined as lexicons in `lexicons/radio/4000/` (drafts, not published yet). Each view carries the record as it is in the repo, like Bluesky's views, so the app maps it with the code it already has.
 
-- `radio.4000.listRadios`: paged, sorted by latest track, newest, or most tracks; optional map area (explore).
-- `radio.4000.getRadios`: by DIDs (cards, follows).
-- `radio.4000.getFeed`: latest tracks, network-wide or from given radios (home, following).
-- `radio.4000.searchTracks`: text, #tags, @radio (r4's search syntax), paged.
-- `radio.4000.searchRadios`: text.
-- `radio.4000.listTracks`: one radio's tracks, paged and filterable (its page, with the PDS as fallback).
+- `radio.4000.defs`: the views (`radioView`, `trackView`, `broadcastView`, `chatMessageView`).
+- `radio.4000.listRadios`: paged; `q` to search, `sort` by latest track, new or most tracks, `bbox` for a map area (home, explore, search).
+- `radio.4000.getRadios`: up to 25 by DID (cards, follows, a radio's header).
+- `radio.4000.listTracks`: newest first, from the network or given `radios`, filtered by `tags`, `mention`, `q` (the feed, following, search, a radio's page).
 - `radio.4000.listBroadcasts`: who is live now.
+- `radio.4000.chat.listMessages`: a room's messages, newest first.
 
-Home, explore, search and the feed each become one request, whatever the size of the network.
+`radio.4000.*` and `radio.4000.chat.*` are covered by the existing `_lexicon` DNS records. Home, explore, search and the feed each become one request, whatever the size of the network.
 
 ## Abuse and limits
 
@@ -78,8 +78,11 @@ Workers paid plan ($5/month). At this size D1 storage, reads and writes, the Que
 5. Deploy `api.4000.radio`, backfill the real network, compare against direct reads.
 6. Publish the query lexicons. Then promote.
 
-## Open questions
+## Decided
 
-- Subdomain: `api.4000.radio`?
-- Index chat too (dropping Constellation), or keep it as is? I'd keep it as is.
+- API at `api.4000.radio`.
+- Chat indexed, to depend on fewer outside services.
+
+## Open
+
 - Live updates: browsers keep one Jetstream connection each for chat and broadcasts. Fine at launch; if it becomes heavy, the Durable Object can relay them.

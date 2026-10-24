@@ -1,0 +1,71 @@
+{
+	"lexicon": 1,
+	"id": "radio.4000.listTracks",
+	"defs": {
+		"main": {
+			"type": "query",
+			"description": "Tracks, newest first, from the whole network or some radios, optionally filtered. Does not require auth.",
+			"parameters": {
+				"type": "params",
+				"properties": {
+					"radios": {
+						"type": "array",
+						"maxLength": 100,
+						"items": {
+							"type": "string",
+							"format": "did"
+						},
+						"description": "Only tracks of these radios."
+					},
+					"tags": {
+						"type": "array",
+						"maxLength": 10,
+						"items": {
+							"type": "string",
+							"maxLength": 640
+						},
+						"description": "Only tracks with all these #tags (without #)."
+					},
+					"mention": {
+						"type": "string",
+						"format": "handle",
+						"description": "Only tracks whose description @mentions this handle."
+					},
+					"q": {
+						"type": "string",
+						"maxLength": 300,
+						"description": "Words to find in titles and descriptions."
+					},
+					"limit": {
+						"type": "integer",
+						"minimum": 1,
+						"maximum": 100,
+						"default": 50
+					},
+					"cursor": {
+						"type": "string"
+					}
+				}
+			},
+			"output": {
+				"encoding": "application/json",
+				"schema": {
+					"type": "object",
+					"required": ["tracks"],
+					"properties": {
+						"cursor": {
+							"type": "string"
+						},
+						"tracks": {
+							"type": "array",
+							"items": {
+								"type": "ref",
+								"ref": "radio.4000.defs#trackView"
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
