@@ -186,6 +186,21 @@ export function updateTrack(_channel: ChannelRef, id: string, changes: Partial<T
 		.then(() => {})
 }
 
+/**
+ * Save a duration learned while playing one of your own tracks, when it has none.
+ * Auto radio needs durations; this fills them in as tracks get played.
+ */
+export function rememberTrackDuration(id: string, seconds: number) {
+	// Called from player effects: reading the track must not subscribe them to it
+	untrack(() => {
+		const track = tracksCollection.get(id)
+		if (!track || track.duration || !seconds || track.did !== myDid()) return
+		updateTrack({id: track.did, slug: track.slug}, id, {duration: Math.round(seconds)}).catch(
+			() => {}
+		)
+	})
+}
+
 export function deleteTrack(_channel: ChannelRef, id: string) {
 	return tracksCollection
 		.delete(id)

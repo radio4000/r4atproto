@@ -52,13 +52,16 @@ export async function uploadBlob(file: Blob) {
 	return res.data.blob
 }
 
-/** Create many records in one commit (a PDS accepts up to 200 writes per call) */
-export async function createRecords(collection: string, items: {rkey: string; value: object}[]) {
+async function applyWrites(
+	type: 'create' | 'update',
+	collection: string,
+	items: {rkey: string; value: object}[]
+) {
 	const {agent, did} = repo()
 	await agent.com.atproto.repo.applyWrites({
 		repo: did,
 		writes: items.map(({rkey, value}) => ({
-			$type: 'com.atproto.repo.applyWrites#create' as const,
+			$type: `com.atproto.repo.applyWrites#${type}` as const,
 			collection,
 			rkey,
 			value: {...value}
@@ -66,3 +69,11 @@ export async function createRecords(collection: string, items: {rkey: string; va
 	})
 	invalidateRepoCache(did, collection)
 }
+
+/** Create many records in one commit (a PDS accepts up to 200 writes per call) */
+export const createRecords = (collection: string, items: {rkey: string; value: object}[]) =>
+	applyWrites('create', collection, items)
+
+/** Replace many records in one commit (up to 200 per call) */
+export const updateRecords = (collection: string, items: {rkey: string; value: object}[]) =>
+	applyWrites('update', collection, items)
