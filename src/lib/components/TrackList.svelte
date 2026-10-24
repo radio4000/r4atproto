@@ -17,7 +17,7 @@
 </script>
 
 {#if tracks && tracks.length > 0}
-  <div class="rounded-xl border border-foreground divide-y overflow-visible">
+  <div class="rounded-xl border border-border divide-y overflow-visible">
     {#each tracks as item, idx (item.uri || idx)}
       <TrackListItem
         {item}

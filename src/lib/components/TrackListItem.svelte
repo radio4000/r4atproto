@@ -191,10 +191,10 @@
     isDetailView
       ? (flat
         ? "border-0 bg-background transition-colors rounded-none shadow-none"
-        : "border border-foreground bg-background transition-colors rounded-lg shadow")
+        : "border border-border bg-background transition-colors rounded-lg shadow")
       : flat
         ? "border-0 border-b border-border bg-transparent transition-colors rounded-none shadow-none ring-0 last:border-b-0"
-        : "border border-foreground bg-background transition-colors hover:bg-foreground/10 rounded-lg shadow-none",
+        : "border border-border bg-background transition-colors hover:bg-foreground/10 rounded-lg shadow-none",
     deleting && "opacity-50 pointer-events-none"
   )}
 >

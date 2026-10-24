@@ -33,5 +33,5 @@
 </script>
 
 <div class="flex gap-2 mb-4 justify-center">
-  <NavTabs items={navItems} variant="pills-muted" class="border border-foreground rounded-full" />
+  <NavTabs items={navItems} variant="pills-muted" class="border border-border rounded-full" />
 </div>

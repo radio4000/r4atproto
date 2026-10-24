@@ -377,7 +377,7 @@
 {#if menuOpen && menuPosition}
 	<div
 		bind:this={menuRef}
-		class="fixed z-[100] w-48 rounded-md border border-foreground bg-background text-foreground shadow-lg"
+		class="fixed z-[100] w-48 rounded-md border border-border bg-background text-foreground shadow-lg"
 		style={`top: ${menuPosition.top}px; right: ${menuPosition.right}px;`}
 		role="menu"
 	>

@@ -123,7 +123,7 @@
           profile={actor}
           handle={actor.handle}
           size="sm"
-          class="border-2"
+          class="border"
         />
       {/each}
     </div>
@@ -134,7 +134,7 @@
           profile={actor}
           handle={actor.handle}
           size="sm"
-          class="border-2"
+          class="border"
         />
       {/each}
     </div>

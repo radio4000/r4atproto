@@ -30,7 +30,7 @@
 
   <!-- Settings Navigation -->
   <div class="mb-6 flex justify-center">
-    <NavTabs items={navItems} variant="pills-muted" class="border border-foreground rounded-full" />
+    <NavTabs items={navItems} variant="pills-muted" class="border border-border rounded-full" />
   </div>
 
   <!-- Settings Content -->

@@ -856,7 +856,7 @@
     style={visible && !isDesktop ? 'max-height:100dvh;' : ''}
   >
     <section
-      class="flex flex-col flex-1 min-h-0 gap-0 border border-foreground bg-card/95 shadow rounded-3xl p-0 w-full overflow-hidden relative"
+      class="flex flex-col flex-1 min-h-0 gap-0 border border-border bg-card/95 shadow rounded-3xl p-0 w-full overflow-hidden relative"
     >
       {#if hasBanner}
         <div
@@ -866,7 +866,7 @@
 
       {/if}
       <div class={cn("flex flex-col gap-0 flex-1 min-h-0 relative")}>
-        <div class={cn("flex items-start gap-3 px-3 pt-3 pb-2 border-b border-foreground", isDesktop ? "min-w-0" : "justify-between items-start")}>
+        <div class={cn("flex items-start gap-3 px-3 pt-3 pb-2 border-b border-border", isDesktop ? "min-w-0" : "justify-between items-start")}>
           <div class="flex items-center gap-3 min-w-0 flex-1">
             <Avatar
               src={profileData?.avatar || ''}
@@ -911,7 +911,7 @@
               {#if menuOpen}
                 <div
                   bind:this={menuRef}
-                  class="absolute right-0 z-[100] mt-1.5 w-48 rounded-md border border-foreground bg-background text-foreground shadow-lg"
+                  class="absolute right-0 z-[100] mt-1.5 w-48 rounded-md border border-border bg-background text-foreground shadow-lg"
                   role="menu"
                 >
                   {#if currentHandle && current?.uri}
@@ -1003,7 +1003,7 @@
               </div>
             </div>
             <div
-              class="flex-1 min-h-0 rounded-none border-t border-foreground border-l-0 border-r-0 bg-background overflow-auto"
+              class="flex-1 min-h-0 rounded-none border-t border-border border-l-0 border-r-0 bg-background overflow-auto"
               bind:this={playlistContainer}
               role="region"
               aria-label={t('player.playlistLabel') || 'Playlist'}
@@ -1078,7 +1078,7 @@
               {@const menuSourceTrackHref = menuSourceTrackUri && menuTrackHandle ? buildViewHash(menuTrackHandle, menuSourceTrackUri) : null}
               <div
                 data-track-menu
-                class="fixed z-[100] w-48 rounded-md border border-foreground bg-background text-foreground shadow-lg"
+                class="fixed z-[100] w-48 rounded-md border border-border bg-background text-foreground shadow-lg"
                 style={`top: ${trackMenuPosition.top}px; right: ${trackMenuPosition.right}px;`}
                 role="menu"
               >
@@ -1154,7 +1154,7 @@
         </div>
       </div>
 
-        <div class={cn("flex items-center justify-center gap-2 py-2 border-t border-foreground bg-background relative z-10", isDesktop ? '' : 'shrink-0')}>
+        <div class={cn("flex items-center justify-center gap-2 py-2 border-t border-border bg-background relative z-10", isDesktop ? '' : 'shrink-0')}>
           <button
             type="button"
             class={cn(

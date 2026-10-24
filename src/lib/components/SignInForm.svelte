@@ -53,7 +53,7 @@
 
 {#if showCard}
   {#if variant === 'default'}
-    <Card class="border-2 shadow-xl">
+    <Card class="border shadow-xl">
       <CardContent class="pt-6">
         <form onsubmit={handleSignIn} class="space-y-6">
           <div class="space-y-2">

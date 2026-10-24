@@ -47,7 +47,7 @@
     </Button>
   </div>
 
-  <div class="rounded-xl border border-foreground bg-card/70 overflow-hidden">
+  <div class="rounded-xl border border-border bg-card/70 overflow-hidden">
     {#each radio.tracks as item, index (item.uri)}
       <TrackListItem
         {item}

@@ -24,8 +24,9 @@
 		--accent-foreground: var(--background);
 		--destructive: var(--foreground);
 		--destructive-foreground: var(--background);
-		--border: var(--foreground);
-		--input: var(--foreground);
+		/* Soft hairline borders (lighter than text), recomputed per theme at runtime */
+		--border: 240 6% 80%;
+		--input: 240 6% 80%;
 		--ring: var(--foreground);
 		--radius: 0.75rem;
 	}
@@ -47,8 +48,8 @@
 		--accent-foreground: var(--background);
 		--destructive: var(--foreground);
 		--destructive-foreground: var(--background);
-		--border: var(--foreground);
-		--input: var(--foreground);
+		--border: 240 5% 28%;
+		--input: 240 5% 28%;
 		--ring: var(--foreground);
 	}
 }

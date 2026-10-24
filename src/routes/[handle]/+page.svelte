@@ -350,7 +350,7 @@
               ({group.tracks.length} {group.tracks.length === 1 ? t('profile.track') : t('profile.tracks')})
             </span>
           </h3>
-          <div class="rounded-xl border border-foreground bg-card/70 overflow-hidden">
+          <div class="rounded-xl border border-border bg-card/70 overflow-hidden">
             {#each group.tracks as item (item.uri)}
               {@const globalIdx = trackIndexMap.get(item.uri) ?? 0}
               <TrackListItem

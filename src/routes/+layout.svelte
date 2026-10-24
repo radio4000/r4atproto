@@ -177,8 +177,8 @@
     set('--accent', colors.foreground);
     set('--primary', colors.foreground);
     set('--destructive', colors.foreground);
-    set('--border', colors.foreground);
-    set('--input', colors.foreground);
+    set('--border', mixChannels(colors.foreground, colors.background, 0.78));
+    set('--input', mixChannels(colors.foreground, colors.background, 0.78));
     set('--ring', colors.foreground);
 
     set('--card-foreground', colors.foreground);
@@ -325,7 +325,7 @@
                       "flex items-center justify-center px-3 py-2 rounded-full text-sm font-medium transition-all duration-200",
                       playerState.playing
                         ? "text-background bg-foreground border border-foreground shadow-sm hover:border-background"
-                        : "text-foreground border border-foreground hover:bg-foreground hover:text-background hover:border-background"
+                        : "text-foreground border border-border hover:bg-foreground hover:text-background hover:border-background"
                     )}
                     aria-label={playerState.playing ? 'Pause' : 'Play'}
                   >
@@ -350,7 +350,7 @@
                       "flex items-center justify-center px-3 py-2 rounded-full text-sm font-medium transition-all duration-200",
                       (playerVisible || mobilePanelOpen)
                         ? "text-background bg-foreground border border-foreground shadow-sm hover:border-background"
-                        : "text-foreground border border-foreground hover:bg-foreground hover:text-background hover:border-background"
+                        : "text-foreground border border-border hover:bg-foreground hover:text-background hover:border-background"
                     )}
                     aria-label="Toggle player visibility"
                   >

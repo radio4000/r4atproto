@@ -12,7 +12,7 @@
 <DropdownMenuPrimitive.SubContent
 	bind:ref
 	class={cn(
-		"bg-background text-foreground z-50 min-w-[8rem] rounded-md border border-foreground p-1 shadow-lg focus:outline-none",
+		"bg-background text-foreground z-50 min-w-[8rem] rounded-md border border-border p-1 shadow-lg focus:outline-none",
 		className
 	)}
 	{...restProps}

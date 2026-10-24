@@ -151,7 +151,7 @@
             type="button"
             onclick={() => theme.setMode('auto')}
             disabled={$theme.mode === 'auto'}
-            class="flex flex-col items-center gap-2 p-3 rounded-md border-2 transition-all disabled:cursor-not-allowed {$theme.mode === 'auto' ? 'border-foreground text-background bg-foreground' : 'border-border hover:text-background hover:bg-foreground hover:border-transparent'}"
+            class="flex flex-col items-center gap-2 p-3 rounded-md border transition-all disabled:cursor-not-allowed {$theme.mode === 'auto' ? 'border-foreground text-background bg-foreground' : 'border-border hover:text-background hover:bg-foreground hover:border-transparent'}"
           >
             <MonitorSmartphone class="h-5 w-5" />
             <span class="text-xs font-medium">{t('settings.appearanceModeAuto')}</span>
@@ -160,7 +160,7 @@
             type="button"
             onclick={() => theme.setMode('light')}
             disabled={$theme.mode === 'light'}
-            class="flex flex-col items-center gap-2 p-3 rounded-md border-2 transition-all disabled:cursor-not-allowed {$theme.mode === 'light' ? 'border-foreground text-background bg-foreground' : 'border-border hover:text-background hover:bg-foreground hover:border-transparent'}"
+            class="flex flex-col items-center gap-2 p-3 rounded-md border transition-all disabled:cursor-not-allowed {$theme.mode === 'light' ? 'border-foreground text-background bg-foreground' : 'border-border hover:text-background hover:bg-foreground hover:border-transparent'}"
           >
             <Sun class="h-5 w-5" />
             <span class="text-xs font-medium">{t('settings.appearanceModeLight')}</span>
@@ -169,7 +169,7 @@
             type="button"
             onclick={() => theme.setMode('dark')}
             disabled={$theme.mode === 'dark'}
-            class="flex flex-col items-center gap-2 p-3 rounded-md border-2 transition-all disabled:cursor-not-allowed {$theme.mode === 'dark' ? 'border-foreground text-background bg-foreground' : 'border-border hover:text-background hover:bg-foreground hover:border-transparent'}"
+            class="flex flex-col items-center gap-2 p-3 rounded-md border transition-all disabled:cursor-not-allowed {$theme.mode === 'dark' ? 'border-foreground text-background bg-foreground' : 'border-border hover:text-background hover:bg-foreground hover:border-transparent'}"
           >
             <Moon class="h-5 w-5" />
             <span class="text-xs font-medium">{t('settings.appearanceModeDark')}</span>

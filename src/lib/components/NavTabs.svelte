@@ -21,7 +21,7 @@
   // Container styles based on variant
   const containerClass = $derived(cn(
     'inline-flex overflow-x-auto',
-    variant === 'pills' && 'rounded-full bg-background/95 backdrop-blur-xl border-2 border-border',
+    variant === 'pills' && 'rounded-full bg-background/95 backdrop-blur-xl border border-border',
     variant === 'pills-muted' && 'rounded-full bg-muted/40 border border-muted',
     variant === 'sidebar' && 'flex-col overflow-x-visible',
     className

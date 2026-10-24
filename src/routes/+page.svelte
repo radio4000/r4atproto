@@ -117,7 +117,7 @@
           {/each}
         </div>
       {:else}
-        <Card class="border-2">
+        <Card class="border">
           <CardHeader>
             <CardTitle class="flex items-center gap-2">
               <Users class="h-5 w-5" />
