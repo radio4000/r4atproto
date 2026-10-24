@@ -1,7 +1,7 @@
 <script lang="ts">
-	import Avatar from '#lib/components/Avatar.svelte'
-	import Link from '#lib/components/Link.svelte'
-	import TrackListItem from '#lib/components/TrackListItem.svelte'
+	import Avatar from '#lib/components/legacy/Avatar.svelte'
+	import Link from '#lib/components/legacy/Link.svelte'
+	import TrackListItem from '#lib/components/legacy/TrackListItem.svelte'
 	import {Button} from '#lib/components/ui/button/index.js'
 	import {PlayCircle} from 'lucide-svelte'
 	import {setPlaylist} from '#lib/player/store.js'

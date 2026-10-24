@@ -120,6 +120,7 @@ export interface Deck {
 	listening_to_channel_id?: string
 	auto_radio?: boolean
 	auto_radio_drifted?: boolean
+	view?: import('#lib/views.js').View
 	auto_radio_rotation_start?: number
 	/** Epoch ms of the last join/resync — drift detection stays quiet for a grace
 	 *  window after it while the seek lands. */
@@ -190,6 +191,30 @@ export interface BroadcastPlaybackFields {
 	muted?: boolean
 	is_playing?: boolean
 	speed?: number
+}
+
+/** One deck of a live broadcast, as listeners see it */
+export interface BroadcastDeckState {
+	index?: number
+	track_id: string | null
+	track_played_at: string | null
+	is_playing?: boolean
+	seeked_at?: string | null
+	seek_position?: number | null
+	volume?: number
+	muted?: boolean
+	speed?: number
+	track_url?: string | null
+	track_title?: string | null
+	track_media_id?: string | null
+}
+
+export interface Broadcast {
+	/** DID of the broadcasting channel */
+	channel_id: string
+	decks: BroadcastDeckState[]
+	updated_at?: string
+	channels?: Channel
 }
 
 export interface CaptureEvent {

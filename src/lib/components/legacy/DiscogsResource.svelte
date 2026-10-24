@@ -16,7 +16,7 @@
 	import {Button} from '#lib/components/ui/button/index.js'
 	import {ExternalLink, Play, Disc} from 'lucide-svelte'
 	import {locale, translate} from '#lib/i18n/index.js'
-	import TrackListItem from '#lib/components/TrackListItem.svelte'
+	import TrackListItem from '#lib/components/legacy/TrackListItem.svelte'
 
 	let {url = '', handle = '', sourceTrackUri = ''} = $props()
 

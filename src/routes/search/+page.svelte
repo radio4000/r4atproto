@@ -1,5 +1,5 @@
 <script lang="ts">
-	import SearchProfiles from '#lib/components/SearchProfiles.svelte'
+	import SearchProfiles from '#lib/components/legacy/SearchProfiles.svelte'
 	import {locale, translate} from '#lib/i18n/index.js'
 	import {page} from '$app/state'
 

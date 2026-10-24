@@ -1,14 +1,14 @@
 <script lang="ts">
 	import {TRACK} from '#lib/lexicons.js'
 	import {getTrackByUri, resolveHandle, listTracksByDid} from '#lib/services/r4-service.js'
-	import TrackDetail from '#lib/components/TrackDetail.svelte'
+	import TrackDetail from '#lib/components/legacy/TrackDetail.svelte'
 	import {session} from '#lib/state/session.js'
 	import {Loader2, AlertCircle} from 'lucide-svelte'
 	import StateCard from '#lib/components/ui/state-card.svelte'
 	import {Button} from '#lib/components/ui/button/index.js'
 	import {locale, translate} from '#lib/i18n/index.js'
 	import {browser} from '$app/environment'
-	import SeoHead from '#lib/components/SeoHead.svelte'
+	import SeoHead from '#lib/components/legacy/SeoHead.svelte'
 
 	let {data} = $props()
 	const _handle = $derived(data?.handle || '')

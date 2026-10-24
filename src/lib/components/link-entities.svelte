@@ -1,0 +1,115 @@
+<script>
+	import Tag from '#lib/components/tag.svelte'
+	import {ENTITY_REGEX} from '#lib/utils.js'
+	import {page} from '$app/state'
+	import {channelHref, channelTracksHref, searchHref} from '#lib/links.js'
+
+	/** @type {{text: string | null | undefined, slug?: string | null, filterMentions?: boolean, onTagClick?: (tag: string) => void, onMentionClick?: (slug: string) => void, deckId?: number, selectedTags?: string[]}} */
+	const {text, slug, filterMentions, onTagClick, onMentionClick, deckId, selectedTags} = $props()
+
+	// Explicit override for Tag's `filtered` state — Tag's own URL fallback only
+	// understands the channel tracks page's ?tags= param, so any page with its
+	// own filter model (search's ?q=, the deck queue's in-memory tags) needs to
+	// say which tags are active itself.
+	const selectedTagSet = $derived(new Set((selectedTags ?? []).map((t) => t.toLowerCase())))
+
+	const parts = $derived.by(() => {
+		if (typeof text !== 'string') return [{type: 'text', content: ''}]
+		if (!text) return [{type: 'text', content: ''}]
+
+		const parts = []
+		let lastIndex = 0
+		const urlTags =
+			page.url.searchParams
+				.get('tags')
+				?.split(',')
+				.filter(Boolean)
+				.map((t) => t.toLowerCase()) ?? []
+
+		text.replace(ENTITY_REGEX, (match, prefix, entity, offset) => {
+			// Add text before the match
+			if (offset > lastIndex) {
+				parts.push({type: 'text', content: text.slice(lastIndex, offset)})
+			}
+
+			// Add the prefix as text
+			if (prefix) {
+				parts.push({type: 'text', content: prefix})
+			}
+
+			// Add the entity as a link
+			const isTag = entity.startsWith('#')
+			const isMention = entity.startsWith('@')
+			let href
+			if (isMention) {
+				const mention = entity.slice(1)
+				if (filterMentions && slug) {
+					// Filter the source radio; keep its filters only if we're already on it
+					const onSource = [channelHref(slug), channelTracksHref(slug)].includes(page.url.pathname)
+					// eslint-disable-next-line svelte/prefer-svelte-reactivity -- built once per href, not state
+					const params = new URLSearchParams(onSource ? page.url.search : '')
+					params.set('mention', mention.toLowerCase())
+					href = channelTracksHref(slug, params)
+				} else {
+					href = channelHref(mention)
+				}
+			} else if (slug) {
+				// Toggle: remove tag if already filtered, add if not
+				const tagName = entity.slice(1).toLowerCase()
+				const next = urlTags.includes(tagName)
+					? urlTags.filter((t) => t !== tagName)
+					: [...urlTags, tagName]
+				href = channelTracksHref(slug, next.length ? {tags: next.join(',')} : undefined)
+			} else {
+				href = searchHref(entity)
+			}
+
+			parts.push({
+				type: 'link',
+				content: entity,
+				href,
+				isTag,
+				filtered:
+					isTag && selectedTags !== undefined
+						? selectedTagSet.has(entity.slice(1).toLowerCase())
+						: undefined
+			})
+
+			lastIndex = offset + match.length
+			return match
+		})
+
+		// Add remaining text
+		if (lastIndex < text.length) {
+			parts.push({type: 'text', content: text.slice(lastIndex)})
+		}
+
+		return parts.length ? parts : [{type: 'text', content: text}]
+	})
+</script>
+
+{#each parts as part, i (i)}
+	{#if part.type === 'link'}
+		{#if part.isTag && onTagClick}
+			<Tag
+				onclick={() => onTagClick(part.content.slice(1))}
+				value={part.content}
+				filtered={part.filtered}
+				{deckId}>{part.content}</Tag
+			>
+		{:else if !part.isTag && onMentionClick}
+			<Tag onclick={() => onMentionClick(part.content.slice(1).toLowerCase())} {deckId}
+				>{part.content}</Tag
+			>
+		{:else}
+			<Tag
+				href={part.href}
+				value={part.isTag ? part.content : undefined}
+				filtered={part.filtered}
+				{deckId}>{part.content}</Tag
+			>
+		{/if}
+	{:else}
+		{part.content}
+	{/if}
+{/each}

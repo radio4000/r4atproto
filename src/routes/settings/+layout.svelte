@@ -1,7 +1,7 @@
 <script lang="ts">
 	import {page} from '$app/state'
 	import {session} from '#lib/state/session.js'
-	import NavTabs from '#lib/components/NavTabs.svelte'
+	import NavTabs from '#lib/components/legacy/NavTabs.svelte'
 	import {User, Palette, Languages, RefreshCw} from 'lucide-svelte'
 	import {locale, translate} from '#lib/i18n/index.js'
 

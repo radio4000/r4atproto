@@ -359,6 +359,8 @@
 	"cover_flip_aria_label": "Cover flip",
 	"day_today": "Today",
 	"day_yesterday": "Yesterday",
+	"deck_menu_fullscreen": "Full screen",
+	"deck_menu_fullscreen_exit": "Exit full screen",
 	"deck_menu_video_mix": "Video mix",
 	"decks_broadcast_listeners": "Broadcast listener decks",
 	"decks_compact_label": "Compact decks",

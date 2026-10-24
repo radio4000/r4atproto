@@ -1,6 +1,6 @@
 <script lang="ts">
 	import {createTrack} from '#lib/services/r4-service.js'
-	import TrackForm from '#lib/components/TrackForm.svelte'
+	import TrackForm from '#lib/components/legacy/TrackForm.svelte'
 	import {
 		Card,
 		CardContent,

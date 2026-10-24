@@ -34,6 +34,8 @@ export default defineConfig({
 		// atproto OAuth loopback clients must use 127.0.0.1, not localhost
 		host: '127.0.0.1'
 	},
+	// Component tests mount in happy-dom, so resolve Svelte's browser build
+	resolve: process.env.VITEST ? {conditions: ['browser']} : undefined,
 	build: {
 		target: 'esnext',
 		reportCompressedSize: false

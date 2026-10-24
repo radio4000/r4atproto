@@ -1,32 +1,37 @@
 <script lang="ts">
 	import {onMount} from 'svelte'
-	import {page} from '$app/state'
+	import {fly} from 'svelte/transition'
+	import {cubicOut} from 'svelte/easing'
+	import {MediaQuery} from 'svelte/reactivity'
 	import {bskyOAuth} from '#lib/services/bsky-oauth.js'
 	import {buildAtprotoLoopbackClientId} from '@atproto/oauth-types'
 	import {CLIENT_METADATA_PATH, OAUTH_SCOPE} from '#lib/oauth.js'
 	import {session} from '#lib/state/session.js'
-	import {theme} from '#lib/state/theme.js'
-	import {getR4Profile} from '#lib/services/r4-service.js'
-	import Player from '#lib/components/Player.svelte'
 	import '../app.css'
 	import '../styles/style.css'
-	import {player} from '#lib/player/store.js'
-	import {browser} from '$app/environment'
+	import {appState, deckAccent} from '#lib/app-state.svelte.js'
+	import {sortedDeckIds} from '#lib/deck.js'
+	import {toggleDeckCompact} from '#lib/api.js'
+	import {leaveBroadcast} from '#lib/broadcast.js'
+	import {initializeKeyboardShortcuts} from '#lib/keyboard.js'
+	import {syncSession} from '#lib/session.js'
+	import {isMobileViewport} from '#lib/utils.js'
 	import ToastContainer from '#lib/components/ui/toast/ToastContainer.svelte'
-	import SeoHead from '#lib/components/SeoHead.svelte'
+	import SeoHead from '#lib/components/legacy/SeoHead.svelte'
 	import LayoutHeader from '#lib/components/layout-header.svelte'
+	import DeckStrip from '#lib/components/deck-strip.svelte'
+	import DeckCompactBar from '#lib/components/deck-compact-bar.svelte'
+	import ToolTip from '#lib/components/tool-tip.svelte'
+	import Icon from '#lib/components/icon.svelte'
+	import TracksKeepalive from '#lib/components/tracks-keepalive.svelte'
+	import {tracksCollection} from '#lib/collections/tracks.js'
+	import {queuePinTargets} from '#lib/collections/keepalive.js'
 	import * as m from '#lib/paraglide/messages.js'
 	import {getLocale} from '#lib/paraglide/runtime.js'
+	import {dev} from '$app/environment'
 
 	let {children} = $props()
 	let ready = $state(false)
-	let playerState = $state({
-		playing: false,
-		customPlaylist: [],
-		context: null,
-		index: -1,
-		isShuffled: false
-	})
 
 	async function initOAuth() {
 		try {
@@ -39,36 +44,17 @@
 							scope: OAUTH_SCOPE,
 							redirect_uris: [`http://127.0.0.1${port ? `:${port}` : ''}/`]
 						})
-
 			await bskyOAuth.init(clientId)
-
-			// Ensure OAuth callback is processed
-			try {
-				await bskyOAuth.handleCallback()
-			} catch (e) {
-				console.error('OAuth callback error:', e)
+			await bskyOAuth.handleCallback().catch((e) => console.error('OAuth callback error:', e))
+			if (!bskyOAuth.session?.did) {
+				const did = bskyOAuth.getStoredDid()
+				if (did)
+					await bskyOAuth
+						.restoreSession(did)
+						.catch((e) => console.error('Session restore error:', e))
 			}
-
-			// Try restoring existing session
-			try {
-				if (!bskyOAuth.session?.did) {
-					const did = bskyOAuth.getStoredDid && bskyOAuth.getStoredDid()
-					if (did) {
-						await bskyOAuth.restoreSession(did)
-					}
-				}
-			} catch (e) {
-				console.error('Session restore error:', e)
-			}
-
-			// Lazy resolve human handle
-			if (bskyOAuth.isAuthenticated()) {
-				bskyOAuth.resolveHandle().then((_) => {
-					session.refresh()
-				})
-			}
-
 			session.refresh()
+			await syncSession()
 		} catch (error) {
 			console.error('OAuth initialization error:', error)
 		} finally {
@@ -76,146 +62,99 @@
 		}
 	}
 
-	// Load theme settings from profile
-	async function loadThemeFromProfile() {
-		if (!$session?.did) {
-			console.log('[loadThemeFromProfile] No session DID, skipping')
-			return
-		}
-
-		console.log('[loadThemeFromProfile] Loading profile for DID:', $session.did)
-
-		try {
-			const profile = await getR4Profile($session.did)
-			console.log('[loadThemeFromProfile] Profile loaded:', profile)
-
-			if (profile) {
-				console.log('[loadThemeFromProfile] Applying theme from profile')
-				theme.setMode(profile.mode)
-				theme.setLightColors({
-					background: profile.lightBackground,
-					foreground: profile.lightForeground,
-					accent: profile.lightAccent
-				})
-				theme.setDarkColors({
-					background: profile.darkBackground,
-					foreground: profile.darkForeground,
-					accent: profile.darkAccent
-				})
-				console.log('[loadThemeFromProfile] Theme applied successfully')
-			} else {
-				console.log('[loadThemeFromProfile] No profile found, using defaults')
-			}
-		} catch (error) {
-			console.error('[loadThemeFromProfile] Failed to load theme from profile:', error)
-		}
-	}
-
-	// Blend the lightness of two "H S% L%" channel strings, keeping `from`'s hue
-	// and saturation. Used to derive one muted tone from the active palette.
-	function mixChannels(from: string, to: string, t: number): string {
-		const f = from.trim().split(/\s+/)
-		const g = to.trim().split(/\s+/)
-		const lf = parseFloat(f[2])
-		const lg = parseFloat(g[2])
-		if (Number.isNaN(lf) || Number.isNaN(lg)) return from
-		const l = lf + (lg - lf) * t
-		return `${f[0]} ${f[1]} ${l.toFixed(1)}%`
-	}
-
-	// Apply theme to document using only background/foreground colors
-	function applyTheme() {
-		if (!browser) return
-
-		const effectiveMode =
-			$theme.mode === 'auto'
-				? window.matchMedia('(prefers-color-scheme: dark)').matches
-					? 'dark'
-					: 'light'
-				: $theme.mode
-
-		document.documentElement.setAttribute('theme', effectiveMode)
-		// Legacy Tailwind screens read the dark class
-		document.documentElement.classList.toggle('dark', effectiveMode === 'dark')
-
-		// Apply custom colors (only background/foreground)
-		const colors = effectiveMode === 'dark' ? $theme.darkColors : $theme.lightColors
-
-		const set = (name: string, value: string) => {
-			document.documentElement.style.setProperty(name, value)
-		}
-
-		set('--background', colors.background)
-		set('--foreground', colors.foreground)
-
-		// Map all other tokens to either background or foreground
-		set('--muted', mixChannels(colors.foreground, colors.background, 0.92))
-		set('--card', colors.background)
-		set('--popover', colors.background)
-		set('--secondary', colors.background)
-		set('--accent', colors.foreground)
-		set('--primary', colors.foreground)
-		set('--destructive', colors.foreground)
-		set('--border', mixChannels(colors.foreground, colors.background, 0.78))
-		set('--input', mixChannels(colors.foreground, colors.background, 0.78))
-		set('--ring', colors.foreground)
-
-		set('--card-foreground', colors.foreground)
-		set('--popover-foreground', colors.foreground)
-		set('--muted-foreground', mixChannels(colors.foreground, colors.background, 0.45))
-		set('--secondary-foreground', colors.foreground)
-		set('--accent-foreground', colors.background)
-		set('--primary-foreground', colors.background)
-		set('--destructive-foreground', colors.background)
-	}
-
 	onMount(() => {
-		initOAuth().catch(console.error)
-		const unsubscribe = player.subscribe((state) => {
-			playerState = state
-		})
-
-		// Apply theme on mount
-		applyTheme()
-
-		// Watch for theme changes
-		const themeUnsubscribe = theme.subscribe(() => {
-			applyTheme()
-		})
-
-		// Watch for session changes to load profile (only way to load)
-		const sessionUnsubscribe = session.subscribe((s) => {
-			if (s?.did) {
-				console.log('[session subscribe] Session updated, loading profile')
-				loadThemeFromProfile()
-			}
-		})
-
-		// Listen for system preference changes
-		const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-		const handleChange = () => {
-			if ($theme.mode === 'auto') {
-				applyTheme()
+		// Mobile decks are either compact or expanded: persisted desktop strip decks normalize once
+		if (isMobileViewport()) {
+			for (const deck of Object.values(appState.decks)) {
+				if (!deck.compact && !deck.expanded) deck.compact = true
 			}
 		}
-		mediaQuery.addEventListener('change', handleChange)
-
-		return () => {
-			unsubscribe()
-			themeUnsubscribe()
-			sessionUnsubscribe()
-			mediaQuery.removeEventListener('change', handleChange)
+		initOAuth()
+		// Console handles for debugging, like r4-svelte's window.r5
+		if (dev) {
+			Promise.all([
+				import('#lib/api.js'),
+				import('#lib/collections/tracks.js'),
+				import('#lib/collections/channels.js')
+			]).then(([api, tracks, channels]) => {
+				Object.assign(window, {
+					r4: {
+						appState,
+						api,
+						tracksCollection: tracks.tracksCollection,
+						channelsCollection: channels.channelsCollection
+					}
+				})
+			})
 		}
+		return initializeKeyboardShortcuts()
 	})
 
-	// Until decks land, the legacy player fills the deck strip whenever something plays
-	const hasPlayback = $derived(
-		(playerState.customPlaylist?.length > 0 || playerState.context !== null) &&
-			playerState.index >= 0
+	// Decks: same layout rules as r4-svelte
+	let anyDeckExpanded = $derived(Object.values(appState.decks).some((deck) => deck.expanded))
+	let anyDeckActive = $derived(
+		Object.values(appState.decks).some(
+			(d) =>
+				!d.compact &&
+				((d.playlist_tracks?.length ?? 0) > 0 ||
+					Boolean(d.playlist_track) ||
+					Boolean(d.listening_to_channel_id))
+		)
 	)
+	let allDeckIds = $derived(sortedDeckIds(appState.decks))
+	let compactDeckIds = $derived(allDeckIds.filter((id) => Boolean(appState.decks[id]?.compact)))
+	let compactListeningDeckIds = $derived(
+		compactDeckIds.filter((id) => Boolean(appState.decks[id]?.listening_to_channel_id))
+	)
+	let compactLocalDeckIds = $derived(
+		compactDeckIds.filter((id) => !appState.decks[id]?.listening_to_channel_id)
+	)
+
+	// Theme: the saved preference, else the system's
+	const prefersLight = new MediaQuery('(prefers-color-scheme: light)')
+	const theme = $derived(appState.theme ?? (prefersLight.current ? 'light' : 'dark'))
+	$effect(() => {
+		document.documentElement.setAttribute('theme', theme)
+		// Legacy Tailwind screens read the dark class
+		document.documentElement.classList.toggle('dark', theme === 'dark')
+	})
 
 	$effect(() => {
 		document.documentElement.lang = getLocale()
+	})
+
+	// On mobile an expanded deck fills the screen like a dialog: "back" should close it,
+	// not navigate the page underneath. A same-URL history entry while expanded does that.
+	let deckHistoryPushed = false
+	let suppressPopstate = false
+
+	$effect(() => {
+		const expanded = anyDeckExpanded
+		if (!isMobileViewport()) return
+		if (expanded && !deckHistoryPushed) {
+			history.pushState({r4DeckExpanded: true}, '', location.href)
+			deckHistoryPushed = true
+		} else if (!expanded && deckHistoryPushed) {
+			deckHistoryPushed = false
+			suppressPopstate = true
+			history.back()
+		}
+	})
+
+	onMount(() => {
+		function onPopState() {
+			if (suppressPopstate) {
+				suppressPopstate = false
+				return
+			}
+			if (!deckHistoryPushed) return
+			deckHistoryPushed = false
+			for (const deck of Object.values(appState.decks)) {
+				if (deck.expanded) toggleDeckCompact(deck.id)
+			}
+		}
+		window.addEventListener('popstate', onPopState)
+		return () => window.removeEventListener('popstate', onPopState)
 	})
 </script>
 
@@ -224,20 +163,64 @@
 {#if !ready}
 	<r4-loading role="status">{m.common_loading()}</r4-loading>
 {:else}
-	<r4-layout deck-active={hasPlayback}>
+	<ToolTip />
+	{#each allDeckIds as deckId (deckId)}
+		<!-- Two pins per deck, the whole queue and the current track, so the playing row
+		     stays resident while the other swaps. See collections/keepalive.ts. -->
+		{@const queuePin = queuePinTargets(appState.decks[deckId], (id) => tracksCollection.get(id))}
+		<TracksKeepalive slugs={queuePin.slugs} ids={queuePin.ids} />
+		<TracksKeepalive
+			ids={appState.decks[deckId]?.playlist_track ? [appState.decks[deckId].playlist_track] : []}
+		/>
+	{/each}
+	<r4-layout deck-expanded={anyDeckExpanded} deck-active={anyDeckActive}>
 		<LayoutHeader />
-		<r4-content>
-			<r4-scroll-area>
-				<main>
-					{@render children()}
-				</main>
-			</r4-scroll-area>
-			{#if hasPlayback}
-				<r4-deck-strip>
-					<Player visible={true} mobilePanelOpen={true} />
-				</r4-deck-strip>
-			{/if}
-		</r4-content>
+		<r4-content-wrapper>
+			<r4-content>
+				<r4-scroll-area>
+					<main>
+						{@render children()}
+					</main>
+				</r4-scroll-area>
+				<DeckStrip />
+			</r4-content>
+			<r4-compact-decks empty={compactDeckIds.length === 0} aria-label={m.decks_compact_label()}>
+				{#each compactLocalDeckIds as deckId (deckId)}
+					<r4-compact-deck
+						style:--deck-accent={deckAccent(allDeckIds, deckId)}
+						transition:fly={{y: 24, duration: 200, easing: cubicOut}}
+					>
+						<DeckCompactBar {deckId} />
+					</r4-compact-deck>
+				{/each}
+				{#if compactListeningDeckIds.length}
+					<r4-compact-listening>
+						<button
+							aria-label={m.broadcasts_leave()}
+							onclick={() => compactListeningDeckIds.forEach((id) => leaveBroadcast(id))}
+						>
+							<Icon icon="close" size={14} />
+						</button>
+						<r4-compact-listening-decks>
+							{#each compactListeningDeckIds as deckId (deckId)}
+								<r4-compact-deck
+									style:--deck-accent={deckAccent(allDeckIds, deckId)}
+									transition:fly={{y: 24, duration: 200, easing: cubicOut}}
+								>
+									<DeckCompactBar {deckId} showEdgeControls={false} />
+								</r4-compact-deck>
+							{/each}
+						</r4-compact-listening-decks>
+						<button
+							aria-label={m.player_compact_show_panel()}
+							onclick={() => toggleDeckCompact(compactListeningDeckIds[0])}
+						>
+							<Icon icon="deck-panel" expanded />
+						</button>
+					</r4-compact-listening>
+				{/if}
+			</r4-compact-decks>
+		</r4-content-wrapper>
 	</r4-layout>
 {/if}
 
@@ -245,8 +228,9 @@
 
 <style>
 	/* Shell: same layout decisions as r4-svelte. On desktop the header is a rail
-	   on the left, the page scrolls in the middle and decks stack on the right.
-	   On mobile it is a column with the header as a tab bar at the bottom. */
+	   on the left, the page scrolls in the middle, decks stack on the right and
+	   compact decks sit at the bottom. On mobile it is a column with the header
+	   as a tab bar at the bottom. */
 	r4-loading {
 		display: grid;
 		place-content: center;
@@ -263,9 +247,24 @@
 	}
 
 	r4-layout > :global(header) {
+		position: sticky;
+		top: 0;
 		flex-shrink: 0;
 		border-radius: var(--border-radius);
 		border: var(--floating-border);
+	}
+
+	r4-layout[deck-expanded='true'] > :global(header) {
+		display: none;
+	}
+
+	r4-content-wrapper {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		min-width: 0;
+		min-height: 0;
+		gap: var(--floating-gap);
 	}
 
 	r4-content {
@@ -288,21 +287,63 @@
 		flex-direction: column;
 	}
 
+	/* A single expanded deck takes the whole content width */
+	r4-layout[deck-expanded='true'] r4-scroll-area {
+		flex: 0 0 0;
+		min-width: 0;
+		overflow: hidden;
+	}
+
+	r4-layout[deck-expanded='true'] :global(r4-deck-strip) {
+		flex: 1 1 auto;
+		max-width: none;
+		width: auto;
+	}
+
 	main {
 		flex: 1;
 		display: flex;
 		flex-direction: column;
 	}
 
-	r4-deck-strip {
+	r4-compact-decks {
 		display: flex;
 		flex-direction: column;
-		flex: 0 0 var(--deck-strip-width);
-		min-height: 0;
-		overflow: hidden;
-		border-radius: var(--border-radius);
-		background: var(--floating-bg);
-		border: var(--floating-border);
+		gap: var(--floating-gap);
+		position: sticky;
+		bottom: 0;
+		z-index: 30;
+
+		/* Stays mounted when empty, so the first compact deck gets its fly-in */
+		&[empty='true'] {
+			display: none;
+		}
+	}
+
+	r4-compact-deck {
+		display: block;
+		min-width: 0;
+
+		:global(r4-deck-compact-bar) {
+			border-radius: var(--border-radius);
+			overflow: hidden;
+			background: var(--floating-bg);
+			border: var(--floating-border);
+		}
+	}
+
+	r4-compact-listening {
+		display: grid;
+		grid-template-columns: auto 1fr auto;
+		align-items: center;
+		column-gap: var(--space-1);
+		min-width: 0;
+	}
+
+	r4-compact-listening-decks {
+		display: flex;
+		flex-direction: column;
+		min-width: 0;
 	}
 
 	@media (max-width: 768px) {
@@ -312,26 +353,49 @@
 
 		r4-layout > :global(header) {
 			order: 2;
+			z-index: 40;
 			border: none;
 			border-block-start: var(--floating-border);
 			border-radius: 0;
+			/* Frosted: a distinct floating layer under the compact player */
 			background: color-mix(in oklch, var(--floating-bg) 75%, transparent);
 			backdrop-filter: blur(12px);
 		}
 
-		r4-content {
+		r4-content-wrapper {
 			order: 1;
+		}
+
+		r4-content {
 			flex-direction: column;
 		}
 
-		/* While a deck plays, it gets most of the viewport */
-		r4-layout[deck-active='true'] r4-scroll-area {
+		/* While a deck shows content, cap the page so the deck gets most of the viewport */
+		r4-content:has(
+				:global(
+					r4-deck:not([compact='true']):is(
+							:not([hide-video='true']),
+							:not([listening='true']):not([auto='true']):not([hide-queue='true'])
+						)
+				)
+			)
+			r4-scroll-area {
 			flex: 0 1 auto;
 			max-height: 28dvh;
 		}
 
-		r4-deck-strip {
-			flex: 1 1 auto;
+		/* An open deck on mobile hides the tab bar, like an expanded one on desktop */
+		r4-layout[deck-active='true'] > :global(header) {
+			display: none;
+		}
+
+		r4-compact-decks {
+			position: relative;
+			bottom: auto;
+		}
+
+		r4-compact-listening > button:last-child {
+			display: none;
 		}
 	}
 </style>

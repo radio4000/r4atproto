@@ -1,7 +1,7 @@
 <script lang="ts">
 	import {createTrack, getTrackByUri} from '#lib/services/r4-service.js'
-	import TrackForm from '#lib/components/TrackForm.svelte'
-	import TrackListItem from '#lib/components/TrackListItem.svelte'
+	import TrackForm from '#lib/components/legacy/TrackForm.svelte'
+	import TrackListItem from '#lib/components/legacy/TrackListItem.svelte'
 	import {
 		Card,
 		CardContent,

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import {page} from '$app/state'
-	import NavTabs from '#lib/components/NavTabs.svelte'
+	import NavTabs from '#lib/components/legacy/NavTabs.svelte'
 	import {locale, translate} from '#lib/i18n/index.js'
 	import {Music, Heart, Plus} from 'lucide-svelte'
 	import {session} from '#lib/state/session.js'

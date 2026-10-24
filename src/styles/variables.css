@@ -25,6 +25,13 @@
 	--header-label-width: 10ch;
 	/* deck strip next to the page on desktop */
 	--deck-strip-width: 28rem;
+	--deck-min-width: 280px;
+	--deck-default-width: 400px;
+	--deck-compact-min-height: 49px;
+	--tooltip-width: 200px;
+	--popover-min-width: 10rem;
+	--dialog-width: 640px;
+	--track-card-min-height: 53px;
 	--shadow-modal: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
 	/* motion: --duration-1 for micro feedback (presses, hovers, exits),
 	   --duration-2 for overlays and larger moves (menus, dialogs) */

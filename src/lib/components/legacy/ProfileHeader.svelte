@@ -1,9 +1,9 @@
 <script lang="ts">
 	import Avatar from './Avatar.svelte'
-	import {Card, CardHeader, CardTitle, CardDescription} from './ui/card'
-	import {Button, buttonVariants} from './ui/button'
+	import {Card, CardHeader, CardTitle, CardDescription} from '../ui/card'
+	import {Button, buttonVariants} from '../ui/button'
 	import {cn, menuItemClass, menuTriggerClass} from '#lib/utils/index.js'
-	import Link from '#lib/components/Link.svelte'
+	import Link from '#lib/components/legacy/Link.svelte'
 	import Dialog from '#lib/components/ui/Dialog.svelte'
 	import {
 		PlayCircle,

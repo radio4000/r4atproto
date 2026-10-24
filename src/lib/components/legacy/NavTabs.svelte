@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Link from '#lib/components/Link.svelte'
+	import Link from '#lib/components/legacy/Link.svelte'
 	import {cn} from '#lib/utils/index.js'
 	import type {ComponentType} from 'svelte'
 

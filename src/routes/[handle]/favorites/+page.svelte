@@ -1,7 +1,7 @@
 <script lang="ts">
 	import {listR4FavoritesByDid, getProfiles} from '#lib/services/r4-service.js'
 	import {getContext} from 'svelte'
-	import ProfileHeader from '#lib/components/ProfileHeader.svelte'
+	import ProfileHeader from '#lib/components/legacy/ProfileHeader.svelte'
 	import {Button} from '#lib/components/ui/button/index.js'
 	import {Loader2, AlertCircle, Users} from 'lucide-svelte'
 	import StateCard from '#lib/components/ui/state-card.svelte'

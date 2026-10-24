@@ -3,10 +3,10 @@
 	import {setContext} from 'svelte'
 	import {useLiveQuery} from '@tanstack/svelte-db'
 	import {profilesCollection, loadProfile, getProfileFromCache} from '#lib/stores/profiles-db.js'
-	import FollowButton from '#lib/components/FollowButton.svelte'
-	import ProfileHeader from '#lib/components/ProfileHeader.svelte'
-	import ProfileNav from '#lib/components/ProfileNav.svelte'
-	import TrackEditDialogContent from '#lib/components/TrackEditDialogContent.svelte'
+	import FollowButton from '#lib/components/legacy/FollowButton.svelte'
+	import ProfileHeader from '#lib/components/legacy/ProfileHeader.svelte'
+	import ProfileNav from '#lib/components/legacy/ProfileNav.svelte'
+	import TrackEditDialogContent from '#lib/components/legacy/TrackEditDialogContent.svelte'
 	import Dialog from '#lib/components/ui/Dialog.svelte'
 	import {session} from '#lib/state/session.js'
 	import {Button} from '#lib/components/ui/button/index.js'
@@ -25,7 +25,7 @@
 	import {page} from '$app/state'
 	import {goto} from '$app/navigation'
 	import {resolve} from '$app/paths'
-	import SeoHead from '#lib/components/SeoHead.svelte'
+	import SeoHead from '#lib/components/legacy/SeoHead.svelte'
 
 	const {data, children} = $props()
 	const handle = $derived(data?.handle ? data.handle.replace(/^@/, '') : '')

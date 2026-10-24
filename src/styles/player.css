@@ -1,0 +1,48 @@
+/* Global styles for media-chrome custom elements */
+
+youtube-video,
+soundcloud-player {
+	aspect-ratio: 16 / 9;
+	height: 100%;
+	min-width: 200px;
+
+	&:not([slot='media']) {
+		display: none;
+		pointer-events: none;
+	}
+}
+
+media-controller,
+media-control-bar {
+	--media-background-color: transparent;
+	--media-text-color: var(--gray-12);
+	--media-primary-color: var(--gray-12);
+	--media-icon-color: var(--gray-12);
+	--media-control-padding: var(--space-2);
+	--media-control-background: transparent;
+	--media-control-hover-background: transparent;
+
+	--media-button-icon-width: 1.5rem;
+	--media-button-icon-height: 1.5rem;
+	--media-button-padding: 0 var(--space-2);
+
+	--media-range-track-background: var(--gray-2);
+	--media-loading-indicator-icon-width: 2rem;
+	--media-loading-indicator-icon-height: 2rem;
+}
+
+media-control-bar {
+	gap: var(--space-1);
+}
+
+media-time-display {
+	--media-control-background: none;
+	user-select: none;
+}
+
+media-time-range {
+	--media-control-background: none;
+	/* Keep elapsed/played progress in active theme color. */
+	--media-range-bar-color: var(--accent-9);
+	--media-range-thumb-background: var(--accent-9);
+}

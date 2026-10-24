@@ -12,7 +12,7 @@
 	} from '#lib/components/ui/card/index.js'
 	import {Input} from '#lib/components/ui/input/index.js'
 	import {Label} from '#lib/components/ui/label/index.js'
-	import SignInForm from '#lib/components/SignInForm.svelte'
+	import SignInForm from '#lib/components/legacy/SignInForm.svelte'
 	import {
 		Dialog,
 		DialogContent,

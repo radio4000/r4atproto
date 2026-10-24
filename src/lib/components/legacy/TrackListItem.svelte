@@ -29,7 +29,7 @@
 	import {resolve} from '$app/paths'
 	import {goto} from '$app/navigation'
 	import {locale, translate} from '#lib/i18n/index.js'
-	import Link from '#lib/components/Link.svelte'
+	import Link from '#lib/components/legacy/Link.svelte'
 	import {player} from '#lib/player/store.js'
 	import {onDestroy} from 'svelte'
 	import Dialog from '#lib/components/ui/Dialog.svelte'

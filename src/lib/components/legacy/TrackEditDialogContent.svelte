@@ -2,7 +2,7 @@
 	import {TRACK} from '#lib/lexicons.js'
 	import {onMount} from 'svelte'
 	import {resolveHandle, getTrackByUri} from '#lib/services/r4-service.js'
-	import TrackEditForm from '#lib/components/TrackEditForm.svelte'
+	import TrackEditForm from '#lib/components/legacy/TrackEditForm.svelte'
 
 	let {handle = '', repo = '', rkey = '', track = null, onsaved = () => {}} = $props()
 

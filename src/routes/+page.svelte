@@ -11,11 +11,11 @@
 		CardTitle
 	} from '#lib/components/ui/card/index.js'
 	import StateCard from '#lib/components/ui/state-card.svelte'
-	import ProfileHeader from '#lib/components/ProfileHeader.svelte'
-	import SignInForm from '#lib/components/SignInForm.svelte'
+	import ProfileHeader from '#lib/components/legacy/ProfileHeader.svelte'
+	import SignInForm from '#lib/components/legacy/SignInForm.svelte'
 	import {Loader2, Users, Search} from 'lucide-svelte'
 	import {locale, translate} from '#lib/i18n/index.js'
-	import SeoHead from '#lib/components/SeoHead.svelte'
+	import SeoHead from '#lib/components/legacy/SeoHead.svelte'
 	import {goto} from '$app/navigation'
 	import {resolve} from '$app/paths'
 

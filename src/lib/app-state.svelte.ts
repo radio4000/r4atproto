@@ -48,6 +48,7 @@ export function serializeAppStateForStorage(state: AppState): Record<string, unk
 			hide_queue_panel: deck.hide_queue_panel,
 			queue_panel_width: deck.queue_panel_width,
 			auto_radio: deck.auto_radio,
+			view: deck.view,
 			auto_radio_rotation_start: deck.auto_radio_rotation_start,
 			speed: deck.speed
 		}

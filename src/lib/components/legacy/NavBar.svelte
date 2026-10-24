@@ -1,6 +1,6 @@
 <script lang="ts">
 	import {Button} from '#lib/components/ui/button/index.js'
-	import Link from '#lib/components/Link.svelte'
+	import Link from '#lib/components/legacy/Link.svelte'
 	import {Menu} from 'lucide-svelte'
 	import {locale, translate} from '#lib/i18n/index.js'
 

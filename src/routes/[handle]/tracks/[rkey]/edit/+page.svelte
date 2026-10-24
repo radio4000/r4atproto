@@ -1,5 +1,5 @@
 <script lang="ts">
-	import TrackEditDialogContent from '#lib/components/TrackEditDialogContent.svelte'
+	import TrackEditDialogContent from '#lib/components/legacy/TrackEditDialogContent.svelte'
 	import {Dialog} from '#lib/components/ui/dialog/index.js'
 	import {goto} from '$app/navigation'
 	import {resolve} from '$app/paths'

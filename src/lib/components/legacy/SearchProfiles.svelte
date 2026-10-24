@@ -7,7 +7,7 @@
 	import StateCard from '#lib/components/ui/state-card.svelte'
 	import {locale, translate} from '#lib/i18n/index.js'
 	import {cn} from '#lib/utils/index.js'
-	import ProfileHeader from '#lib/components/ProfileHeader.svelte'
+	import ProfileHeader from '#lib/components/legacy/ProfileHeader.svelte'
 	import {FEATURED_PROFILES} from '#lib/config/featured-profiles.js'
 
 	import {onMount} from 'svelte'
