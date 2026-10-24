@@ -118,6 +118,15 @@ describe('xrpc queries', () => {
 		expect(await titles('tags=dub&tags=techno')).toEqual(['Basic Channel'])
 		expect(await titles('mention=bob.test')).toEqual(['Basic Channel'])
 		expect(await titles('q=tub')).toEqual(['King Tubby'])
+		expect(await titles('radios=did:plc:alice&q=tub')).toEqual(['King Tubby'])
+		expect(await titles('radios=did:plc:bob&q=tub')).toEqual([])
+		const byTag = await get(db, '/xrpc/radio.4000.listTracks?tags=dub&limit=1')
+		expect(byTag.body.tracks.map((t) => t.record.title)).toEqual(['King Tubby'])
+		const nextByTag = await get(
+			db,
+			`/xrpc/radio.4000.listTracks?tags=dub&limit=1&cursor=${encodeURIComponent(byTag.body.cursor ?? '')}`
+		)
+		expect(nextByTag.body.tracks.map((t) => t.record.title)).toEqual(['Basic Channel'])
 	})
 
 	test('getRadios, listBroadcasts and chat.listMessages', async () => {

@@ -95,6 +95,7 @@ function statementsFor(db: Db, change: Change, now: string): Statement[] {
 		}
 		const r = change.record
 		const description = text(r.description) ?? ''
+		const createdAt = text(r.createdAt)
 		return [
 			db
 				.prepare(
@@ -116,12 +117,16 @@ function statementsFor(db: Db, change: Change, now: string): Statement[] {
 				),
 			...clear,
 			...bareTags(description).map((tag) =>
-				db.prepare('INSERT OR IGNORE INTO track_tags (tag, uri) VALUES (?, ?)').bind(tag, uri)
+				db
+					.prepare('INSERT OR IGNORE INTO track_tags (tag, uri, created_at) VALUES (?, ?, ?)')
+					.bind(tag, uri, createdAt)
 			),
 			...extractMentions(description).map((mention) =>
 				db
-					.prepare('INSERT OR IGNORE INTO track_mentions (handle, uri) VALUES (?, ?)')
-					.bind(mention.slice(1), uri)
+					.prepare(
+						'INSERT OR IGNORE INTO track_mentions (handle, uri, created_at) VALUES (?, ?, ?)'
+					)
+					.bind(mention.slice(1), uri, createdAt)
 			)
 		]
 	}

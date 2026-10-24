@@ -41,18 +41,23 @@ CREATE TABLE tracks (
 CREATE INDEX tracks_created ON tracks (created_at DESC, uri DESC);
 CREATE INDEX tracks_radio ON tracks (did, created_at DESC, uri DESC);
 
--- #tags and @mentions of track descriptions, lowercase, without # or @
+-- #tags and @mentions of track descriptions, lowercase, without # or @. With the
+-- track's date, so a tag's tracks are read newest first straight from the index.
 CREATE TABLE track_tags (
 	tag TEXT NOT NULL,
 	uri TEXT NOT NULL,
+	created_at TEXT NOT NULL,
 	PRIMARY KEY (tag, uri)
 );
+CREATE INDEX track_tags_feed ON track_tags (tag, created_at DESC, uri DESC);
 CREATE INDEX track_tags_uri ON track_tags (uri);
 CREATE TABLE track_mentions (
 	handle TEXT NOT NULL,
 	uri TEXT NOT NULL,
+	created_at TEXT NOT NULL,
 	PRIMARY KEY (handle, uri)
 );
+CREATE INDEX track_mentions_feed ON track_mentions (handle, created_at DESC, uri DESC);
 CREATE INDEX track_mentions_uri ON track_mentions (uri);
 
 CREATE TABLE broadcasts (

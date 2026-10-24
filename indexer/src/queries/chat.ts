@@ -11,8 +11,8 @@ export async function listMessages(
 	const binds: unknown[] = [params.radio]
 	const after = decodeCursor(params.cursor)
 	if (after) {
-		where.push('(c.created_at < ? OR (c.created_at = ? AND c.uri < ?))')
-		binds.push(after.createdAt, after.createdAt, after.uri)
+		where.push('(c.created_at, c.uri) < (?, ?)')
+		binds.push(after.createdAt, after.uri)
 	}
 	const {results} = await db
 		.prepare(
