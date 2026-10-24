@@ -34,13 +34,17 @@
 		labelsVisible = !labelsVisible
 		try {
 			localStorage.setItem(LABELS_STORAGE_KEY, labelsVisible ? '1' : '0')
-		} catch {}
+		} catch {
+			// storage unavailable (private mode): labels stay visible
+		}
 	}
 
 	onMount(() => {
 		try {
 			labelsVisible = localStorage.getItem(LABELS_STORAGE_KEY) !== '0'
-		} catch {}
+		} catch {
+			// storage unavailable (private mode): labels stay visible
+		}
 	})
 </script>
 

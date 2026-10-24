@@ -22,6 +22,17 @@ export interface TrackRecord {
 	updatedAt?: string
 }
 
+/** Colors of a radio, as HSL triplets like '262 83% 58%' */
+export interface ChannelTheme {
+	mode?: 'auto' | 'light' | 'dark'
+	lightBackground?: string
+	lightForeground?: string
+	lightAccent?: string
+	darkBackground?: string
+	darkForeground?: string
+	darkAccent?: string
+}
+
 export interface ChannelRecord {
 	$type?: string
 	name?: string

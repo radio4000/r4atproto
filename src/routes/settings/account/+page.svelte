@@ -1,8 +1,7 @@
 <script>
 	import {appState} from '#lib/app-state.svelte.js'
-	import {bskyOAuth} from '#lib/services/bsky-oauth.js'
 	import {resolvePds} from '#lib/atproto/identity.js'
-	import {signOut} from '#lib/session.js'
+	import {renewPermissions, signOut} from '#lib/session.js'
 	import {channelHref} from '#lib/links.js'
 	import SettingsHeader from '#lib/components/settings-header.svelte'
 	import Seo from '#lib/components/seo.svelte'
@@ -36,7 +35,7 @@
 			<p><small>{m.settings_account_permissions_hint()}</small></p>
 			<menu>
 				<li>
-					<button type="button" onclick={() => bskyOAuth.requestScopes()}
+					<button type="button" onclick={renewPermissions}
 						>{m.settings_account_permissions()}</button
 					>
 				</li>

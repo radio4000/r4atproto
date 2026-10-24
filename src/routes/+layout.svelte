@@ -3,22 +3,17 @@
 	import {fly} from 'svelte/transition'
 	import {cubicOut} from 'svelte/easing'
 	import {MediaQuery} from 'svelte/reactivity'
-	import {bskyOAuth} from '#lib/services/bsky-oauth.js'
-	import {buildAtprotoLoopbackClientId} from '@atproto/oauth-types'
-	import {CLIENT_METADATA_PATH, OAUTH_SCOPE} from '#lib/oauth.js'
-	import {session} from '#lib/state/session.js'
-	import '../app.css'
 	import '../styles/style.css'
 	import {appState, deckAccent} from '#lib/app-state.svelte.js'
 	import {sortedDeckIds} from '#lib/deck.js'
 	import {toggleDeckCompact} from '#lib/api.js'
 	import {leaveBroadcast} from '#lib/broadcast.js'
 	import {initializeKeyboardShortcuts} from '#lib/keyboard.js'
-	import {syncSession, takeAuthRedirect} from '#lib/session.js'
+	import {initSession} from '#lib/session.js'
 	import {goto} from '$app/navigation'
 	import {isMobileViewport} from '#lib/utils.js'
-	import ToastContainer from '#lib/components/ui/toast/ToastContainer.svelte'
-	import SeoHead from '#lib/components/legacy/SeoHead.svelte'
+	import Seo from '#lib/components/seo.svelte'
+	import app from '#lib/config/app.json' with {type: 'json'}
 	import LayoutHeader from '#lib/components/layout-header.svelte'
 	import DeckStrip from '#lib/components/deck-strip.svelte'
 	import DeckCompactBar from '#lib/components/deck-compact-bar.svelte'
@@ -35,33 +30,13 @@
 	let {children} = $props()
 	let ready = $state(false)
 
-	async function initOAuth() {
+	async function init() {
 		try {
-			// Over HTTPS we publish client metadata; plain-HTTP dev uses a loopback client
-			const {protocol, origin, port} = window.location
-			const clientId =
-				protocol === 'https:'
-					? `${origin}${CLIENT_METADATA_PATH}`
-					: buildAtprotoLoopbackClientId({
-							scope: OAUTH_SCOPE,
-							redirect_uris: [`http://127.0.0.1${port ? `:${port}` : ''}/`]
-						})
-			await bskyOAuth.init(clientId)
-			await bskyOAuth.handleCallback().catch((e) => console.error('OAuth callback error:', e))
-			if (!bskyOAuth.session?.did) {
-				const did = bskyOAuth.getStoredDid()
-				if (did)
-					await bskyOAuth
-						.restoreSession(did)
-						.catch((e) => console.error('Session restore error:', e))
-			}
-			session.refresh()
-			await syncSession()
-			// Back from the OAuth round trip: return to where sign-in started
-			const redirect = appState.session ? takeAuthRedirect() : undefined
-			if (redirect) goto(redirect, {replace: true})
+			// Back from an OAuth round trip: return to where sign-in started
+			const returnTo = await initSession()
+			if (returnTo && returnTo !== location.pathname) goto(returnTo, {replace: true})
 		} catch (error) {
-			console.error('OAuth initialization error:', error)
+			console.error('Session error:', error)
 		} finally {
 			ready = true
 		}
@@ -74,7 +49,7 @@
 				if (!deck.compact && !deck.expanded) deck.compact = true
 			}
 		}
-		initOAuth()
+		init()
 		// Console handles for debugging, like r4-svelte's window.r5
 		if (dev) {
 			Promise.all([
@@ -120,8 +95,6 @@
 	const theme = $derived(appState.theme ?? (prefersLight.current ? 'light' : 'dark'))
 	$effect(() => {
 		document.documentElement.setAttribute('theme', theme)
-		// Legacy Tailwind screens read the dark class
-		document.documentElement.classList.toggle('dark', theme === 'dark')
 	})
 
 	$effect(() => {
@@ -173,7 +146,7 @@
 	})
 </script>
 
-<SeoHead title="Radio4000" description={m.welcome_tagline_channel()} />
+<Seo title={app.name} description={m.welcome_tagline_channel()} plain />
 
 {#if !ready}
 	<r4-loading role="status">{m.common_loading()}</r4-loading>
@@ -239,8 +212,6 @@
 		</r4-content-wrapper>
 	</r4-layout>
 {/if}
-
-<ToastContainer />
 
 <style>
 	/* Shell: same layout decisions as r4-svelte. On desktop the header is a rail

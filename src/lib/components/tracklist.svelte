@@ -345,6 +345,14 @@
 		display: flex;
 		flex-direction: column;
 		min-height: 0;
+		container-type: inline-size;
+	}
+
+	/* Narrow lists: a radio is just its avatar next to each track */
+	@container (max-width: 520px) {
+		r4-tracklist[show-slug='true'] :global(r4-channel-micro-card span) {
+			display: none;
+		}
 	}
 
 	ul {

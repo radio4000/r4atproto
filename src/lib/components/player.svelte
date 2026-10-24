@@ -189,7 +189,6 @@
 		}))
 	})
 
-	const headerPresenceCount = $derived(display.presenceCount)
 
 	// Track previous track ID to detect changes for autoplay
 	let prevTrackId = $state(/** @type {string|undefined} */ (undefined))

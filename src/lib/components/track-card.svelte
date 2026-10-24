@@ -17,7 +17,6 @@
 	import PopoverMenu from './popover-menu.svelte'
 	import Dialog from './dialog.svelte'
 	import LinkEntities from './link-entities.svelte'
-	import {tooltip} from './tooltip-attachment.svelte.js'
 	import * as m from '#lib/paraglide/messages.js'
 	import {trackImageUrl} from '#lib/utils.js'
 	import {authHref, trackHref} from '#lib/links.js'
@@ -215,7 +214,6 @@
 {/snippet}
 
 <r4-track-card {active} selected={selected && !active} bind:this={articleEl}>
-	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<article
 		ondblclick={dblclick}
 		onmousedown={(e) => {

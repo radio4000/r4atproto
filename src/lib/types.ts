@@ -16,7 +16,7 @@ export interface Channel {
 	url?: string | null
 	latitude?: number | null
 	longitude?: number | null
-	theme?: import('#lib/services/atproto/channel.service.js').ChannelTheme
+	theme?: import('#lib/atproto/records.js').ChannelTheme
 	/** slug on radio4000.com, when imported from there */
 	r4_slug?: string | null
 	/** true when the account has a radio.4000.channel record */

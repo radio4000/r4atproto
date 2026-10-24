@@ -46,7 +46,9 @@ function parseChannelParams(opts: Parameters<typeof parseLoadSubsetOptions>[0]) 
 		const parsed = parseLoadSubsetOptions(opts) as {filters: Filter[]; limit?: number}
 		filters = parsed.filters
 		limit = parsed.limit
-	} catch {}
+	} catch {
+		// No subset options: browse everything
+	}
 	const actors = [...values(filters, 'id'), ...values(filters, 'slug')]
 	const geo = ['latitude', 'longitude'].every((field) =>
 		filters.some((f) => f.field[0] === field && f.operator === 'not_isNull')

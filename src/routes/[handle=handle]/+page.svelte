@@ -25,6 +25,7 @@
 
 	/** Update the URL filter, keeping the rest */
 	function setParam(key, value) {
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity -- built per navigation, not state
 		const params = new URLSearchParams(page.url.search)
 		if (value) params.set(key, value)
 		else params.delete(key)

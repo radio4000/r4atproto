@@ -1,15 +1,10 @@
-# r4atproto — Documentation
+# Docs
 
-Radio4000 for AT Protocol. Share and discover music tracks on the AT Protocol network.
-
-## Guides
-
-- [Features](./features.md) — all user-facing pages and what they do
-- [Configuration](./configuration.md) — instance-level config (featured profiles, etc.)
-- [State](./state.md) — atproto reads/writes, collections, app state
+- [Lexicons](./lexicons.md) — `radio.4000.*` records, the namespace, the OAuth scope
+- [State](./state.md) — atproto reads and writes, collections, app state
 - [TanStack](./tanstack.md) — collection contracts
-- [Lexicons](./lexicons.md) — records, namespace, OAuth scope
 - [Localization](./localization-i18n.md) — Paraglide, 21 languages
 - [Tone](./tone.md) — voice for all copy
-- [Services](./services.md) — data layer: AT Protocol collections, Discogs, sync
-- [Contributing](./contributing.md) — local dev setup, conventions, adding features
+- [Contributing](./contributing.md) — conventions
+
+The deck player is documented next to its code: `src/lib/player/AGENTS.md`. Styles: `src/styles/AGENTS.md`.

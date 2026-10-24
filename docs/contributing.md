@@ -1,87 +1,23 @@
 # Contributing
 
-## Local development
+## Conventions
 
-```sh
-# Install dependencies
-bun install
+- **Classless:** semantic HTML and `r4-*` custom elements, state as attributes (`aria-current`, `aria-pressed`, `expanded="true"`; `data-*` on native elements). No classes, no hardcoded values: every value is a token in `src/styles/variables.css`.
+- **No hardcoded strings:** copy lives in `i18n/messages/*.json` (`m.key()`); add new keys with `node i18n/add.js batch.json`.
+- **Identifiers and settings in one place:** namespace, domain and service URLs in `src/lib/config/app.json`, UI constants in `ui.json`.
+- **Data models:** lexicons in `lexicons/`; records are mapped to domain types in `src/lib/atproto/records.ts`.
+- **Same as r4-svelte where possible:** components, collections and the deck API keep r4-svelte's names, so changes can flow between the two.
 
-# Start dev server
-bun run dev
-
-# Run tests
-bun run test
-```
-
-The app runs at `http://127.0.0.1:5173` (atproto OAuth loopback clients need 127.0.0.1, not localhost).
-
----
-
-## Stack
-
-- **Framework:** SvelteKit 3 + Svelte 5 (runes syntax)
-- **Styling:** Tailwind CSS + shadcn-svelte component library
-- **Protocol:** AT Protocol via `@atproto/api`
-- **Auth:** AT Protocol OAuth (`@atproto/oauth-client-browser`)
-- **Local state:** TanStack Svelte DB (IndexedDB)
-- **Build:** Vite, static adapter (`@sveltejs/adapter-static`)
-
----
-
-## Project structure
+## Layout
 
 ```
-src/
-  lib/
-    components/       # Svelte components
-    config/           # Instance-level configuration
-    i18n/             # Translations (en, fr)
-    services/         # Data layer (AT Protocol, Discogs, oEmbed)
-    state/            # Svelte stores (session, theme)
-    stores/           # TanStack DB collections
-    utils.ts          # Shared helpers
-  routes/             # SvelteKit file-based routing
-docs/                 # This documentation
+src/lib/atproto      identity, repo reads, writes, OAuth
+src/lib/collections  TanStack DB collections (tracks, channels, follows, feed)
+src/lib/components   r4-* components
+src/lib/player       deck helpers: queue, auto-radio, media session
+src/lib/api.ts       deck orchestration (play, queue, layout)
+src/routes           pages; a radio is /@handle
+src/styles           global classless styles
 ```
 
----
-
-## Adding a new page
-
-1. Create `src/routes/your-page/+page.svelte`
-2. Add any server-side data loading in `+page.ts` if needed
-3. Add a nav link in `src/lib/components/NavBar.svelte`
-4. Add translation keys to both `src/lib/i18n/locales/en.ts` and `fr.ts`
-
----
-
-## Adding a new AT Protocol collection
-
-1. Define the Lexicon in the relevant service file under `src/lib/services/atproto/`
-2. Export from `src/lib/services/atproto/index.ts`
-3. Re-export from `src/lib/services/r4-service.ts`
-4. Add the collection to the permissions list in `src/routes/settings/permissions/+page.svelte`
-5. Document it in [services.md](./services.md)
-
----
-
-## Customising featured profiles
-
-Edit `src/lib/config/featured-profiles.ts`. See [configuration.md](./configuration.md) for details.
-
----
-
-## i18n
-
-All user-visible strings must use the `translate()` helper:
-
-```ts
-import {locale, translate} from '$lib/i18n'
-const t = (key, vars = {}) => translate($locale, key, vars)
-
-// Usage
-t('search.placeholder')
-t('search.emptyDescription', {query: q})
-```
-
-Add keys to both `src/lib/i18n/locales/en.ts` and `fr.ts` when adding new UI.
+Make atomic commits; run `bun run check`, `bun run types` and `bun run test` before pushing.
