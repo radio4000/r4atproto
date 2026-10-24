@@ -95,6 +95,15 @@
 		)
 	const shuffle = () => withLoading(() => shufflePlayChannel(appState.active_deck_id, channel))
 
+	/** A link's host without www, shown when it has no label */
+	function linkHost(url) {
+		try {
+			return new URL(url).host.replace(/^www\./, '')
+		} catch {
+			return url
+		}
+	}
+
 	const base = $derived(channelHref(slug))
 	const tabs = $derived([
 		{href: base, label: m.nav_tracks(), count: tracks.length || undefined},
@@ -182,6 +191,17 @@
 				</PopoverMenu>
 			</li>
 		</menu>
+		{#if channel?.links?.length}
+			<ul aria-label={m.settings_radio_links()}>
+				{#each channel.links as link (link.url)}
+					<li>
+						<a href={link.url} target="_blank" rel="noopener noreferrer me"
+							>{link.title || linkHost(link.url)}</a
+						>
+					</li>
+				{/each}
+			</ul>
+		{/if}
 		{#if channel?.description}
 			<p>
 				<LinkEntities {slug} text={channel.description} />
@@ -222,6 +242,7 @@
 		grid-template-areas:
 			'avatar title actions'
 			'description description description'
+			'links links links'
 			'tabs tabs tabs';
 		align-items: center;
 		gap: var(--space-2) var(--space-3);
@@ -267,6 +288,17 @@
 		overflow-wrap: anywhere;
 	}
 
+	header > ul {
+		grid-area: links;
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-1) var(--space-3);
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		font-size: var(--font-3);
+	}
+
 	nav {
 		grid-area: tabs;
 		min-width: 0;
@@ -284,6 +316,7 @@
 				'avatar title'
 				'actions actions'
 				'description description'
+				'links links'
 				'tabs tabs';
 		}
 

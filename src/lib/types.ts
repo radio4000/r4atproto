@@ -13,7 +13,8 @@ export interface Channel {
 	description?: string | null
 	/** image URL: the channel image, else the Bluesky avatar */
 	image?: string | null
-	url?: string | null
+	/** links to elsewhere, with optional labels */
+	links?: {url: string; title?: string}[]
 	latitude?: number | null
 	longitude?: number | null
 	theme?: import('#lib/atproto/records.js').ChannelTheme

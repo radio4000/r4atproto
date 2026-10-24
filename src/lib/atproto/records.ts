@@ -33,11 +33,18 @@ export interface ChannelTheme {
 	darkAccent?: string
 }
 
+export interface ChannelLink {
+	url: string
+	title?: string
+}
+
 export interface ChannelRecord {
 	$type?: string
 	name?: string
 	description?: string
 	image?: {ref: {$link: string} | string; mimeType?: string}
+	links?: ChannelLink[]
+	/** @deprecated single link, before `links` */
 	url?: string
 	geo?: {latitude: string; longitude: string}
 	theme?: Channel['theme']
@@ -116,7 +123,7 @@ export function channelFrom(
 		name: record?.name || profile?.displayName || owner.handle,
 		description: record?.description ?? profile?.description ?? null,
 		image,
-		url: record?.url ?? null,
+		links: record?.links ?? (record?.url ? [{url: record.url}] : []),
 		latitude: Number.isFinite(latitude) ? latitude : null,
 		longitude: Number.isFinite(longitude) ? longitude : null,
 		theme: record?.theme,
@@ -141,7 +148,8 @@ export function channelToRecord(
 		$type: CHANNEL,
 		name: channel.name ?? existing?.name,
 		description: channel.description ?? existing?.description,
-		url: channel.url ?? existing?.url,
+		links: channel.links ?? existing?.links ?? (existing?.url ? [{url: existing.url}] : undefined),
+		url: undefined,
 		geo: 'latitude' in channel ? geo : existing?.geo,
 		theme: channel.theme ?? existing?.theme,
 		r4Slug: channel.r4_slug ?? existing?.r4Slug,

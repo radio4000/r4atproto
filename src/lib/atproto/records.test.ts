@@ -75,6 +75,28 @@ describe('channelFrom', () => {
 	})
 })
 
+describe('channel links', () => {
+	test('come from links, or from the older single url', () => {
+		const record = {
+			links: [{url: 'https://a.test', title: 'A'}],
+			createdAt: '2026-01-01T00:00:00.000Z'
+		}
+		expect(channelFrom(owner, record).links).toEqual([{url: 'https://a.test', title: 'A'}])
+		expect(
+			channelFrom(owner, {url: 'https://b.test', createdAt: '2026-01-01T00:00:00.000Z'}).links
+		).toEqual([{url: 'https://b.test'}])
+	})
+
+	test('are saved as links, dropping the single url', () => {
+		const record = channelToRecord(
+			{links: [{url: 'https://a.test'}]},
+			{url: 'https://old.test', createdAt: '2026-01-01T00:00:00.000Z'}
+		)
+		expect(record.links).toEqual([{url: 'https://a.test'}])
+		expect(record.url).toBeUndefined()
+	})
+})
+
 describe('channelToRecord', () => {
 	test('stores coordinates as strings and keeps existing fields', () => {
 		const record = channelToRecord(

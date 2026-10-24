@@ -6,13 +6,14 @@
 	import SettingsHeader from '#lib/components/settings-header.svelte'
 	import Seo from '#lib/components/seo.svelte'
 	import MapPicker from '#lib/components/map-picker.svelte'
+	import Icon from '#lib/components/icon.svelte'
 	import * as m from '#lib/paraglide/messages.js'
 
 	const channel = $derived(appState.channel)
 
 	let name = $state('')
 	let description = $state('')
-	let url = $state('')
+	let links = $state(/** @type {{url: string, title: string}[]} */ ([]))
 	let latitude = $state('')
 	let longitude = $state('')
 	let image = $state(/** @type {File | undefined} */ (undefined))
@@ -29,7 +30,7 @@
 		filledFor = channel.id
 		name = channel.has_record ? channel.name : ''
 		description = channel.has_record ? (channel.description ?? '') : ''
-		url = channel.url ?? ''
+		links = (channel.links ?? []).map((l) => ({url: l.url, title: l.title ?? ''}))
 		latitude = channel.latitude?.toString() ?? ''
 		longitude = channel.longitude?.toString() ?? ''
 	})
@@ -53,7 +54,9 @@
 				{
 					name: name.trim() || undefined,
 					description: description.trim() || undefined,
-					url: url.trim() || undefined,
+					links: links
+						.filter((l) => l.url.trim())
+						.map((l) => ({url: l.url.trim(), title: l.title.trim() || undefined})),
 					latitude: hasGeo ? lat : null,
 					longitude: hasGeo ? lng : null
 				},
@@ -103,8 +106,38 @@
 				></textarea>
 			</fieldset>
 			<fieldset>
-				<label for="radio-url">{m.settings_radio_link()}</label>
-				<input id="radio-url" type="url" bind:value={url} placeholder="https://" />
+				<legend>{m.settings_radio_links()}</legend>
+				{#each links as link, i (i)}
+					<r4-link-field>
+						<input
+							type="url"
+							bind:value={link.url}
+							placeholder="https://"
+							aria-label={m.track_form_url_label()}
+						/>
+						<input
+							type="text"
+							bind:value={link.title}
+							maxlength="64"
+							placeholder={m.settings_radio_link_label()}
+							aria-label={m.settings_radio_link_label()}
+						/>
+						<button
+							type="button"
+							onclick={() => links.splice(i, 1)}
+							title={m.common_delete()}
+							aria-label={m.common_delete()}
+						>
+							<Icon icon="close" />
+						</button>
+					</r4-link-field>
+				{/each}
+				{#if links.length < 10}
+					<button type="button" onclick={() => links.push({url: '', title: ''})}>
+						<Icon icon="add" />
+						{m.settings_radio_add_link()}
+					</button>
+				{/if}
 			</fieldset>
 			<fieldset>
 				<legend>{m.settings_radio_location()}</legend>
@@ -157,6 +190,16 @@
 		:global(r4-channel-avatar) {
 			width: var(--channel-header-avatar-size);
 			flex-shrink: 0;
+		}
+	}
+
+	r4-link-field {
+		display: grid;
+		grid-template-columns: 2fr 1fr auto;
+		gap: var(--space-1);
+
+		input {
+			min-width: 0;
 		}
 	}
 
