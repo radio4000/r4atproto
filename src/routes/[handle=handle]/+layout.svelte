@@ -94,13 +94,6 @@
 		)
 	const shuffle = () => withLoading(() => shufflePlayChannel(appState.active_deck_id, channel))
 
-	let copied = $state(false)
-	async function copyLink() {
-		await navigator.clipboard.writeText(new URL(channelHref(slug), location.origin).href)
-		copied = true
-		setTimeout(() => (copied = false), 1500)
-	}
-
 	const base = $derived(channelHref(slug))
 	const tabs = $derived([
 		{href: base, label: m.nav_tracks(), count: tracks.length || undefined},
@@ -166,12 +159,14 @@
 								</button>
 							</li>
 						{/if}
-						<li>
-							<button type="button" onclick={copyLink} data-no-close>
-								<Icon icon="share" />
-								{copied ? m.channel_link_copied() : m.channel_copy_link()}
-							</button>
-						</li>
+						{#if channel}
+							<li>
+								<button type="button" onclick={() => (appState.modal_share = {channel})}>
+									<Icon icon="share" />
+									{m.share_native()}
+								</button>
+							</li>
+						{/if}
 						<li>
 							<a href="https://bsky.app/profile/{slug}" target="_blank" rel="noopener noreferrer">
 								<Icon icon="globe" />

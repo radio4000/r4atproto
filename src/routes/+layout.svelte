@@ -19,6 +19,7 @@
 	import DeckCompactBar from '#lib/components/deck-compact-bar.svelte'
 	import ToolTip from '#lib/components/tool-tip.svelte'
 	import EditTrackDialog from '#lib/components/track-edit-dialog.svelte'
+	import ShareDialog from '#lib/components/share-dialog.svelte'
 	import Icon from '#lib/components/icon.svelte'
 	import TracksKeepalive from '#lib/components/tracks-keepalive.svelte'
 	import {tracksCollection} from '#lib/collections/tracks.js'
@@ -153,6 +154,7 @@
 {:else}
 	<ToolTip />
 	<EditTrackDialog />
+	<ShareDialog />
 	{#each allDeckIds as deckId (deckId)}
 		<!-- Two pins per deck, the whole queue and the current track, so the playing row
 		     stays resident while the other swaps. See collections/keepalive.ts. -->
