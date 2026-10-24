@@ -213,16 +213,11 @@ export function rememberTrackDuration(id: string, seconds: number) {
 	})
 }
 
+/** Delete a track once its repo has: the card asking for it stays until then, to show
+ *  an error if the delete fails. */
 export function deleteTrack(_channel: ChannelRef, id: string) {
 	return tracksCollection
-		.delete(id)
-		.when('settled')
-		.then(() => {})
-}
-
-export function batchDeleteTracks(_channel: ChannelRef, ids: string[]) {
-	return tracksCollection
-		.delete(ids)
+		.delete(id, {optimistic: false})
 		.when('settled')
 		.then(() => {})
 }

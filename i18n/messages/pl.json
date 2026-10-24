@@ -766,7 +766,7 @@
 	"track_delete_button": "Usuń utwór",
 	"track_delete_confirm": "Usunąć {title}? Zostanie usunięty z Twojego radia.",
 	"track_delete_confirm_input": "Wpisz {title}, aby potwierdzić",
-	"track_delete_failed": "Nie udało się usunąć utworu",
+	"track_delete_failed": "Nie udało się usunąć: {message}",
 	"track_delete_heading": "Usuń utwór",
 	"track_delete_no_permission": "Nie masz uprawnień do usunięcia tego utworu.",
 	"track_delete_warning": "To trwale usuwa ten utwór.",

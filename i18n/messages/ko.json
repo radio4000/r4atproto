@@ -766,7 +766,7 @@
 	"track_delete_button": "트랙 삭제",
 	"track_delete_confirm": "{title}을(를) 삭제할까요? 라디오에서 제거됩니다.",
 	"track_delete_confirm_input": "{title} 입력으로 확인",
-	"track_delete_failed": "트랙을 삭제하지 못했습니다",
+	"track_delete_failed": "삭제할 수 없습니다: {message}",
 	"track_delete_heading": "트랙 삭제",
 	"track_delete_no_permission": "이 트랙을 삭제할 권한이 없습니다.",
 	"track_delete_warning": "이 작업은 이 트랙을 영구적으로 삭제합니다.",

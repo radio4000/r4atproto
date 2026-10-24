@@ -766,7 +766,7 @@
 	"track_delete_button": "ट्रैक हटाएँ",
 	"track_delete_confirm": "{title} हटाएँ? यह आपके रेडियो से इसे हटा देगा।",
 	"track_delete_confirm_input": "पुष्टि के लिए {title} टाइप करें",
-	"track_delete_failed": "ट्रैक हटाया नहीं जा सका",
+	"track_delete_failed": "हटाया नहीं जा सका: {message}",
 	"track_delete_heading": "ट्रैक हटाएँ",
 	"track_delete_no_permission": "आपको यह ट्रैक हटाने की अनुमति नहीं है।",
 	"track_delete_warning": "यह इस ट्रैक को हमेशा के लिए हटा देगा।",

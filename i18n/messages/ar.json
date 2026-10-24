@@ -766,7 +766,7 @@
 	"track_delete_button": "حذف المسار",
 	"track_delete_confirm": "حذف {title}? هذا سيزيله من راديوك.",
 	"track_delete_confirm_input": "اكتب {title} للتأكيد",
-	"track_delete_failed": "تعذر حذف المسار",
+	"track_delete_failed": "تعذّر الحذف: {message}",
 	"track_delete_heading": "حذف المسار",
 	"track_delete_no_permission": "ليس لديك إذن لحذف هذا المسار.",
 	"track_delete_warning": "سيتم حذف هذا المسار نهائياً.",

@@ -766,7 +766,7 @@
 	"track_delete_button": "Șterge piesa",
 	"track_delete_confirm": "Ștergi {title}? Va fi eliminată din radioul tău.",
 	"track_delete_confirm_input": "Scrie {title} pentru confirmare",
-	"track_delete_failed": "Ștergerea piesei a eșuat",
+	"track_delete_failed": "Nu s-a putut șterge: {message}",
 	"track_delete_heading": "Șterge piesa",
 	"track_delete_no_permission": "Nu ai permisiunea să ștergi această piesă.",
 	"track_delete_warning": "Asta șterge definitiv această piesă.",

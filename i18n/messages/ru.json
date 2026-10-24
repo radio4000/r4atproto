@@ -766,7 +766,7 @@
 	"track_delete_button": "Удалить трек",
 	"track_delete_confirm": "Удалить {title}? Это уберёт его из вашего радио.",
 	"track_delete_confirm_input": "Введите {title} для подтверждения",
-	"track_delete_failed": "Не удалось удалить трек",
+	"track_delete_failed": "Не удалось удалить: {message}",
 	"track_delete_heading": "Удалить трек",
 	"track_delete_no_permission": "У вас нет прав на удаление этого трека.",
 	"track_delete_warning": "Это навсегда удалит трек.",

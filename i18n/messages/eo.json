@@ -766,7 +766,7 @@
 	"track_delete_button": "Forigi trakon",
 	"track_delete_confirm": "Forigi {title}? Tio forigos ĝin el via radio.",
 	"track_delete_confirm_input": "Tajpu {title} por konfirmi",
-	"track_delete_failed": "Malsukcesis forigi trakon",
+	"track_delete_failed": "Ne eblis forigi: {message}",
 	"track_delete_heading": "Forigi trakon",
 	"track_delete_no_permission": "Vi ne havas permeson forigi ĉi tiun trakon.",
 	"track_delete_warning": "Tio permanente forigas ĉi tiun trakon.",

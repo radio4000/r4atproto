@@ -835,7 +835,7 @@
 	"track_delete_button": "Delete track",
 	"track_delete_confirm": "Delete {title}? This removes it from your radio.",
 	"track_delete_confirm_input": "Type {title} to confirm",
-	"track_delete_failed": "Failed to delete track",
+	"track_delete_failed": "Could not delete: {message}",
 	"track_delete_heading": "Delete track",
 	"track_delete_no_permission": "You don't have permission to delete this track.",
 	"track_delete_warning": "This permanently deletes this track.",

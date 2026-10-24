@@ -137,6 +137,7 @@
 	}
 
 	let showDeleteDialog = $state(false)
+	let deleteError = $state('')
 	let menu = $state<{close: () => void; open: () => Promise<void>}>()
 	// A list renders thousands of cards and few menus get opened, so each card starts
 	// with a lookalike trigger and mounts the real menu on first press.
@@ -170,12 +171,16 @@
 	}
 
 	async function handleDelete() {
-		if (!track.slug) return
-		const channel = [...channelsCollection.state.values()].find((ch) => ch.slug === track.slug)
-		if (!channel) return
-		await deleteTrack({id: channel.id, slug: channel.slug}, track.id)
-		showDeleteDialog = false
-		menu?.close()
+		deleteError = ''
+		try {
+			await deleteTrack({id: track.did, slug: track.slug}, track.id)
+			showDeleteDialog = false
+			menu?.close()
+		} catch (error) {
+			deleteError = m.track_delete_failed({
+				message: error instanceof Error ? error.message : String(error)
+			})
+		}
 	}
 </script>
 
@@ -357,6 +362,7 @@
 				<h2>{m.common_delete()}</h2>
 			{/snippet}
 			<p>{m.track_delete_confirm({title: track.title})}</p>
+			{#if deleteError}<p role="alert">{deleteError}</p>{/if}
 			<r4-track-card preview>
 				<article>
 					{#if ytid && showImage && appState.show_track_artwork}

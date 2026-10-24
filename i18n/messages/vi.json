@@ -766,7 +766,7 @@
 	"track_delete_button": "Xóa track",
 	"track_delete_confirm": "Xoá {title}? Mục này sẽ bị gỡ khỏi radio của bạn.",
 	"track_delete_confirm_input": "Gõ {title} để xác nhận",
-	"track_delete_failed": "Không xóa được track",
+	"track_delete_failed": "Không thể xóa: {message}",
 	"track_delete_heading": "Xóa track",
 	"track_delete_no_permission": "Bạn không có quyền xóa track này.",
 	"track_delete_warning": "Việc này sẽ xóa vĩnh viễn track này.",

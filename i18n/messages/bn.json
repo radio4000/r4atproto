@@ -766,7 +766,7 @@
 	"track_delete_button": "ট্র্যাক মুছুন",
 	"track_delete_confirm": "{title} মুছে ফেলবেন? এটি আপনার রেডিও থেকে সরিয়ে দেওয়া হবে।",
 	"track_delete_confirm_input": "নিশ্চিত করতে {title} লিখুন",
-	"track_delete_failed": "ট্র্যাক মুছতে ব্যর্থ হয়েছে",
+	"track_delete_failed": "মুছে ফেলা যায়নি: {message}",
 	"track_delete_heading": "ট্র্যাক মুছুন",
 	"track_delete_no_permission": "এই ট্র্যাক মুছতে আপনার অনুমতি নেই।",
 	"track_delete_warning": "এতে এই ট্র্যাকটি স্থায়ীভাবে মুছে যাবে।",

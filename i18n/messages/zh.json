@@ -766,7 +766,7 @@
 	"track_delete_button": "删除曲目",
 	"track_delete_confirm": "删除 {title}？这将从您的电台中移除它。",
 	"track_delete_confirm_input": "输入 {title} 以确认",
-	"track_delete_failed": "删除曲目失败",
+	"track_delete_failed": "无法删除：{message}",
 	"track_delete_heading": "删除曲目",
 	"track_delete_no_permission": "你没有权限删除这首曲目。",
 	"track_delete_warning": "这会永久删除这首曲目。",

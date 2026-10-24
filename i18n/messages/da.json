@@ -766,7 +766,7 @@
 	"track_delete_button": "Slet track",
 	"track_delete_confirm": "Slet {title}? Dette fjerner den fra din radio.",
 	"track_delete_confirm_input": "Skriv {title} for at bekræfte",
-	"track_delete_failed": "Kunne ikke slette track",
+	"track_delete_failed": "Kunne ikke slette: {message}",
 	"track_delete_heading": "Slet track",
 	"track_delete_no_permission": "Du har ikke tilladelse til at slette dette track.",
 	"track_delete_warning": "Det sletter dette track permanent.",

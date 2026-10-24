@@ -766,7 +766,7 @@
 	"track_delete_button": "Apagar faixa",
 	"track_delete_confirm": "Excluir {title}? Isto removerá da sua rádio.",
 	"track_delete_confirm_input": "Escreve {title} para confirmar",
-	"track_delete_failed": "Falha ao apagar faixa",
+	"track_delete_failed": "Não foi possível excluir: {message}",
 	"track_delete_heading": "Apagar faixa",
 	"track_delete_no_permission": "Não tens permissão para apagar esta faixa.",
 	"track_delete_warning": "Isto apaga permanentemente esta faixa.",

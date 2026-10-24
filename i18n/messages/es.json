@@ -766,7 +766,7 @@
 	"track_delete_button": "Eliminar pista",
 	"track_delete_confirm": "¿Eliminar {title}? Esto lo quita de tu radio.",
 	"track_delete_confirm_input": "Escribe {title} para confirmar",
-	"track_delete_failed": "No se pudo eliminar la pista",
+	"track_delete_failed": "No se pudo eliminar: {message}",
 	"track_delete_heading": "Eliminar pista",
 	"track_delete_no_permission": "No tienes permiso para eliminar esta pista.",
 	"track_delete_warning": "Esto elimina permanentemente esta pista.",

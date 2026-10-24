@@ -766,7 +766,7 @@
 	"track_delete_button": "ٹریک حذف کریں",
 	"track_delete_confirm": "{title} حذف کریں؟ یہ آپ کے ریڈیو سے ہٹا دیا جائے گا۔",
 	"track_delete_confirm_input": "تصدیق کے لیے {title} لکھیں",
-	"track_delete_failed": "ٹریک حذف کرنا ناکام ہوا",
+	"track_delete_failed": "حذف نہیں ہو سکا: {message}",
 	"track_delete_heading": "ٹریک حذف کریں",
 	"track_delete_no_permission": "آپ کو یہ ٹریک حذف کرنے کی اجازت نہیں ہے۔",
 	"track_delete_warning": "اس سے یہ ٹریک مستقل طور پر حذف ہو جائے گا۔",

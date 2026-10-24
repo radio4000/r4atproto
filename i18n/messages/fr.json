@@ -833,7 +833,7 @@
 	"track_delete_button": "Supprimer le track",
 	"track_delete_confirm": "Supprimer {title} ? Cela l’enlèvera de votre radio.",
 	"track_delete_confirm_input": "Tape {title} pour confirmer",
-	"track_delete_failed": "Impossible de supprimer le track",
+	"track_delete_failed": "Suppression impossible : {message}",
 	"track_delete_heading": "Supprimer le track",
 	"track_delete_no_permission": "Tu n’as pas le droit de supprimer ce track.",
 	"track_delete_warning": "Cela supprime définitivement ce track.",
