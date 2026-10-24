@@ -1,42 +1,60 @@
 /**
- * Who is out of a chat room. Blocks are public Bluesky records (app.bsky.graph.block):
- * accounts the radio's owner blocks are out of its room, and accounts you block are out
- * of every room you read.
+ * Who is out of a chat room, by Bluesky's blocks. Bluesky's AppView knows every
+ * block of the network and answers who blocks whom (app.bsky.graph.getRelationships),
+ * so a room asks it about its authors: those the radio's owner blocks (or who block
+ * the owner) are out of the room, and so are those blocking or blocked by the reader.
  */
 import app from '#lib/config/app.json' with {type: 'json'}
-import {BSKY_BLOCK} from '#lib/lexicons.js'
-import {listRecords} from '#lib/atproto/repo.js'
+import {xrpcGet} from '#lib/atproto/xrpc.js'
 
-interface BlockRecord {
-	subject?: unknown
+interface Relationship {
+	did?: string
+	blocking?: string
+	blockedBy?: string
+	blockingByList?: string
+	blockedByList?: string
 }
 
-const blocks = new Map<string, Promise<Set<string>>>()
+/** The AppView answers about at most this many accounts per request */
+const PER_REQUEST = 30
 
-/** Accounts an account blocks, from its repo. Long lists are read up to chat.blockListPages. */
-export function blockedBy(did: string): Promise<Set<string>> {
-	let promise = blocks.get(did)
-	if (!promise) {
-		promise = (async () => {
-			const dids = new Set<string>()
-			let cursor: string | undefined
-			for (let page = 0; page < app.chat.blockListPages; page++) {
-				const result = await listRecords<BlockRecord>(did, BSKY_BLOCK, {cursor})
-				for (const {value} of result.records) {
-					if (typeof value.subject === 'string') dids.add(value.subject)
-				}
-				cursor = result.cursor
-				if (!cursor) break
+/** "actor other" → whether a block stands between them */
+const known = new Map<string, Promise<boolean>>()
+
+const blocks = (r: Relationship) =>
+	Boolean(r.blocking || r.blockedBy || r.blockingByList || r.blockedByList)
+
+/** Whether a block stands between `actor` and each of `others`, in as few requests as possible */
+function relations(actor: string, others: string[]): Promise<boolean>[] {
+	const missing = [...new Set(others)].filter((did) => did !== actor && !known.has(`${actor} ${did}`))
+	for (let i = 0; i < missing.length; i += PER_REQUEST) {
+		const chunk = missing.slice(i, i + PER_REQUEST)
+		const answer = xrpcGet<{relationships: Relationship[]}>(
+			app.services.appview,
+			'app.bsky.graph.getRelationships',
+			{actor, others: chunk}
+		).then(
+			({relationships}) => new Map(relationships.map((r) => [r.did, blocks(r)])),
+			() => {
+				// Ask again next time
+				for (const did of chunk) known.delete(`${actor} ${did}`)
+				return new Map<string | undefined, boolean>()
 			}
-			return dids
-		})().catch(() => new Set<string>())
-		blocks.set(did, promise)
+		)
+		for (const did of chunk) known.set(`${actor} ${did}`, answer.then((map) => map.get(did) ?? false))
 	}
-	return promise
+	return others.map((did) => known.get(`${actor} ${did}`) ?? Promise.resolve(false))
 }
 
-/** Accounts kept out of a radio's room: the owner's blocks, and the reader's own */
-export async function roomBlocks(radioDid: string, readerDid?: string): Promise<Set<string>> {
-	const lists = await Promise.all([radioDid, readerDid].flatMap((did) => (did ? blockedBy(did) : [])))
-	return new Set(lists.flatMap((list) => [...list]))
+/** The authors kept out of a radio's room, for a reader (signed in or not) */
+export async function roomBlocks(
+	radioDid: string,
+	readerDid: string | undefined,
+	authors: string[]
+): Promise<Set<string>> {
+	const actors = readerDid && readerDid !== radioDid ? [radioDid, readerDid] : [radioDid]
+	const answers = await Promise.all(
+		actors.map((actor) => Promise.all(relations(actor, authors)))
+	)
+	return new Set(authors.filter((_, i) => answers.some((blocked) => blocked[i])))
 }

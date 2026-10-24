@@ -3,7 +3,7 @@
 	import {appState} from '#lib/app-state.svelte.js'
 	import {deleteChatMessage, fetchChatHistory, sendChatMessage, watchChat} from '#lib/chat.js'
 	import {openChatRoom} from '#lib/chat-unread.svelte.js'
-	import {blockedBy, roomBlocks} from '#lib/chat-blocks.js'
+	import {roomBlocks} from '#lib/chat-blocks.js'
 	import {muteAuthor, mutedAuthors, unmuteAuthor} from '#lib/chat-moderation.svelte.js'
 	import {authHref, channelHref} from '#lib/links.js'
 	import {relativeDateDetailed} from '#lib/dates.js'
@@ -27,7 +27,8 @@
 	let error = $state('')
 	/** @type {HTMLElement | undefined} */
 	let list = $state()
-	/** Accounts blocked by the radio's owner or by you */
+	/** Authors checked against blocks, and those blocked by or blocking the owner or you */
+	let checked = $state(new Set())
 	let blocked = $state(new Set())
 	/** The radio's owner blocks you */
 	let blockedFromRoom = $state(false)
@@ -43,17 +44,29 @@
 		const track = id ? tracksCollection.get(id) : undefined
 		return track && isRecordUri(track.id) ? track : undefined
 	})
-	const visible = $derived(messages.filter((m) => m.did === me || !blocked.has(m.did)))
+	const authors = $derived([...new Set(messages.map((m) => m.did))])
+	// A message shows once its author is known not to be blocked
+	const visible = $derived(
+		messages.filter((m) => m.did === me || (checked.has(m.did) && !blocked.has(m.did)))
+	)
 
 	$effect(() => {
 		const did = radioDid
 		const reader = me
-		blocked = new Set()
-		blockedFromRoom = false
-		roomBlocks(did, reader).then((set) => {
-			if (did === radioDid) blocked = set
+		const list = authors
+		roomBlocks(did, reader, list).then((set) => {
+			if (did !== radioDid) return
+			checked = new Set(list)
+			blocked = set
 		})
-		if (reader) blockedBy(did).then((set) => (blockedFromRoom = set.has(reader)))
+	})
+
+	$effect(() => {
+		const did = radioDid
+		const reader = me
+		blockedFromRoom = false
+		if (reader)
+			roomBlocks(did, undefined, [reader]).then((set) => (blockedFromRoom = set.has(reader)))
 	})
 
 	function add(message) {

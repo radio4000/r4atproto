@@ -81,7 +81,8 @@ const tidTime = (rkey: string) => {
  *  time is known without fetching the record. */
 async function countOwnRadio(did: string) {
 	const since = seen[did] ?? 0
-	const [refs, blocked] = await Promise.all([fetchChatRefs(did).catch(() => []), roomBlocks(did)])
+	const refs = await fetchChatRefs(did).catch(() => [])
+	const blocked = await roomBlocks(did, undefined, refs.map((ref) => ref.did))
 	const count = refs.filter(
 		(ref) => ref.did !== did && !hidden(ref.did, blocked) && tidTime(ref.rkey) > since
 	).length
@@ -115,7 +116,7 @@ export function watchUnreadChat() {
 			if (!watchedRadios().has(subject) || openRooms.has(subject)) return
 			const since = Math.max(seen[subject] ?? 0, listeningSince[subject] ?? 0)
 			if (Date.parse(commit.record?.createdAt ?? '') <= since) return
-			if (hidden(did, await roomBlocks(subject, reader))) return
+			if (hidden(did, await roomBlocks(subject, reader, [did]))) return
 			unreadChat[subject] = (unreadChat[subject] ?? 0) + 1
 		})
 	)
