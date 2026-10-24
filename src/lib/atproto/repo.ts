@@ -1,15 +1,29 @@
 /**
- * Public reads from a repo, straight from its PDS.
+ * Public reads from repos.
  *
- * Identical reads share one request and are reused for reads.cacheSeconds: pages
- * ask for the same records from several queries, and PDSes rate-limit by IP.
- * Writes clear the cache of the collection they touch (invalidateRepoCache).
+ * Single records are read through Slingshot (microcosm's public record cache), so
+ * pages showing many radios don't hit each radio's PDS for every record; the PDS
+ * is the fallback. Listings go to the PDS. Identical reads share one request and
+ * are reused for reads.cacheSeconds; writes clear the cache of the collection
+ * they touch (invalidateRepoCache).
  */
 import app from '../config/app.json' with {type: 'json'}
 import {resolvePds} from './identity'
 import {xrpcGet, type XrpcParams} from './xrpc'
 
 const cache = new Map<string, {at: number; promise: Promise<unknown>}>()
+
+const isNotFound = (err: unknown) => (err as {error?: string}).error === 'RecordNotFound'
+
+/** A single record from Slingshot, or from the PDS when Slingshot fails */
+async function fromCacheOrPds<T>(did: string, nsid: string, params: XrpcParams): Promise<T> {
+	try {
+		return await xrpcGet<T>(app.services.slingshot, nsid, params)
+	} catch (err) {
+		if (isNotFound(err)) throw err
+		return xrpcGet<T>(await resolvePds(did), nsid, params)
+	}
+}
 
 function cachedGet<T>(
 	did: string,
@@ -20,7 +34,10 @@ function cachedGet<T>(
 	const key = JSON.stringify([did, collection, nsid, params])
 	const hit = cache.get(key)
 	if (hit && Date.now() - hit.at < app.reads.cacheSeconds * 1000) return hit.promise as Promise<T>
-	const promise = resolvePds(did).then((pds) => xrpcGet<T>(pds, nsid, params))
+	const promise =
+		nsid === 'com.atproto.repo.getRecord'
+			? fromCacheOrPds<T>(did, nsid, params)
+			: resolvePds(did).then((pds) => xrpcGet<T>(pds, nsid, params))
 	promise.catch(() => cache.delete(key))
 	cache.set(key, {at: Date.now(), promise})
 	return promise
@@ -84,7 +101,7 @@ export async function getRecord<T>(
 			rkey
 		})
 	} catch (err) {
-		if ((err as {error?: string}).error === 'RecordNotFound') return null
+		if (isNotFound(err)) return null
 		throw err
 	}
 }

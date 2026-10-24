@@ -11,7 +11,8 @@
 		"plcDirectory": "https://plc.directory",
 		"relay": "https://relay1.us-west.bsky.network",
 		"jetstream": "wss://jetstream2.us-east.bsky.network/subscribe",
-		"constellation": "https://constellation.microcosm.blue"
+		"constellation": "https://constellation.microcosm.blue",
+		"slingshot": "https://slingshot.microcosm.blue"
 	},
 	"oauth": {
 		"permissionSet": "authFull",
@@ -29,5 +30,8 @@
 	},
 	"reads": {
 		"cacheSeconds": 30
+	},
+	"feed": {
+		"perRadio": 5
 	}
 }

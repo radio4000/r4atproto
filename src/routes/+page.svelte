@@ -30,7 +30,7 @@
 	let feed = $state(/** @type {import('#lib/types.js').Track[] | undefined} */ (undefined))
 	$effect(() => {
 		const dids = feedDids
-		fetchLatestTracks({perRadio: 4, dids}).then((tracks) => (feed = tracks.slice(0, 30)))
+		fetchLatestTracks({dids}).then((tracks) => (feed = tracks.slice(0, 30)))
 	})
 
 	// Radios broadcasting right now

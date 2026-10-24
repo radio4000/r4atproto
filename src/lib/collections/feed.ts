@@ -2,6 +2,7 @@
  * The network feed: the latest tracks of every radio the relay knows, newest first.
  * One listRecords per radio, so it suits today's network size (see channels.ts).
  */
+import app from '#lib/config/app.json' with {type: 'json'}
 import {TRACK} from '#lib/lexicons.js'
 import {resolveIdentity} from '#lib/atproto/identity.js'
 import {listRecords} from '#lib/atproto/repo.js'
@@ -21,7 +22,13 @@ async function latestOf(did: string, limit: number): Promise<Track[]> {
 }
 
 /** The latest `perRadio` tracks of each radio (optionally only `dids`), merged newest first */
-export function fetchLatestTracks({perRadio = 5, dids}: {perRadio?: number; dids?: string[]} = {}) {
+export function fetchLatestTracks({
+	perRadio = app.feed.perRadio,
+	dids
+}: {
+	perRadio?: number
+	dids?: string[]
+} = {}) {
 	return queryClient.query({
 		queryKey: ['feed', perRadio, ...(dids?.toSorted() ?? ['all'])],
 		staleTime: 2 * 60 * 1000,

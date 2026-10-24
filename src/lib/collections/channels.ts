@@ -78,7 +78,8 @@ async function profilesByDid(dids: string[]): Promise<Map<string, Profile>> {
 async function loadChannel(owner: Identity, profile?: Profile): Promise<Channel> {
 	const [record, latest] = await Promise.all([
 		getRecord<ChannelRecord>(owner.did, CHANNEL, SELF).catch(() => null),
-		listRecords<TrackRecord>(owner.did, TRACK, {limit: 1}).catch(() => null)
+		// Same page as the feed's, so both share one cached read
+		listRecords<TrackRecord>(owner.did, TRACK, {limit: app.feed.perRadio}).catch(() => null)
 	])
 	const channel = channelFrom(owner, record?.value, profile)
 	channel.latest_track_at = latest?.records[0]?.value.createdAt ?? null
