@@ -3,6 +3,7 @@
  */
 import app from '../config/app.json' with {type: 'json'}
 import {xrpcGet} from './xrpc'
+import {safeUrl} from './validate'
 
 export interface Identity {
 	did: string
@@ -48,8 +49,9 @@ function didDocument(did: string): Promise<DidDocument> {
 
 export function pdsFromDocument(doc: DidDocument): string {
 	const service = doc.service?.find((s) => s.id.endsWith('#atproto_pds'))
-	if (!service) throw new Error(`No PDS for ${doc.id}`)
-	return service.serviceEndpoint
+	const endpoint = safeUrl(service?.serviceEndpoint)
+	if (!endpoint) throw new Error(`No PDS for ${doc.id}`)
+	return endpoint
 }
 
 export function handleFromDocument(doc: DidDocument): string | undefined {
@@ -73,13 +75,16 @@ export async function resolvePds(did: string): Promise<string> {
 	return pdsFromDocument(await didDocument(did))
 }
 
-/** Resolve a handle or a DID to its DID, handle and PDS */
+/**
+ * Resolve a handle or a DID to its DID, handle and PDS. A handle counts only when it
+ * goes both ways: the DID document claims it and it resolves back to that DID.
+ * Anyone can claim any handle in their DID document, so an unverified one is
+ * replaced by the DID, never shown.
+ */
 export async function resolveIdentity(handleOrDid: string): Promise<Identity> {
 	const did = isDid(handleOrDid) ? handleOrDid : await resolveHandle(handleOrDid)
 	const doc = await didDocument(did)
-	return {
-		did,
-		handle: handleFromDocument(doc) ?? (isDid(handleOrDid) ? did : normalizeHandle(handleOrDid)),
-		pds: pdsFromDocument(doc)
-	}
+	const claimed = handleFromDocument(doc)
+	const verified = claimed && (await resolveHandle(claimed).catch(() => null)) === did
+	return {did, handle: verified ? normalizeHandle(claimed) : did, pds: pdsFromDocument(doc)}
 }
