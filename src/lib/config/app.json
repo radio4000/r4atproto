@@ -16,5 +16,11 @@
 		"permissionSet": "authFull",
 		"permissionSetPublished": false,
 		"blobAccept": ["image/*"]
+	},
+	"broadcast": {
+		"heartbeatSeconds": 60,
+		"staleSeconds": 300,
+		"writeDebounceMs": 800,
+		"idleStopSeconds": 600
 	}
 }

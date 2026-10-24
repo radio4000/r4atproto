@@ -16,6 +16,7 @@
 	import ChannelAvatar from '#lib/components/channel-avatar.svelte'
 	import LinkEntities from '#lib/components/link-entities.svelte'
 	import Icon from '#lib/components/icon.svelte'
+	import LiveBadge from '#lib/components/live-badge.svelte'
 	import PopoverMenu from '#lib/components/popover-menu.svelte'
 	import Seo from '#lib/components/seo.svelte'
 	import * as m from '#lib/paraglide/messages.js'
@@ -115,7 +116,10 @@
 		</r4-channel-avatar-link>
 		<hgroup>
 			<h1><a href={base}>{channel?.name ?? `@${slug}`}</a></h1>
-			<p><a href={base}>@{slug}</a></p>
+			<p>
+				<a href={base}>@{slug}</a>
+				{#if channel}<LiveBadge channelId={channel.id} />{/if}
+			</p>
 		</hgroup>
 		<menu>
 			<li>

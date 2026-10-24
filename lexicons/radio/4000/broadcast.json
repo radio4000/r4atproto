@@ -4,7 +4,7 @@
 	"defs": {
 		"main": {
 			"type": "record",
-			"description": "What a radio is playing live, deck by deck. Exists only while broadcasting.",
+			"description": "What a radio plays live, deck by deck. Exists only while broadcasting; updatedAt doubles as a heartbeat.",
 			"key": "literal:self",
 			"record": {
 				"type": "object",
@@ -17,28 +17,15 @@
 		},
 		"deck": {
 			"type": "object",
-			"required": ["track", "url", "startedAt"],
+			"required": ["track", "url", "positionMs", "positionAt", "playing"],
 			"properties": {
-				"track": {
-					"type": "string",
-					"format": "at-uri",
-					"description": "The radio.4000.track record."
-				},
+				"track": {"type": "string", "description": "The radio.4000.track record (at:// URI), or another id for tracks without a record.", "maxLength": 512},
 				"url": {"type": "string", "format": "uri", "maxLength": 2048},
 				"title": {"type": "string", "maxLength": 3000, "maxGraphemes": 300},
-				"startedAt": {
-					"type": "string",
-					"format": "datetime",
-					"description": "When the track would have started at normal speed; listeners seek to now - startedAt."
-				},
-				"paused": {"type": "boolean"},
-				"speed": {
-					"type": "integer",
-					"description": "Playback rate in percent.",
-					"minimum": 25,
-					"maximum": 400,
-					"default": 100
-				}
+				"positionMs": {"type": "integer", "description": "Playback position in milliseconds at positionAt.", "minimum": 0},
+				"positionAt": {"type": "string", "format": "datetime"},
+				"playing": {"type": "boolean"},
+				"speed": {"type": "integer", "description": "Playback rate in percent.", "minimum": 25, "maximum": 400, "default": 100}
 			}
 		}
 	}

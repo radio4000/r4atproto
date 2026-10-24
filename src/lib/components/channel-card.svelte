@@ -11,6 +11,7 @@
 	import ButtonFollow from './button-follow.svelte'
 	import PopoverMenu from './popover-menu.svelte'
 	import Icon from './icon.svelte'
+	import LiveBadge from './live-badge.svelte'
 
 	/** @type {{channel: import('#lib/types.js').Channel, children?: import('svelte').Snippet}}*/
 	let {channel, children} = $props()
@@ -62,7 +63,7 @@
 		</button>
 	</figure>
 	<section>
-		<h3><a {href}>{channel.name}</a></h3>
+		<h3><a {href}>{channel.name}</a> <LiveBadge channelId={channel.id} /></h3>
 		<small><a {href}>@{channel.slug}</a></small>
 		{#if channel.description}
 			<p>

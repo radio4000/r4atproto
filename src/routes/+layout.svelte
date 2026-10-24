@@ -24,6 +24,7 @@
 	import TracksKeepalive from '#lib/components/tracks-keepalive.svelte'
 	import {tracksCollection} from '#lib/collections/tracks.js'
 	import {queuePinTargets} from '#lib/collections/keepalive.js'
+	import {watchBroadcasts} from '#lib/collections/broadcasts.js'
 	import * as m from '#lib/paraglide/messages.js'
 	import {getLocale} from '#lib/paraglide/runtime.js'
 	import {dev} from '$app/env'
@@ -51,6 +52,7 @@
 			}
 		}
 		init()
+		watchBroadcasts()
 		// Console handles for debugging, like r4-svelte's window.r5
 		if (dev) {
 			Promise.all([

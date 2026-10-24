@@ -5,6 +5,8 @@
 	import {channelsCollection} from '#lib/collections/channels.js'
 	import {followsCollection} from '#lib/collections/follows.js'
 	import {fetchLatestTracks} from '#lib/collections/feed.js'
+	import {broadcastsCollection} from '#lib/collections/broadcasts.js'
+	import {inArray} from '@tanstack/db'
 	import {authHref, channelHref, searchHref} from '#lib/links.js'
 	import app from '#lib/config/app.json' with {type: 'json'}
 	import ChannelCard from '#lib/components/channel-card.svelte'
@@ -30,6 +32,18 @@
 		const dids = feedDids
 		fetchLatestTracks({perRadio: 4, dids}).then((tracks) => (feed = tracks.slice(0, 30)))
 	})
+
+	// Radios broadcasting right now
+	const broadcastsQuery = useLiveQuery(broadcastsCollection)
+	const liveIds = $derived((broadcastsQuery.data ?? []).map((b) => b.channel_id))
+	const liveQuery = useLiveQuery(
+		(q) =>
+			liveIds.length
+				? q.from({c: channelsCollection}).where(({c}) => inArray(c.id, liveIds))
+				: null,
+		[() => liveIds.join(',')]
+	)
+	const live = $derived(liveIds.length ? (liveQuery.data ?? []) : [])
 
 	const RADIOS_ON_HOME = 12
 	const channelsQuery = useLiveQuery((q) =>
@@ -62,6 +76,17 @@
 			<SearchInput bind:value={search} placeholder={m.search_title()} />
 		</search>
 	</r4-home-hero>
+
+	{#if live.length}
+		<section>
+			<h2>{m.home_broadcasting()}</h2>
+			<r4-grid>
+				{#each live as channel (channel.id)}
+					<ChannelCard {channel} />
+				{/each}
+			</r4-grid>
+		</section>
+	{/if}
 
 	<r4-home-columns>
 		<section>

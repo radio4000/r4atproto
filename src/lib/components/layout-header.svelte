@@ -6,6 +6,7 @@
 	import Icon from '#lib/components/icon.svelte'
 	import ChannelAvatar from '#lib/components/channel-avatar.svelte'
 	import AddTrackDialog from '#lib/components/track-add-dialog.svelte'
+	import BroadcastToggle from '#lib/components/broadcast-toggle.svelte'
 	import {authHref, channelHref} from '#lib/links.js'
 	import ui from '#lib/config/ui.json' with {type: 'json'}
 	import * as m from '#lib/paraglide/messages.js'
@@ -69,6 +70,9 @@
 			<AddTrackDialog label={m.track_add_title()} />
 		</li>
 		{#if handle}
+			<li>
+				<BroadcastToggle label />
+			</li>
 			<li>
 				<a
 					href={channelHref(handle)}

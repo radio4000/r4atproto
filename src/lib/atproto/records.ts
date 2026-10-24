@@ -3,9 +3,9 @@
  * lexicons; Track and Channel are snake_case like r4's domain model.
  */
 import {parseUrl} from 'media-now'
-import {CHANNEL, TRACK} from '#lib/lexicons.js'
+import {BROADCAST, CHANNEL, TRACK} from '#lib/lexicons.js'
 import {extractHashtags, extractMentions} from '#lib/utils.js'
-import type {Channel, Track} from '#lib/types.js'
+import type {Broadcast, Channel, Track} from '#lib/types.js'
 import type {Profile} from './profiles'
 import type {RepoRecord} from './repo'
 
@@ -159,4 +159,44 @@ export interface FollowRecord {
 /** rkey of a follow record, derived from the followed DID so each radio is followed once */
 export function followRkey(subject: string): string {
 	return subject.replace(/[^a-z0-9._-]/gi, '-').toLowerCase()
+}
+
+export interface BroadcastDeckRecord {
+	track: string
+	url: string
+	title?: string
+	positionMs: number
+	positionAt: string
+	playing: boolean
+	speed?: number
+}
+
+export interface BroadcastRecord {
+	$type?: string
+	decks: BroadcastDeckRecord[]
+	updatedAt: string
+}
+
+/** A broadcast record as r4's BroadcastDeckState list, which the deck sync code speaks */
+export function broadcastFromRecord(did: string, record: BroadcastRecord): Broadcast {
+	return {
+		channel_id: did,
+		updated_at: record.updatedAt,
+		decks: record.decks.map((d, index) => ({
+			index,
+			track_id: d.track,
+			track_url: d.url,
+			track_title: d.title ?? null,
+			track_media_id: null,
+			track_played_at: null,
+			seek_position: d.positionMs / 1000,
+			seeked_at: d.positionAt,
+			is_playing: d.playing,
+			speed: (d.speed ?? 100) / 100
+		}))
+	}
+}
+
+export function broadcastToRecord(decks: BroadcastDeckRecord[]): BroadcastRecord {
+	return {$type: BROADCAST, decks, updatedAt: new Date().toISOString()}
 }
