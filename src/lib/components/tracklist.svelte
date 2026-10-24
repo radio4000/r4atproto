@@ -383,7 +383,6 @@
 		display: flex;
 		align-items: center;
 		gap: var(--space-1);
-		padding-inline: var(--space-2);
 
 		> :global(r4-track-card) {
 			flex: 1;

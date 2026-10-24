@@ -161,6 +161,10 @@
 		align-items: stretch;
 	}
 
+	r4-popover :global(menu li) {
+		display: grid;
+	}
+
 	r4-popover :global(menu :is(a, button)) {
 		justify-content: flex-start;
 		background: none;

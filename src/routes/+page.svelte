@@ -59,11 +59,14 @@
 
 <r4-page size="wide">
 	<r4-home-hero>
-		<IconR4 size={56} />
+		<IconR4 size={48} />
 		<hgroup>
 			<h1>{m.welcome_tagline_channel()}</h1>
 			<p>{m.home_atproto_note()}</p>
 		</hgroup>
+		<search>
+			<SearchInput bind:value={search} placeholder={m.search_title()} />
+		</search>
 		<menu>
 			{#if appState.session}
 				<li><a href={channelHref(appState.session.handle)}>{m.home_your_channel()}</a></li>
@@ -72,14 +75,11 @@
 			{/if}
 			<li><a href="/explore">{m.home_explore_all()}</a></li>
 		</menu>
-		<search>
-			<SearchInput bind:value={search} placeholder={m.search_title()} />
-		</search>
 	</r4-home-hero>
 
 	{#if live.length}
 		<section>
-			<h2>{m.home_broadcasting()}</h2>
+			<header><h2>{m.home_broadcasting()}</h2></header>
 			<r4-grid>
 				{#each live as channel (channel.id)}
 					<ChannelCard {channel} />
@@ -88,36 +88,40 @@
 		</section>
 	{/if}
 
-	<r4-home-columns>
-		<section>
-			<h2>{feedDids ? m.home_latest_following() : m.home_latest_network()}</h2>
-			{#if feed?.length}
-				<Tracklist
-					tracks={feed}
-					showSlug
-					playContext
-					playlistTitle={feedDids ? m.home_following() : m.home_latest_network()}
-				/>
-			{:else if feed}
-				<r4-empty><p>{m.channel_no_tracks()}</p></r4-empty>
-			{:else}
-				<r4-empty><p role="status">{m.common_loading()}</p></r4-empty>
-			{/if}
-		</section>
+	<section>
+		<header>
+			<h2>{m.home_radios()}</h2>
+			<a href="/explore">{m.home_explore_all()}</a>
+		</header>
+		{#if radios.length}
+			<r4-grid>
+				{#each radios as channel (channel.id)}
+					<ChannelCard {channel} />
+				{/each}
+			</r4-grid>
+		{:else if !channelsQuery.isReady}
+			<r4-empty><p role="status">{m.common_loading()}</p></r4-empty>
+		{/if}
+	</section>
 
-		<section>
-			<h2><a href="/explore">{m.home_radios()}</a></h2>
-			{#if radios.length}
-				<r4-grid>
-					{#each radios as channel (channel.id)}
-						<ChannelCard {channel} />
-					{/each}
-				</r4-grid>
-			{:else if !channelsQuery.isReady}
-				<r4-empty><p role="status">{m.common_loading()}</p></r4-empty>
-			{/if}
-		</section>
-	</r4-home-columns>
+	<section>
+		<header>
+			<h2>{feedDids ? m.home_latest_following() : m.home_latest_network()}</h2>
+			<a href="/explore?tab=tracks">{m.explore_tab_tracks()}</a>
+		</header>
+		{#if feed?.length}
+			<Tracklist
+				tracks={feed}
+				showSlug
+				playContext
+				playlistTitle={feedDids ? m.home_following() : m.home_latest_network()}
+			/>
+		{:else if feed}
+			<r4-empty><p>{m.channel_no_tracks()}</p></r4-empty>
+		{:else}
+			<r4-empty><p role="status">{m.common_loading()}</p></r4-empty>
+		{/if}
+	</section>
 </r4-page>
 
 <style>
@@ -125,14 +129,14 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: var(--space-3);
+		gap: var(--space-2);
 		padding-block: var(--space-3);
 		text-align: center;
 
 		hgroup {
 			display: flex;
 			flex-direction: column;
-			gap: var(--space-2);
+			gap: var(--space-1);
 			max-width: var(--measure);
 			margin: 0;
 		}
@@ -145,40 +149,34 @@
 			color: var(--gray-10);
 		}
 
-		menu {
-			justify-content: center;
-		}
-
 		search {
 			display: flex;
 			width: 100%;
 			max-width: var(--measure-narrow);
+			margin-block-start: var(--space-2);
+		}
+
+		menu {
+			justify-content: center;
 		}
 	}
 
-	r4-home-columns {
-		display: grid;
-		grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-		gap: var(--space-3);
-		align-items: start;
+	section {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-2);
+		min-width: 0;
 
-		@media (max-width: 1024px) {
-			grid-template-columns: minmax(0, 1fr);
-		}
-
-		section {
+		> header {
 			display: flex;
-			flex-direction: column;
+			align-items: baseline;
+			justify-content: space-between;
 			gap: var(--space-2);
-			min-width: 0;
-		}
 
-		h2 a {
-			text-decoration: none;
+			a {
+				font-size: var(--font-3);
+				color: var(--gray-10);
+			}
 		}
-	}
-
-	r4-home-columns r4-grid {
-		--grid-min: 150px;
 	}
 </style>

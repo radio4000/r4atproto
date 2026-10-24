@@ -1,8 +1,36 @@
 /**
  * Public reads from a repo, straight from its PDS.
+ *
+ * Identical reads share one request and are reused for reads.cacheSeconds: pages
+ * ask for the same records from several queries, and PDSes rate-limit by IP.
+ * Writes clear the cache of the collection they touch (invalidateRepoCache).
  */
+import app from '../config/app.json' with {type: 'json'}
 import {resolvePds} from './identity'
-import {xrpcGet} from './xrpc'
+import {xrpcGet, type XrpcParams} from './xrpc'
+
+const cache = new Map<string, {at: number; promise: Promise<unknown>}>()
+
+function cachedGet<T>(
+	did: string,
+	collection: string,
+	nsid: string,
+	params: XrpcParams
+): Promise<T> {
+	const key = JSON.stringify([did, collection, nsid, params])
+	const hit = cache.get(key)
+	if (hit && Date.now() - hit.at < app.reads.cacheSeconds * 1000) return hit.promise as Promise<T>
+	const promise = resolvePds(did).then((pds) => xrpcGet<T>(pds, nsid, params))
+	promise.catch(() => cache.delete(key))
+	cache.set(key, {at: Date.now(), promise})
+	return promise
+}
+
+/** Forget cached reads of a collection, after writing to it */
+export function invalidateRepoCache(did: string, collection: string) {
+	const prefix = JSON.stringify([did, collection]).slice(0, -1)
+	for (const key of cache.keys()) if (key.startsWith(prefix)) cache.delete(key)
+}
 
 export interface RepoRecord<T = unknown> {
 	uri: string
@@ -22,8 +50,7 @@ export async function listRecords<T>(
 	collection: string,
 	{limit = 100, cursor, reverse}: ListRecordsOptions = {}
 ): Promise<{records: RepoRecord<T>[]; cursor?: string}> {
-	const pds = await resolvePds(did)
-	return xrpcGet(pds, 'com.atproto.repo.listRecords', {
+	return cachedGet(did, collection, 'com.atproto.repo.listRecords', {
 		repo: did,
 		collection,
 		limit,
@@ -50,9 +77,12 @@ export async function getRecord<T>(
 	collection: string,
 	rkey: string
 ): Promise<RepoRecord<T> | null> {
-	const pds = await resolvePds(did)
 	try {
-		return await xrpcGet(pds, 'com.atproto.repo.getRecord', {repo: did, collection, rkey})
+		return await cachedGet(did, collection, 'com.atproto.repo.getRecord', {
+			repo: did,
+			collection,
+			rkey
+		})
 	} catch (err) {
 		if ((err as {error?: string}).error === 'RecordNotFound') return null
 		throw err

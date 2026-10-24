@@ -26,5 +26,8 @@
 	},
 	"chat": {
 		"historySize": 50
+	},
+	"reads": {
+		"cacheSeconds": 30
 	}
 }

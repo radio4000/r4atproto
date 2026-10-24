@@ -1,7 +1,9 @@
 /**
- * Writes to the signed-in account's repo.
+ * Writes to the signed-in account's repo. Each write clears the cached reads
+ * of its collection, so the next read sees it.
  */
 import {getAgent, getDid} from './oauth-client'
+import {invalidateRepoCache} from './repo'
 
 /** The agent and the DID of the signed-in repo */
 function repo() {
@@ -23,6 +25,7 @@ export async function createRecord(collection: string, record: object, rkey?: st
 		record: {...record},
 		rkey
 	})
+	invalidateRepoCache(did, collection)
 	return res.data
 }
 
@@ -34,12 +37,14 @@ export async function putRecord(collection: string, rkey: string, record: object
 		rkey,
 		record: {...record}
 	})
+	invalidateRepoCache(did, collection)
 	return res.data
 }
 
 export async function deleteRecord(collection: string, rkey: string) {
 	const {agent, did} = repo()
 	await agent.com.atproto.repo.deleteRecord({repo: did, collection, rkey})
+	invalidateRepoCache(did, collection)
 }
 
 export async function uploadBlob(file: Blob) {
@@ -59,4 +64,5 @@ export async function createRecords(collection: string, items: {rkey: string; va
 			value: {...value}
 		}))
 	})
+	invalidateRepoCache(did, collection)
 }
