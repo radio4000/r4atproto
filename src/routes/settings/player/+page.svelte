@@ -13,22 +13,24 @@
 	<r4-box>
 		<form>
 			<fieldset>
-				<legend>{m.settings_player_new_deck_volume()}</legend>
+				<legend>{m.settings_player_pause_new_decks()}</legend>
 				<label>
-					<input type="radio" bind:group={appState.default_new_deck_volume} value={0} />
-					{m.settings_player_volume_silent()}
-				</label>
-				<label>
-					<input type="radio" bind:group={appState.default_new_deck_volume} value={1} />
-					{m.settings_player_volume_full()}
+					<input type="checkbox" bind:checked={appState.pause_new_decks} />
+					{m.settings_player_pause_new_decks_description()}
 				</label>
 			</fieldset>
 
 			<fieldset>
-				<legend>{m.settings_player_autoplay()}</legend>
+				<legend>{m.settings_player_new_deck_volume()}</legend>
 				<label>
-					<input type="checkbox" bind:checked={appState.autoplay_new_deck} />
-					{m.settings_player_autoplay_description()}
+					<input
+						type="checkbox"
+						bind:checked={
+							() => appState.default_new_deck_volume !== 0,
+							(full) => (appState.default_new_deck_volume = full ? 1 : 0)
+						}
+					/>
+					{m.settings_player_new_deck_volume_description()}
 				</label>
 			</fieldset>
 
@@ -58,5 +60,11 @@
 
 	legend {
 		font-size: var(--font-5);
+	}
+
+	label {
+		display: flex;
+		align-items: baseline;
+		gap: var(--space-2);
 	}
 </style>

@@ -4,25 +4,20 @@
 	import {getBroadcastingChannelId, notifyBroadcastState} from '#lib/broadcast.js'
 	import {tooltip} from '#lib/components/tooltip-attachment.svelte.js'
 	import * as m from '#lib/paraglide/messages.js'
-	import Icon from '#lib/components/icon.svelte'
+	import ui from '#lib/config/ui.json' with {type: 'json'}
 
 	/** @type {{deckId: number, provider: string | null}} */
 	let {deckId, provider} = $props()
 
 	let deck = $derived(appState.decks[deckId])
-	let useNativeAudio = $derived(provider === 'file')
 	let supportsPlaybackSpeed = $derived(provider !== 'soundcloud' && Boolean(deck))
-	const speedMin = 0.25
-	let speedMax = $derived(useNativeAudio ? 3 : 2)
-	// YouTube's IFrame API only accepts fixed steps (0.25 … 2); native audio takes any rate.
-	let speedStep = $derived(useNativeAudio ? 0.01 : 0.25)
-	let isCustomSpeed = $derived(deck?.speed != null && deck.speed !== 1)
+	let speed = $derived(deck?.speed ?? 1)
 
-	function handleSpeedChange(speed) {
+	function handleSpeedChange(rate) {
 		if (!deck) return
-		deck.speed = speed
+		deck.speed = rate
 		const mediaElement = getMediaPlayer(deckId)
-		if (mediaElement && 'playbackRate' in mediaElement) mediaElement.playbackRate = speed
+		if (mediaElement && 'playbackRate' in mediaElement) mediaElement.playbackRate = rate
 		const broadcastingChannelId = getBroadcastingChannelId()
 		if (broadcastingChannelId) {
 			// Snapshot the position first, or listeners would scale the whole elapsed
@@ -37,55 +32,30 @@
 </script>
 
 {#if appState.show_speed_control && supportsPlaybackSpeed}
-	<r4-speed-control custom={isCustomSpeed}>
-		<button
-			aria-pressed={isCustomSpeed}
-			onclick={() => handleSpeedChange(1)}
-			aria-label={m.player_reset_speed()}
-			{@attach tooltip({content: m.player_reset_speed(), position: 'top'})}
-		>
-			<Icon icon="speed" />
-			{Number(deck?.speed ?? 1).toFixed(2)}x
-		</button>
-		<input
-			type="range"
-			min={speedMin}
-			max={speedMax}
-			step={speedStep}
-			value={deck?.speed ?? 1}
-			oninput={(e) => handleSpeedChange(Number(e.currentTarget.value))}
-			aria-label={m.player_reset_speed()}
-			style="--range-fill: {(
-				(((deck?.speed ?? 1) - speedMin) / (speedMax - speedMin)) *
-				100
-			).toFixed(1)}%"
-		/>
-	</r4-speed-control>
+	<!-- A native select: the steps every provider accepts (YouTube only takes fixed rates) -->
+	<select
+		aria-label={m.settings_player_speed_control()}
+		data-custom={speed !== 1}
+		value={speed}
+		onchange={(e) => handleSpeedChange(Number(e.currentTarget.value))}
+		{@attach tooltip({content: m.settings_player_speed_control(), position: 'top'})}
+	>
+		{#each ui.player.speeds as option (option)}
+			<option value={option}>{option}×</option>
+		{/each}
+	</select>
 {/if}
 
 <style>
-	r4-speed-control {
-		display: flex;
-		align-items: center;
-		gap: var(--space-1);
-		flex: 1 1 6rem;
-		min-width: 0;
-	}
-
-	button {
-		font-size: var(--font-1);
-		/* Fixed-width digits so the button (and the range beside it) never resizes */
+	select {
+		min-height: var(--control-size-small);
+		padding: 0 var(--space-1);
+		font-size: var(--font-2);
 		font-variant-numeric: tabular-nums;
 	}
 
-	input {
-		flex: 1 1 0;
-		min-width: 0;
-		width: 100%;
-	}
-
-	r4-speed-control[custom='false'] input {
-		--range-color: var(--gray-7);
-		accent-color: var(--gray-7);
+	select[data-custom='true'] {
+		color: var(--accent-9);
+		border-color: var(--accent-9);
 	}
 </style>

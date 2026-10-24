@@ -395,41 +395,6 @@
 					flex: 1 1 auto;
 				}
 			}
-
-			&[single-visible='true'] r4-deck-sections {
-				width: 100%;
-				max-width: none;
-			}
-
-			&[single-visible='true'] {
-				r4-local-decks,
-				r4-listening-decks {
-					flex: 1 1 auto;
-					min-width: 0;
-					width: 100%;
-				}
-
-				r4-deck-item {
-					flex: 0 0 auto;
-
-					&:has(:global(r4-deck:not([compact='true']))) {
-						flex: 1 1 auto;
-						min-width: 0;
-					}
-				}
-
-				:global(r4-deck:not([compact='true'])) {
-					width: 100% !important;
-					min-width: 0;
-					flex: 1 1 auto;
-				}
-
-				:global(r4-deck[listening='true']:not([compact='true'])),
-				:global(r4-deck[auto='true']:not([compact='true'])) {
-					width: 100%;
-					min-width: 0;
-				}
-			}
 		}
 
 		/* "fill deck": non-compact with at least one visible panel (video or queue) */

@@ -63,7 +63,7 @@
 		display: flex;
 		align-items: center;
 		gap: var(--space-1);
-		flex: 1 1 6rem;
+		flex: 0 1 var(--volume-width);
 		min-width: 0;
 	}
 
@@ -79,12 +79,15 @@
 	}
 
 	media-mute-button {
-		min-width: var(--control-size);
-		min-height: var(--control-size);
-		border: 1px solid var(--color-control-border);
+		flex-shrink: 0;
+		width: var(--control-size-small);
+		height: var(--control-size-small);
+		padding: var(--space-1);
 		border-radius: var(--border-radius);
-		--media-control-background: var(--button-bg);
-		--media-control-hover-background: var(--button-bg);
+		--media-control-background: transparent;
+		--media-control-hover-background: var(--gray-4);
+		--media-button-icon-width: var(--player-icon-size);
+		--media-button-icon-height: var(--player-icon-size);
 		--media-icon-color: currentColor;
 		--media-icon-color-hover: currentColor;
 		color: var(--button-color);

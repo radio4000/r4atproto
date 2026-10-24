@@ -20,5 +20,33 @@
 		"defaultTileStyle": "osm",
 		"showDayNight": true,
 		"showGraticules": true
+	},
+	"appearance": {
+		"scale": {
+			"min": 0.8,
+			"max": 1.2,
+			"step": 0.05
+		},
+		"fonts": [
+			{
+				"id": "default",
+				"family": ""
+			},
+			{
+				"id": "system",
+				"family": "system-ui, sans-serif"
+			},
+			{
+				"id": "serif",
+				"family": "Georgia, 'Times New Roman', serif"
+			},
+			{
+				"id": "mono",
+				"family": "ui-monospace, 'SF Mono', Menlo, monospace"
+			}
+		]
+	},
+	"player": {
+		"speeds": [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2]
 	}
 }

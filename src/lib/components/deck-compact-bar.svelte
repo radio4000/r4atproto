@@ -252,18 +252,18 @@
 		min-width: 0;
 		padding-inline: var(--space-2);
 
-		> :global(r4-speed-control) {
-			flex: 0 1 7rem;
-			min-width: 0;
-			max-width: 9rem;
-		}
-
 		> menu {
 			flex-wrap: nowrap;
 			align-items: center;
-			gap: var(--space-2);
+			gap: var(--space-1);
 			min-width: 0;
 			flex: 0 0 auto;
+
+			> :global(button) {
+				min-width: var(--control-size-small);
+				min-height: var(--control-size-small);
+				padding: 0 var(--space-1);
+			}
 		}
 
 		> menu:last-child {
@@ -276,9 +276,7 @@
 			scrollbar-width: none;
 
 			:global(r4-volume-control) {
-				flex: 1 1 7rem;
-				min-width: 0;
-				max-width: 10rem;
+				width: var(--volume-width);
 			}
 		}
 	}
@@ -355,7 +353,7 @@
 			display: none;
 		}
 
-		r4-deck-compact-row > :global(r4-speed-control) {
+		r4-deck-compact-row > :global(select) {
 			display: none;
 		}
 	}

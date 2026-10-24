@@ -40,7 +40,12 @@
 	import {shortcutHint} from '#lib/keyboard.js'
 	import {logger} from '#lib/logger.js'
 	import {parseUrl} from 'media-now/parse-url'
-	import {tracksCollection, updateTrack, watchTracks} from '#lib/collections/tracks.js'
+	import {
+		rememberTrackDuration,
+		tracksCollection,
+		updateTrack,
+		watchTracks
+	} from '#lib/collections/tracks.js'
 	import {extractHashtags, HASH_PREFIX_REGEX, isMobileViewport} from '#lib/utils.js'
 	import PlayerProgress from '#lib/components/player-progress.svelte'
 	import Tag from '#lib/components/tag.svelte'
@@ -370,7 +375,9 @@
 		const onDuration = () => {
 			if (!deck || deck.playlist_track !== trackId) return
 			const d = el.duration
-			deck.media_duration = Number.isFinite(d) && d > 0 ? d : NaN
+			const known = Number.isFinite(d) && d > 0
+			deck.media_duration = known ? d : NaN
+			if (known) rememberTrackDuration(trackId, d)
 		}
 		el.addEventListener('timeupdate', onTime)
 		el.addEventListener('durationchange', onDuration)
@@ -656,8 +663,6 @@
 					{@render btnPrev()}
 					{@render btnPlay()}
 					{@render btnNext()}
-					<VolumeControl {deckId} />
-					<SpeedControl {deckId} {provider} />
 					{#if activeQueue.length > 2}
 						<button
 							onclick={() => toggleShuffle(deckId)}
@@ -672,6 +677,8 @@
 					{#if display.autoRadioAvailable}
 						<AutoRadioButton size={14} onclick={() => rejoinAutoRadio(deckId)} />
 					{/if}
+					<VolumeControl {deckId} />
+					<SpeedControl {deckId} {provider} />
 				{:else if deck?.auto_radio}
 					{@render btnPlay()}
 					<VolumeControl {deckId} />
@@ -847,38 +854,28 @@
 			margin-top: 0;
 		}
 
+		/* Transport: small buttons on one row, volume and speed to the right */
 		> menu {
 			align-items: center;
-			flex-wrap: nowrap;
+			flex-wrap: wrap;
 			gap: var(--space-1);
 			min-width: 0;
-			padding: var(--space-2);
-			/* Only the controls row is a container, so track cards keep their own rules */
-			container-type: inline-size;
-			flex-wrap: wrap;
+			padding: var(--space-1) var(--space-2) var(--space-2);
 
-			/* Volume and speed split the space the buttons leave */
-			:global(:is(r4-volume-control, r4-speed-control)) {
-				flex: 1 1 0;
+			> :global(button) {
+				min-width: var(--control-size-small);
+				min-height: var(--control-size-small);
+				padding: 0 var(--space-1);
+			}
+
+			> :global(r4-volume-control) {
+				margin-inline-start: auto;
 			}
 		}
 	}
 
 	:global(r4-deck[listening='true']) section {
 		margin-top: 0;
-	}
-
-	/* Narrow decks: transport buttons on one line, both ranges on the next */
-	@container (max-width: 520px) {
-		section > menu::before {
-			content: '';
-			flex-basis: 100%;
-			order: 1;
-		}
-
-		section > menu :global(:is(r4-volume-control, r4-speed-control)) {
-			order: 2;
-		}
 	}
 
 	footer {

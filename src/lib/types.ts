@@ -156,8 +156,8 @@ export interface AppState {
 	show_track_artwork: boolean
 	/** Default volume for new decks: 0 (silent) or 1 (full) */
 	default_new_deck_volume: 0 | 1
-	/** Whether new decks auto-play when a track is loaded */
-	autoplay_new_deck: boolean
+	/** New decks open paused while another deck plays, so they don't play over it */
+	pause_new_decks: boolean
 	/** Show playback speed control in deck transport */
 	show_speed_control?: boolean
 	/** Show track progress/range control in deck transport */

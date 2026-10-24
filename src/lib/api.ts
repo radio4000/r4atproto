@@ -215,7 +215,7 @@ export async function playTrack(
 		return
 	}
 
-	// Set flag for user-initiated playback (respects autoplay setting for fresh decks)
+	// Set flag for user-initiated playback. A fresh deck waits paused while another deck plays.
 	const userInitiatedReasons = [
 		'user_click_track',
 		'user_next',
@@ -225,7 +225,10 @@ export async function playTrack(
 	]
 	if (userInitiatedReasons.includes(startReason)) {
 		const deckAlreadyPlaying = deck.is_playing || deck.playlist_track
-		if (appState.autoplay_new_deck || deckAlreadyPlaying) {
+		const otherDeckPlaying = Object.values(appState.decks).some(
+			(d) => d.id !== deckId && d.is_playing
+		)
+		if (deckAlreadyPlaying || !appState.pause_new_decks || !otherDeckPlaying) {
 			setUserInitiatedPlay(deckId, true)
 		}
 	}
