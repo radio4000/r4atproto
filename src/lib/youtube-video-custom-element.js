@@ -1,5 +1,6 @@
 import {logger} from '#lib/logger.js'
 import {upgradeProperties} from '#lib/custom-element-props.js'
+import app from '#lib/config/app.json' with {type: 'json'}
 
 const log = logger.ns('youtube-video').seal()
 const YOUTUBE_IFRAME_ALLOW =
@@ -104,13 +105,15 @@ class YouTube2Element extends HTMLElement {
 				log.error('Invalid YouTube URL:', src)
 				return
 			}
-			iframe.src = `https://www.youtube.com/embed/${videoId}?enablejsapi=1`
+			// The no-cookie host: watching here isn't tied to the listener's Google account
+			iframe.src = `${app.services.youtubeEmbed}/embed/${videoId}?enablejsapi=1`
 		}
 		if (this.hasAttribute('muted')) this.#mutedIntent = true
 
 		try {
 			// @ts-expect-error iframe may be null/undefined at type-check time but is guaranteed present here
 			this.api = new globalThis.YT.Player(iframe, {
+				host: app.services.youtubeEmbed,
 				width: '100%',
 				height: '100%',
 				playerVars: {

@@ -13,7 +13,8 @@
 		"relay": "https://relay1.us-west.bsky.network",
 		"jetstream": "wss://jetstream2.us-east.bsky.network/subscribe",
 		"constellation": "https://constellation.microcosm.blue",
-		"slingshot": "https://slingshot.microcosm.blue"
+		"slingshot": "https://slingshot.microcosm.blue",
+		"youtubeEmbed": "https://www.youtube-nocookie.com"
 	},
 	"oauth": {
 		"permissionSet": "authFull",
@@ -35,5 +36,13 @@
 	},
 	"feed": {
 		"perRadio": 5
+	},
+	"csp": {
+		"scripts": ["https://www.youtube.com", "https://w.soundcloud.com"],
+		"frames": [
+			"https://www.youtube-nocookie.com",
+			"https://www.youtube.com",
+			"https://w.soundcloud.com"
+		]
 	}
 }

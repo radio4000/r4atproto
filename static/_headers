@@ -1,0 +1,9 @@
+# Security headers for every response (Cloudflare static assets).
+# The Content-Security-Policy itself is a meta tag from SvelteKit (vite.config.ts csp);
+# framing can only be refused from a header, so it is here.
+/*
+  Content-Security-Policy: frame-ancestors 'none'
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
