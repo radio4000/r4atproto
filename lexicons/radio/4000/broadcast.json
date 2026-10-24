@@ -17,12 +17,12 @@
 		},
 		"deck": {
 			"type": "object",
-			"required": ["track", "url", "positionMs", "positionAt", "playing"],
+			"required": ["url", "positionMs", "positionAt", "playing"],
 			"properties": {
 				"track": {
-					"type": "string",
-					"description": "The radio.4000.track record (at:// URI), or another id for tracks without a record.",
-					"maxLength": 512
+					"type": "ref",
+					"ref": "com.atproto.repo.strongRef",
+					"description": "The radio.4000.track record playing, when the media has one."
 				},
 				"url": {"type": "string", "format": "uri", "maxLength": 2048},
 				"title": {"type": "string", "maxLength": 3000, "maxGraphemes": 300},

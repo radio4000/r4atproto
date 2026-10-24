@@ -2,14 +2,18 @@
 
 The namespace is set once in `src/lib/config/app.json` (`radio.4000`, the reverse of the 4000.radio domain). `src/lib/lexicons.ts` derives every NSID from it; code never spells an NSID out. The schemas live in `lexicons/radio/4000/`, and a test checks they match the configured namespace.
 
-| NSID                   | rkey             | What                                                                                       |
-| ---------------------- | ---------------- | ------------------------------------------------------------------------------------------ |
-| `radio.4000.track`     | TID              | A media URL with title, description (#tags, @mentions), Discogs URL, duration              |
-| `radio.4000.channel`   | `self`           | The account's radio: name, description, image, link, public coarse location (`geo`), theme |
-| `radio.4000.follow`    | from subject DID | Following another radio; one record per followed DID                                       |
-| `radio.4000.broadcast` | `self`           | What a radio plays live, per deck. Deleted when the broadcast ends                         |
+| NSID                   | rkey             | What                                                                                        |
+| ---------------------- | ---------------- | ------------------------------------------------------------------------------------------- |
+| `radio.4000.track`     | TID              | A media URL with title, description (#tags, @mentions), Discogs URL, duration               |
+| `radio.4000.channel`   | `self`           | The account's radio: name, description, image, links, public coarse location (`geo`), theme |
+| `radio.4000.follow`    | from subject DID | Following another radio; one record per followed DID                                        |
+| `radio.4000.broadcast` | `self`           | What a radio plays live, per deck (its track as a strongRef). Deleted when it ends          |
 
-Records use camelCase as in the lexicons. The app's `Track` type is snake_case like r4's domain model; `src/lib/services/atproto/track-record.ts` maps between them.
+Records use camelCase as in the lexicons. The app's `Track` type is snake_case like r4's domain model; `src/lib/atproto/records.ts` maps between them.
+
+Records read from the network are validated against these schemas (`src/lib/atproto/schemas.ts`) and dropped when they don't match. Schemas of other namespaces that ours refer to, like `com.atproto.repo.strongRef`, are pulled next to them with `goat lex pull <nsid>`; `goat lex publish` only publishes the ones whose DNS points at the publishing account.
+
+`radio.4000.chat.message` has no `facets`, `langs` or `reply` yet: optional fields can be added to a published lexicon, so they come with the features that use them. The `large-string` lint is ignored: track descriptions allow 30,000 bytes, as imported radio4000.com descriptions may be long.
 
 Everything in a repo is public. Nothing private goes in a record: settings that aren't meant to be seen stay in the browser.
 

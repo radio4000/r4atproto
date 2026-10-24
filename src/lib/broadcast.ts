@@ -24,7 +24,11 @@ import {
 import {sortedDeckIds} from '#lib/deck.js'
 import {BROADCAST, SELF} from '#lib/lexicons.js'
 import {deleteRecord, putRecord} from '#lib/atproto/write.js'
-import {broadcastToRecord, type BroadcastDeckRecord} from '#lib/atproto/records.js'
+import {
+	broadcastFromRecord,
+	broadcastToRecord,
+	type BroadcastDeckRecord
+} from '#lib/atproto/records.js'
 import {ensureTracksLoaded, tracksCollection} from '#lib/collections/tracks.js'
 import {
 	broadcastsCollection,
@@ -72,7 +76,7 @@ function deckRecords(): BroadcastDeckRecord[] {
 		const position = broadcastPosition(deck, getMediaPlayer(id)?.currentTime)
 		return [
 			{
-				track: track.id,
+				track: track.cid ? {uri: track.id, cid: track.cid} : undefined,
 				url: track.url,
 				title: track.title,
 				positionMs: Math.max(0, Math.round(position * 1000)),
@@ -90,21 +94,7 @@ export async function upsertRemoteBroadcast(channelId: string) {
 	if (!decks.length) return
 	const record = broadcastToRecord(decks)
 	await putRecord(BROADCAST, SELF, record)
-	upsertBroadcast({
-		channel_id: channelId,
-		updated_at: record.updatedAt,
-		decks: decks.map((d, index) => ({
-			index,
-			track_id: d.track,
-			track_url: d.url,
-			track_title: d.title ?? null,
-			track_played_at: null,
-			seek_position: d.positionMs / 1000,
-			seeked_at: d.positionAt,
-			is_playing: d.playing,
-			speed: (d.speed ?? 100) / 100
-		}))
-	})
+	upsertBroadcast(broadcastFromRecord(channelId, record))
 }
 
 /** Something changed on a broadcasting deck: write it soon */

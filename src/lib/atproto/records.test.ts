@@ -147,7 +147,6 @@ describe('unsafe links in records', () => {
 
 	test('a broadcast opens a bounded number of decks', () => {
 		const deck = {
-			track: 'at://did:plc:x/radio.4000.track/1',
 			url: 'https://youtu.be/x',
 			positionMs: 0,
 			positionAt: '2026-01-01T00:00:00Z',
@@ -158,5 +157,18 @@ describe('unsafe links in records', () => {
 			updatedAt: '2026-01-01T00:00:00Z'
 		})
 		expect(broadcast.decks.length).toBe(4)
+	})
+})
+
+describe('broadcast decks', () => {
+	const deck = {url: 'https://youtu.be/x', positionMs: 0, positionAt: '2026-01-01T00:00:00Z', playing: true}
+
+	test('are known by their track record, or by URL without one', () => {
+		const uri = 'at://did:plc:x/radio.4000.track/1'
+		const broadcast = broadcastFromRecord('did:plc:x', {
+			decks: [{...deck, track: {uri, cid: 'bafy'}}, deck],
+			updatedAt: '2026-01-01T00:00:00Z'
+		})
+		expect(broadcast.decks.map((d) => d.track_id)).toEqual([uri, deck.url])
 	})
 })
