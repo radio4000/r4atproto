@@ -38,6 +38,7 @@
 		"@tanstack/query-db-collection": "^1.4.8",
 		"@tanstack/svelte-db": "^0.5.12",
 		"fuzzysort": "^4.0.2",
+		"maplibre-gl": "^6.15.0",
 		"media-chrome": "^4.19.4",
 		"media-now": "^2.2.3",
 		"obra-icons-svelte": "^1.25.0",

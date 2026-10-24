@@ -30,6 +30,10 @@
 	--deck-default-width: 400px;
 	--deck-compact-min-height: 49px;
 	--channel-header-avatar-size: 5rem;
+	--map-min-height: 300px;
+	--map-picker-height: 18rem;
+	--map-popup-width: 14.5rem;
+	--explore-map-height: 70dvh;
 	--tooltip-width: 200px;
 	--popover-min-width: 10rem;
 	--dialog-width: 640px;

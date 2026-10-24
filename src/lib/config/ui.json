@@ -14,5 +14,11 @@
 		"followers": "users",
 		"map": "map",
 		"chat": "message-circle"
+	},
+	"map": {
+		"tileStyles": ["osm", "topo", "satellite"],
+		"defaultTileStyle": "osm",
+		"showDayNight": true,
+		"showGraticules": true
 	}
 }

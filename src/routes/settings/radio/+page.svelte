@@ -5,6 +5,7 @@
 	import ChannelAvatar from '#lib/components/channel-avatar.svelte'
 	import SettingsHeader from '#lib/components/settings-header.svelte'
 	import Seo from '#lib/components/seo.svelte'
+	import MapPicker from '#lib/components/map-picker.svelte'
 	import * as m from '#lib/paraglide/messages.js'
 
 	const channel = $derived(appState.channel)
@@ -16,6 +17,7 @@
 	let longitude = $state('')
 	let image = $state(/** @type {File | undefined} */ (undefined))
 	let preview = $state(/** @type {string | undefined} */ (undefined))
+	let showMap = $state(false)
 	let saving = $state(false)
 	let saved = $state(false)
 	let error = $state('')
@@ -117,6 +119,20 @@
 						<input type="number" step="any" min="-180" max="180" bind:value={longitude} />
 					</label>
 				</r4-geo-field>
+				<button type="button" aria-pressed={showMap} onclick={() => (showMap = !showMap)}>
+					{showMap ? m.channel_edit_hide_map() : m.channel_edit_pick_on_map()}
+				</button>
+				{#if showMap}
+					<MapPicker
+						latitude={Number.parseFloat(latitude) || null}
+						longitude={Number.parseFloat(longitude) || null}
+						onselect={(point) => {
+							// Coarse on purpose: about a kilometre is enough to place a radio
+							latitude = point.latitude == null ? '' : point.latitude.toFixed(2)
+							longitude = point.longitude == null ? '' : point.longitude.toFixed(2)
+						}}
+					/>
+				{/if}
 			</fieldset>
 			<menu>
 				<li>

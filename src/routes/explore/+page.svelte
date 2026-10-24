@@ -11,9 +11,10 @@
 	import SearchInput from '#lib/components/search-input.svelte'
 	import FilterChips from '#lib/components/filter-chips.svelte'
 	import Seo from '#lib/components/seo.svelte'
+	import MapChannels from '#lib/components/map-channels.svelte'
 	import * as m from '#lib/paraglide/messages.js'
 
-	const TABS = ['radios', 'tracks', 'tags']
+	const TABS = ['radios', 'tracks', 'tags', 'map']
 	const tab = $derived(
 		TABS.includes(page.url.searchParams.get('tab') ?? '')
 			? page.url.searchParams.get('tab')
@@ -83,11 +84,16 @@
 						>{m.explore_tab_tags()}</a
 					>
 				</li>
+				<li>
+					<a href={tabHref('map')} aria-current={tab === 'map' ? 'page' : undefined}
+						>{m.nav_map()}</a
+					>
+				</li>
 			</menu>
 		</nav>
 	</r4-page-header>
 
-	{#if tab !== 'tags'}
+	{#if tab !== 'tags' && tab !== 'map'}
 		<search>
 			<SearchInput
 				bind:value={() => q, (value) => setParams({q: value})}
@@ -139,6 +145,10 @@
 		{:else}
 			<r4-empty><p role="status">{m.common_loading()}</p></r4-empty>
 		{/if}
+	{:else if tab === 'map'}
+		<r4-explore-map>
+			<MapChannels channels={channelsQuery.data ?? []} loading={!channelsQuery.isReady} />
+		</r4-explore-map>
 	{:else}
 		{#if tags.length}
 			<ul>
@@ -158,6 +168,13 @@
 </r4-page>
 
 <style>
+	r4-explore-map {
+		display: flex;
+		height: var(--explore-map-height);
+		border-radius: var(--border-radius);
+		overflow: hidden;
+	}
+
 	search {
 		display: flex;
 		gap: var(--space-1);

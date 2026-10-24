@@ -36,6 +36,10 @@ export default defineConfig({
 	},
 	// Component tests mount in happy-dom, so resolve Svelte's browser build
 	resolve: process.env.VITEST ? {conditions: ['browser']} : undefined,
+	optimizeDeps: {
+		// MapLibre 6 resolves its ESM worker via import.meta.url, which Vite's prebundler drops in dev
+		exclude: ['maplibre-gl']
+	},
 	build: {
 		target: 'esnext',
 		reportCompressedSize: false
