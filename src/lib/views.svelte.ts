@@ -3,6 +3,7 @@ import {useLiveQuery} from '#lib/useLiveQuery.svelte.js'
 import {inArray} from '@tanstack/db'
 import {tracksCollection} from '#lib/collections/tracks.js'
 import {channelsCollection, fetchRadioDids} from '#lib/collections/channels.js'
+import {searchNetworkTracks} from '#lib/collections/network-search.js'
 import type {Channel, Deck, Track} from '#lib/types.js'
 import {viewURI, type View, type ViewSource} from '#lib/views.js'
 
@@ -12,8 +13,8 @@ const EMPTY_STRINGS: string[] = []
  * Which fetch+filter path queryView should use for a View.
  * - `channel`: the channel's tracks, newest first
  * - `channel-filtered`: the channel's tracks, post-filtered by tags/mention/search
- * - `tags-only`, `search-only`: every radio's tracks, post-filtered. No index exists
- *   without a server, so these load all radios — fine at today's network size.
+ * - `tags-only`, `search-only`: the network's matching tracks, from the index; without
+ *   it, every radio's tracks, post-filtered (fine for a few dozen radios).
  * - `empty`: no source specified, returns nothing
  */
 export type ViewStrategy = 'channel' | 'channel-filtered' | 'tags-only' | 'search-only' | 'empty'
@@ -94,12 +95,21 @@ export function queryView(getView: () => View) {
 	const strategy = $derived(resolveViewStrategy(getView().sources[0]))
 	const global = $derived(strategy === 'tags-only' || strategy === 'search-only')
 
-	// Global strategies read every radio the relay knows
+	// Global strategies ask the index; without it, they read every radio the relay knows
+	let networkIds = $state.raw<string[] | undefined>(undefined)
 	let radioDids = $state.raw<string[] | undefined>(undefined)
+	const sourceKey = $derived(JSON.stringify(getView().sources[0] ?? {}))
 	$effect(() => {
-		if (global && !radioDids) fetchRadioDids().then((dids) => (radioDids = dids))
+		if (!global) return
+		const source = JSON.parse(sourceKey)
+		networkIds = undefined
+		searchNetworkTracks(source).then((tracks) => {
+			if (JSON.stringify(source) !== sourceKey) return
+			if (tracks) networkIds = tracks.map((t) => t.id)
+			else if (!radioDids) fetchRadioDids().then((dids) => (radioDids = dids))
+		})
 	})
-	const radioDidsKey = $derived(radioDids?.join(',') ?? '')
+	const radioDidsKey = $derived(networkIds ? `ids:${networkIds.join(',')}` : (radioDids?.join(',') ?? ''))
 
 	const channelsQuery = useLiveQuery(
 		(q) => {
@@ -112,6 +122,12 @@ export function queryView(getView: () => View) {
 
 	const tracksQuery = useLiveQuery(
 		(q) => {
+			if (global && networkIds) {
+				return q
+					.from({tracks: tracksCollection})
+					.where(({tracks}) => inArray(tracks.id, networkIds?.length ? networkIds : ['']))
+					.orderBy(({tracks}) => tracks.created_at, 'desc')
+			}
 			if (global) {
 				if (!radioDids?.length)
 					return q.from({tracks: tracksCollection}).where(({tracks}) => inArray(tracks.id, ['']))
@@ -149,7 +165,7 @@ export function queryView(getView: () => View) {
 		},
 		get loading() {
 			if (strategy === 'empty') return false
-			if (global && !radioDids) return true
+			if (global && !networkIds && !radioDids) return true
 			return !tracksQuery.isReady
 		}
 	}

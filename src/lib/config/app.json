@@ -40,9 +40,13 @@
 		"maxBackoffMs": 30000
 	},
 	"feed": {
-		"perRadio": 5
+		"perRadio": 5,
+		"size": 50
 	},
 	"indexer": {
+		"enabled": false,
+		"retrySeconds": 60,
+		"browseMax": 1000,
 		"maxTracksPerRadio": 20000,
 		"cacheSeconds": 60,
 		"flushMs": 1000,

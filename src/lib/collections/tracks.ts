@@ -71,11 +71,15 @@ export async function fetchTrack(id: string): Promise<Track | undefined> {
 	const loaded = tracksCollection.get(id)
 	if (loaded) return loaded
 	const [track] = await fetchTracksByIds([id]).catch(() => [])
-	if (track) {
-		if (!tracksCollection.isReady()) tracksCollection.startSyncImmediate()
-		tracksCollection.utils.writeUpsert(track)
-	}
+	if (track) keepTracks([track])
 	return track
+}
+
+/** Put tracks read elsewhere (the index) in the collection, so decks can play them */
+export function keepTracks(tracks: Track[]) {
+	if (!tracks.length) return
+	if (!tracksCollection.isReady()) tracksCollection.startSyncImmediate()
+	tracksCollection.utils.writeUpsert(tracks)
 }
 
 export const tracksCollection = createCollection<Track, string>({

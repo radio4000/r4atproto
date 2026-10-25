@@ -2,7 +2,7 @@
 	import {page} from '$app/state'
 	import {goto} from '$app/navigation'
 	import {useLiveQuery} from '#lib/useLiveQuery.svelte.js'
-	import {channelsCollection} from '#lib/collections/channels.js'
+	import {channelsCollection, searchRadios} from '#lib/collections/channels.js'
 	import {viewFromUrl} from '#lib/views.js'
 	import {queryView} from '#lib/views.svelte.js'
 	import {fuzzySearch} from '#lib/utils.js'
@@ -20,10 +20,20 @@
 
 	const channelsQuery = useLiveQuery((query) => query.from({c: channelsCollection}))
 	const words = $derived(q.replace(/[@#]\S+/g, '').trim())
+	// From the index when there is one; else among the radios loaded here
+	let found = $state.raw(/** @type {import('#lib/types.js').Channel[] | null} */ (null))
+	$effect(() => {
+		const q = words
+		found = null
+		if (q) searchRadios(q).then((radios) => q === words && (found = radios))
+	})
 	const radios = $derived(
-		words
-			? fuzzySearch(words, channelsQuery.data ?? [], ['name', 'slug', 'description'], {limit: 12})
-			: []
+		!words
+			? []
+			: (found ??
+					fuzzySearch(words, channelsQuery.data ?? [], ['name', 'slug', 'description'], {
+						limit: 12
+					}))
 	)
 
 	// A query that looks like a handle can be opened directly

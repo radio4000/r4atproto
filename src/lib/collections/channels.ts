@@ -2,15 +2,17 @@
  * Radios as an on-demand TanStack DB collection, keyed by DID. A channel is an
  * account: its radio.4000.channel record when it has one, its Bluesky profile otherwise.
  *
- * Browsing (no id/slug filter) discovers radios through the relay, which indexes
- * which repos hold radio.4000.track records, then reads each repo. That fan-out
- * suits up to a few hundred radios; beyond, an indexer is needed (docs/services.md).
+ * Radios come from the 4000.radio index (docs/indexer.md). Without it, browsing
+ * discovers radios through the relay, which knows which repos hold radio.4000.track
+ * records, then reads each repo: a fan-out that suits a few dozen radios.
  */
 import {createCollection} from '@tanstack/svelte-db'
 import {queryCollectionOptions, parseLoadSubsetOptions} from '@tanstack/query-db-collection'
 import app from '#lib/config/app.json' with {type: 'json'}
 import {CHANNEL, SELF, TRACK} from '#lib/lexicons.js'
-import {resolveIdentity, type Identity} from '#lib/atproto/identity.js'
+import {isDid, resolveHandle, resolveIdentity, type Identity} from '#lib/atproto/identity.js'
+import {fromIndex, indexGet} from '#lib/atproto/appview.js'
+import {channelFromView, type RadioView} from '#lib/atproto/index-views.js'
 import {getProfiles, type Profile} from '#lib/atproto/profiles.js'
 import {getRecord, listRecords} from '#lib/atproto/repo.js'
 import {xrpcGet} from '#lib/atproto/xrpc.js'
@@ -87,7 +89,61 @@ async function loadChannel(owner: Identity, profile?: Profile): Promise<Channel>
 }
 
 /** Channels for handles or DIDs */
-export async function fetchChannels(actors: string[]): Promise<Channel[]> {
+export function fetchChannels(actors: string[]): Promise<Channel[]> {
+	return fromIndex(
+		() => channelsFromIndex(actors),
+		() => channelsFromRepos(actors)
+	)
+}
+
+/** Bluesky profiles, for radios without a channel record (their name and avatar) */
+async function withProfiles(views: RadioView[]): Promise<Channel[]> {
+	const profiles = await profilesByDid(views.filter((v) => !v.record).map((v) => v.did))
+	return views.map((view) => channelFromView(view, profiles.get(view.did)))
+}
+
+async function channelsFromIndex(actors: string[]): Promise<Channel[]> {
+	const dids = (
+		await Promise.all(actors.map((a) => (isDid(a) ? a : resolveHandle(a).catch(() => null))))
+	).filter((did): did is string => Boolean(did))
+	const views: RadioView[] = []
+	for (let i = 0; i < dids.length; i += 25) {
+		const page = await indexGet<{radios: RadioView[]}>('getRadios', {dids: dids.slice(i, i + 25)})
+		views.push(...page.radios)
+	}
+	// Accounts without a radio yet aren't in the index
+	const found = new Set(views.map((v) => v.did))
+	const others = await channelsFromRepos(dids.filter((did) => !found.has(did)))
+	return [...(await withProfiles(views)), ...others]
+}
+
+/** Radios by latest track, up to `limit` (else indexer.browseMax) */
+async function browseIndex(limit = app.indexer.browseMax): Promise<Channel[]> {
+	const views: RadioView[] = []
+	let cursor: string | undefined
+	do {
+		const page = await indexGet<{radios: RadioView[]; cursor?: string}>('listRadios', {
+			limit: Math.min(100, limit - views.length),
+			cursor
+		})
+		views.push(...page.radios)
+		cursor = page.cursor
+	} while (cursor && views.length < limit)
+	return withProfiles(views)
+}
+
+/** Radios matching words, from the index; null without it (callers search what they have) */
+export function searchRadios(q: string, limit = 12): Promise<Channel[] | null> {
+	return fromIndex(
+		async () => {
+			const {radios} = await indexGet<{radios: RadioView[]}>('listRadios', {q, limit})
+			return withProfiles(radios)
+		},
+		async () => null
+	)
+}
+
+async function channelsFromRepos(actors: string[]): Promise<Channel[]> {
 	const owners = (await mapLimit(actors, (a) => resolveIdentity(a).catch(() => null))).filter(
 		(o): o is Identity => Boolean(o)
 	)
@@ -134,8 +190,13 @@ export const channelsCollection = createCollection<Channel, string>({
 		queryFn: async (ctx): Promise<Channel[]> => {
 			const {actors, limit} = parseChannelParams(ctx.meta?.loadSubsetOptions)
 			if (actors.length) return fetchChannels(actors)
-			const dids = await fetchRadioDids()
-			return fetchChannels(limit ? dids.slice(0, limit) : dids)
+			return fromIndex(
+				() => browseIndex(limit),
+				async () => {
+					const dids = await fetchRadioDids()
+					return channelsFromRepos(limit ? dids.slice(0, limit) : dids)
+				}
+			)
 		}
 	})
 })

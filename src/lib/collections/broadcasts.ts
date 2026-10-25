@@ -12,6 +12,8 @@ import {getRecord} from '#lib/atproto/repo.js'
 import {subscribe} from '#lib/atproto/jetstream.js'
 import {broadcastFromRecord, type BroadcastRecord} from '#lib/atproto/records.js'
 import type {Broadcast} from '#lib/types.js'
+import {fromIndex, indexGet} from '#lib/atproto/appview.js'
+import {broadcastFromView, type BroadcastView} from '#lib/atproto/index-views.js'
 import {fetchRadioDids} from './channels'
 
 const CONCURRENCY = 6
@@ -48,6 +50,20 @@ export async function fetchBroadcast(did: string): Promise<Broadcast | null> {
 }
 
 async function loadBroadcasts() {
+	await fromIndex(
+		async () => {
+			const {broadcasts} = await indexGet<{broadcasts: BroadcastView[]}>('listBroadcasts')
+			for (const view of broadcasts) {
+				const broadcast = broadcastFromView(view)
+				if (broadcast) upsertBroadcast(broadcast)
+			}
+		},
+		broadcastsFromRepos
+	)
+}
+
+/** Without the index: every radio's broadcast record */
+async function broadcastsFromRepos() {
 	const dids = await fetchRadioDids()
 	for (let i = 0; i < dids.length; i += CONCURRENCY) {
 		const found = await Promise.all(dids.slice(i, i + CONCURRENCY).map(fetchBroadcast))

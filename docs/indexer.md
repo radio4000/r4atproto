@@ -73,7 +73,7 @@ Workers paid plan ($5/month). At this size D1 storage, reads and writes, the Que
 1. ✅ Query lexicons.
 2. ✅ Indexer: ingest, backfill, tables, API, with tests (`indexer/test`, on node:sqlite).
 3. Load test: 10,000 synthetic radios in a local D1, measure response times.
-4. App: home, explore, search, feed and broadcasts read from the indexer; radio pages from the indexer with the PDS as fallback.
+4. ✅ App: radio lists and cards, the feed, broadcasts, network search and chat read from the index (`src/lib/atproto/appview.ts`), each with its direct read as fallback; a radio's own page still reads its PDS. Off until deployed: `indexer.enabled` in `app.json`.
 5. Deploy `api.4000.radio`, backfill the real network, compare against direct reads.
 6. Publish the query lexicons. Then promote.
 
