@@ -28,7 +28,6 @@ describe('isValidRecord', () => {
 		)
 	})
 
-
 	test('rejects wrong types, missing fields and oversized values', () => {
 		expect(isValidRecord(TRACK, {url: 'https://youtu.be/x', createdAt: now})).toBe(false)
 		expect(isValidRecord(CHAT_MESSAGE, {subject: 'did:plc:abc', text: 5, createdAt: now})).toBe(

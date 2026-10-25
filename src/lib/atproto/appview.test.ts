@@ -10,7 +10,12 @@ const {fromIndex, indexAvailable} = await import('./appview')
 
 test('a failing index falls back to direct reads, and is left alone for a while', async () => {
 	vi.spyOn(console, 'warn').mockImplementation(() => {})
-	expect(await fromIndex(async () => 'index', async () => 'direct')).toBe('index')
+	expect(
+		await fromIndex(
+			async () => 'index',
+			async () => 'direct'
+		)
+	).toBe('index')
 	const failing = vi.fn(async () => Promise.reject(new Error('down')))
 	expect(await fromIndex(failing, async () => 'direct')).toBe('direct')
 	expect(indexAvailable()).toBe(false)

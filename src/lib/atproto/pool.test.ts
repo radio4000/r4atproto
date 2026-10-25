@@ -25,7 +25,10 @@ test('keeps at most reads.perHost requests in flight per host', async () => {
 })
 
 test('a 429 is retried after the delay the host asks for', async () => {
-	const responses = [new Response('', {status: 429, headers: {'retry-after': '0'}}), new Response('ok')]
+	const responses = [
+		new Response('', {status: 429, headers: {'retry-after': '0'}}),
+		new Response('ok')
+	]
 	const fetch = vi.fn(async () => responses.shift()!)
 	vi.stubGlobal('fetch', fetch)
 	const res = await pooledFetch('https://b.test/x')

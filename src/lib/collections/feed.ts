@@ -54,7 +54,9 @@ async function latestFromRepos(perRadio: number, dids?: string[]): Promise<Track
 	const results: Track[][] = []
 	for (let i = 0; i < radios.length; i += CONCURRENCY) {
 		const batch = radios.slice(i, i + CONCURRENCY)
-		results.push(...(await Promise.all(batch.map((did) => latestOf(did, perRadio).catch(() => [])))))
+		results.push(
+			...(await Promise.all(batch.map((did) => latestOf(did, perRadio).catch(() => []))))
+		)
 	}
 	return results.flat().toSorted((a, b) => b.created_at.localeCompare(a.created_at))
 }

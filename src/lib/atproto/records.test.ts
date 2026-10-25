@@ -161,7 +161,12 @@ describe('unsafe links in records', () => {
 })
 
 describe('broadcast decks', () => {
-	const deck = {url: 'https://youtu.be/x', positionMs: 0, positionAt: '2026-01-01T00:00:00Z', playing: true}
+	const deck = {
+		url: 'https://youtu.be/x',
+		positionMs: 0,
+		positionAt: '2026-01-01T00:00:00Z',
+		playing: true
+	}
 
 	test('are known by their track record, or by URL without one', () => {
 		const uri = 'at://did:plc:x/radio.4000.track/1'

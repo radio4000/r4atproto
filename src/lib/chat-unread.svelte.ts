@@ -82,7 +82,11 @@ const tidTime = (rkey: string) => {
 async function countOwnRadio(did: string) {
 	const since = seen[did] ?? 0
 	const refs = await fetchChatRefs(did).catch(() => [])
-	const blocked = await roomBlocks(did, undefined, refs.map((ref) => ref.did))
+	const blocked = await roomBlocks(
+		did,
+		undefined,
+		refs.map((ref) => ref.did)
+	)
 	const count = refs.filter(
 		(ref) => ref.did !== did && !hidden(ref.did, blocked) && tidTime(ref.rkey) > since
 	).length

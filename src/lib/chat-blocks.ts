@@ -26,7 +26,9 @@ const blocks = (r: Relationship) =>
 
 /** Whether a block stands between `actor` and each of `others`, in as few requests as possible */
 function relations(actor: string, others: string[]): Promise<boolean>[] {
-	const missing = [...new Set(others)].filter((did) => did !== actor && !known.has(`${actor} ${did}`))
+	const missing = [...new Set(others)].filter(
+		(did) => did !== actor && !known.has(`${actor} ${did}`)
+	)
 	for (let i = 0; i < missing.length; i += PER_REQUEST) {
 		const chunk = missing.slice(i, i + PER_REQUEST)
 		const answer = xrpcGet<{relationships: Relationship[]}>(
@@ -41,7 +43,11 @@ function relations(actor: string, others: string[]): Promise<boolean>[] {
 				return new Map<string | undefined, boolean>()
 			}
 		)
-		for (const did of chunk) known.set(`${actor} ${did}`, answer.then((map) => map.get(did) ?? false))
+		for (const did of chunk)
+			known.set(
+				`${actor} ${did}`,
+				answer.then((map) => map.get(did) ?? false)
+			)
 	}
 	return others.map((did) => known.get(`${actor} ${did}`) ?? Promise.resolve(false))
 }
@@ -53,8 +59,6 @@ export async function roomBlocks(
 	authors: string[]
 ): Promise<Set<string>> {
 	const actors = readerDid && readerDid !== radioDid ? [radioDid, readerDid] : [radioDid]
-	const answers = await Promise.all(
-		actors.map((actor) => Promise.all(relations(actor, authors)))
-	)
+	const answers = await Promise.all(actors.map((actor) => Promise.all(relations(actor, authors))))
 	return new Set(authors.filter((_, i) => answers.some((blocked) => blocked[i])))
 }

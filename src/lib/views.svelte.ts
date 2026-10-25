@@ -109,7 +109,9 @@ export function queryView(getView: () => View) {
 			else if (!radioDids) fetchRadioDids().then((dids) => (radioDids = dids))
 		})
 	})
-	const radioDidsKey = $derived(networkIds ? `ids:${networkIds.join(',')}` : (radioDids?.join(',') ?? ''))
+	const radioDidsKey = $derived(
+		networkIds ? `ids:${networkIds.join(',')}` : (radioDids?.join(',') ?? '')
+	)
 
 	const channelsQuery = useLiveQuery(
 		(q) => {

@@ -50,16 +50,13 @@ export async function fetchBroadcast(did: string): Promise<Broadcast | null> {
 }
 
 async function loadBroadcasts() {
-	await fromIndex(
-		async () => {
-			const {broadcasts} = await indexGet<{broadcasts: BroadcastView[]}>('listBroadcasts')
-			for (const view of broadcasts) {
-				const broadcast = broadcastFromView(view)
-				if (broadcast) upsertBroadcast(broadcast)
-			}
-		},
-		broadcastsFromRepos
-	)
+	await fromIndex(async () => {
+		const {broadcasts} = await indexGet<{broadcasts: BroadcastView[]}>('listBroadcasts')
+		for (const view of broadcasts) {
+			const broadcast = broadcastFromView(view)
+			if (broadcast) upsertBroadcast(broadcast)
+		}
+	}, broadcastsFromRepos)
 }
 
 /** Without the index: every radio's broadcast record */

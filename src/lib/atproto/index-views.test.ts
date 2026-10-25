@@ -25,13 +25,26 @@ describe('index views', () => {
 
 	test('without a channel record, the Bluesky profile names the radio', () => {
 		const view = {...author, trackCount: 1, indexedAt: '2026-01-01T00:00:00.000Z'}
-		const channel = channelFromView(view, {...author, displayName: 'Alice', avatar: 'https://cdn.test/a.jpg'})
-		expect(channel).toMatchObject({name: 'Alice', image: 'https://cdn.test/a.jpg', has_record: false})
+		const channel = channelFromView(view, {
+			...author,
+			displayName: 'Alice',
+			avatar: 'https://cdn.test/a.jpg'
+		})
+		expect(channel).toMatchObject({
+			name: 'Alice',
+			image: 'https://cdn.test/a.jpg',
+			has_record: false
+		})
 	})
 
 	test('records that fail our lexicons are dropped, as from any repo', () => {
 		const view = {uri: 'at://did:plc:alice/radio.4000.track/1', cid: 'c', author, indexedAt: ''}
 		expect(trackFromView({...view, record: {title: 5}})).toBeNull()
-		expect(trackFromView({...view, record: {url: 'https://youtu.be/x', title: 'A', createdAt: '2026-01-01T00:00:00.000Z'}})).toMatchObject({title: 'A', slug: 'alice.test'})
+		expect(
+			trackFromView({
+				...view,
+				record: {url: 'https://youtu.be/x', title: 'A', createdAt: '2026-01-01T00:00:00.000Z'}
+			})
+		).toMatchObject({title: 'A', slug: 'alice.test'})
 	})
 })
