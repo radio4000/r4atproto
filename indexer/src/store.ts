@@ -19,6 +19,15 @@ const uriOf = (c: {did: string; collection: string; rkey: string}) =>
 
 const text = (value: unknown) => (typeof value === 'string' ? value : null)
 
+/** Milliseconds of the latest date a track's key allows (2100), so keys stay exact integers */
+const LAST_MS = Date.UTC(2100, 0, 1)
+
+/** A new track's key: the first free slot of its millisecond (bound three times: start, from, below) */
+export function seqRange(createdAt: string | null): [number, number, number] {
+	const ms = Math.min(LAST_MS, Math.max(0, Date.parse(createdAt ?? '') || 0))
+	return [ms * 1000, ms * 1000, ms * 1000 + 1000]
+}
+
 function coordinate(value: unknown): number | null {
 	const number = typeof value === 'string' ? Number.parseFloat(value) : Number.NaN
 	return Number.isFinite(number) ? number : null
@@ -99,14 +108,15 @@ function statementsFor(db: Db, change: Change, now: string): Statement[] {
 		return [
 			db
 				.prepare(
-					`INSERT INTO tracks (uri, did, cid, record, title, description, created_at, indexed_at)
-					VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+					`INSERT INTO tracks (uri, seq, did, cid, record, title, description, created_at, indexed_at)
+					VALUES (?, (SELECT coalesce(max(seq) + 1, ?) FROM tracks WHERE seq >= ? AND seq < ?), ?, ?, ?, ?, ?, ?, ?)
 					ON CONFLICT (uri) DO UPDATE SET cid = excluded.cid, record = excluded.record,
 						title = excluded.title, description = excluded.description,
 						created_at = excluded.created_at, indexed_at = excluded.indexed_at`
 				)
 				.bind(
 					uri,
+					...seqRange(createdAt),
 					did,
 					change.cid,
 					JSON.stringify(r),

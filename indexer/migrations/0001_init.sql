@@ -30,6 +30,8 @@ CREATE INDEX radios_location ON radios (latitude, longitude);
 
 CREATE TABLE tracks (
 	uri TEXT PRIMARY KEY,
+	-- Follows created_at (milliseconds × 1000 + a slot), so full-text search reads newest first
+	seq INTEGER NOT NULL UNIQUE,
 	did TEXT NOT NULL,
 	cid TEXT NOT NULL,
 	record TEXT NOT NULL,
@@ -80,16 +82,16 @@ CREATE INDEX chat_messages_room ON chat_messages (subject, created_at DESC, uri 
 CREATE INDEX chat_messages_author ON chat_messages (did);
 
 -- Full-text search, kept in sync by triggers
-CREATE VIRTUAL TABLE tracks_fts USING fts5 (title, description, content = 'tracks');
+CREATE VIRTUAL TABLE tracks_fts USING fts5 (title, description, content = 'tracks', content_rowid = 'seq');
 CREATE TRIGGER tracks_fts_insert AFTER INSERT ON tracks BEGIN
-	INSERT INTO tracks_fts (rowid, title, description) VALUES (new.rowid, new.title, new.description);
+	INSERT INTO tracks_fts (rowid, title, description) VALUES (new.seq, new.title, new.description);
 END;
 CREATE TRIGGER tracks_fts_delete AFTER DELETE ON tracks BEGIN
-	INSERT INTO tracks_fts (tracks_fts, rowid, title, description) VALUES ('delete', old.rowid, old.title, old.description);
+	INSERT INTO tracks_fts (tracks_fts, rowid, title, description) VALUES ('delete', old.seq, old.title, old.description);
 END;
 CREATE TRIGGER tracks_fts_update AFTER UPDATE OF title, description ON tracks BEGIN
-	INSERT INTO tracks_fts (tracks_fts, rowid, title, description) VALUES ('delete', old.rowid, old.title, old.description);
-	INSERT INTO tracks_fts (rowid, title, description) VALUES (new.rowid, new.title, new.description);
+	INSERT INTO tracks_fts (tracks_fts, rowid, title, description) VALUES ('delete', old.seq, old.title, old.description);
+	INSERT INTO tracks_fts (rowid, title, description) VALUES (new.seq, new.title, new.description);
 END;
 
 CREATE VIRTUAL TABLE radios_fts USING fts5 (handle, name, description, content = 'radios');

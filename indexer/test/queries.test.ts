@@ -120,6 +120,17 @@ describe('xrpc queries', () => {
 		expect(await titles('q=tub')).toEqual(['King Tubby'])
 		expect(await titles('radios=did:plc:alice&q=tub')).toEqual(['King Tubby'])
 		expect(await titles('radios=did:plc:bob&q=tub')).toEqual([])
+		expect(await titles('tags=dub&q=basic')).toEqual(['Basic Channel'])
+		// Descriptions count too: #dub is in King Tubby's
+		const words = await get(db, '/xrpc/radio.4000.listTracks?q=dub&limit=1')
+		expect(words.body.tracks.map((t) => t.record.title)).toEqual(['King Tubby'])
+		const channel = await get(db, '/xrpc/radio.4000.listTracks?q=c&limit=1')
+		expect(channel.body.tracks.map((t) => t.record.title)).toEqual(['Coltrane'])
+		const more = await get(
+			db,
+			`/xrpc/radio.4000.listTracks?q=c&limit=1&cursor=${channel.body.cursor}`
+		)
+		expect(more.body.tracks.map((t) => t.record.title)).toEqual(['Basic Channel'])
 		const byTag = await get(db, '/xrpc/radio.4000.listTracks?tags=dub&limit=1')
 		expect(byTag.body.tracks.map((t) => t.record.title)).toEqual(['King Tubby'])
 		const nextByTag = await get(

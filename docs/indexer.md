@@ -81,18 +81,18 @@ Workers paid plan ($5/month). At this size D1 storage, reads and writes, the Que
 
 Local, on SQLite (D1's engine) with 10,000 synthetic radios and 1.7 million tracks (1.6 GB), through the same query code (median of 7):
 
-| Query                                                            | Time                                                      |
-| ---------------------------------------------------------------- | --------------------------------------------------------- |
-| Radios by latest track, by most tracks, a map area, 25 by DID    | 1–3 ms                                                    |
-| Radios, page 20; radios search                                   | 9–12 ms                                                   |
-| Network feed; a radio's tracks; with a tag; following 100 radios | 1–6 ms                                                    |
-| A #tag across the network (common or rare), next pages           | 1–3 ms                                                    |
-| Two tags                                                         | 34 ms                                                     |
-| Words inside a radio, or 100 followed radios                     | 1–16 ms                                                   |
-| Words across the network                                         | ~75 ms per 1% of tracks containing the word (4% → 300 ms) |
-| Live broadcasts, a chat room                                     | < 1 ms                                                    |
+| Query                                                            | Time                                                        |
+| ---------------------------------------------------------------- | ----------------------------------------------------------- |
+| Radios by latest track, by most tracks, a map area, 25 by DID    | 1–3 ms                                                      |
+| Radios, page 20; radios search                                   | 9–12 ms                                                     |
+| Network feed; a radio's tracks; with a tag; following 100 radios | 1–6 ms                                                      |
+| A #tag across the network (common or rare), next pages           | 1–3 ms                                                      |
+| Two tags                                                         | 34 ms                                                       |
+| Words inside a radio, or 100 followed radios                     | 1–16 ms                                                     |
+| Words across the network                                         | 16–65 ms (a word in 4–13% of tracks); 229 ms for one in 40% |
+| Live broadcasts, a chat room                                     | < 1 ms                                                      |
 
-Each read starts from the index that narrows it most (`queries/tracks.ts`). Tag and mention rows carry their track's date, so a tag's tracks are read newest first straight from the index, and cursors are row values that resume from it. Network-wide word search is the one read whose cost grows with the network: it finds every match, then the newest. D1 runs one query at a time per database, so slow searches would delay the others; answers are cached for `indexer.cacheSeconds`.
+Each read starts from the index that narrows it most and stops after a page (`queries/tracks.ts`). Tag and mention rows carry their track's date, so a tag's tracks are read newest first straight from the index; the full-text index is keyed by `seq`, a number that follows each track's date, so word search reads newest first too. Cursors resume from the index. D1 runs one query at a time per database, which is why no read may grow with the network; answers are also cached for `indexer.cacheSeconds`.
 
 ## Running it
 
