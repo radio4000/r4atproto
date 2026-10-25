@@ -9,8 +9,7 @@ routes = [{ pattern = "api.4000.radio", custom_domain = true }]
 [[d1_databases]]
 binding = "DB"
 database_name = "r4-index"
-# Set after `wrangler d1 create r4-index`
-database_id = "00000000-0000-0000-0000-000000000000"
+database_id = "7d456f76-2671-4f82-ad57-8db9c48887df"
 migrations_dir = "migrations"
 
 [[durable_objects.bindings]]
