@@ -15,7 +15,7 @@
 		"constellation": "https://constellation.microcosm.blue",
 		"slingshot": "https://slingshot.microcosm.blue",
 		"youtubeEmbed": "https://www.youtube-nocookie.com",
-		"index": ""
+		"index": "https://api.4000.radio"
 	},
 	"oauth": {
 		"permissionSet": "authFull",
