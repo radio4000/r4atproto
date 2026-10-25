@@ -46,7 +46,7 @@ All on Cloudflare, next to the app, in this repository (`indexer/`, its own `wra
 
 ## Queries
 
-Defined as lexicons in `lexicons/radio/4000/` (drafts, not published yet). Each view carries the record as it is in the repo, like Bluesky's views, so the app maps it with the code it already has.
+Defined as lexicons in `lexicons/radio/4000/`, published with the record schemas (see [lexicons.md](lexicons.md)). Each view carries the record as it is in the repo, like Bluesky's views, so the app maps it with the code it already has.
 
 - `radio.4000.defs`: the views (`radioView`, `trackView`, `broadcastView`, `chatMessageView`).
 - `radio.4000.listRadios`: paged; `q` to search, `sort` by latest track, new or most tracks, `bbox` for a map area (home, explore, search).
@@ -60,22 +60,22 @@ Defined as lexicons in `lexicons/radio/4000/` (drafts, not published yet). Each 
 ## Abuse and limits
 
 - Records failing validation are skipped, as in the app.
-- A cap on indexed tracks per radio (e.g. 20,000; the biggest radio4000.com radios are below that) and on writes per account per minute, so one account can't flood the index.
+- A cap on indexed tracks per radio (`indexer.maxTracksPerRadio`, 20,000; the biggest radio4000.com radios are below that), so one account can't flood the index. A cap on writes per account per minute may come later.
 - Deactivated or taken-down accounts disappear from the index with the account event.
 - Moderation labels can come later, from labelers, the atproto way.
 
 ## Cost
 
-Workers paid plan ($5/month). At this size D1 storage, reads and writes, the Queue, and one always-connected Durable Object should fit in the plan's included usage; I'll measure during the load test before launch rather than promise numbers now.
+Workers paid plan ($5/month). At this size D1 storage, reads and writes, the Queue, and one always-connected Durable Object should fit in the plan's included usage; not measured yet.
 
 ## Steps
 
 1. ✅ Query lexicons.
 2. ✅ Indexer: ingest, backfill, tables, API, with tests (`indexer/test`, on node:sqlite).
-3. Load test: 10,000 synthetic radios in a local D1, measure response times.
+3. ✅ Load test: 10,000 synthetic radios in a local D1, measure response times.
 4. ✅ App: radio lists and cards, the feed, broadcasts, network search and chat read from the index (`src/lib/atproto/appview.ts`), each with its direct read as fallback; a radio's own page still reads its PDS. The index the app uses is `services.index` in `app.json`; empty means none.
-5. Deploy `api.4000.radio`, backfill the real network, compare against direct reads.
-6. Publish the query lexicons. Then promote.
+5. ✅ Deployed at `api.4000.radio`; it backfilled the network by itself, and matches direct reads. The app reads from it.
+6. ✅ Query lexicons published. Next: promote.
 
 ## Load test
 

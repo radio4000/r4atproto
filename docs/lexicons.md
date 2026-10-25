@@ -13,6 +13,8 @@ Records use camelCase as in the lexicons. The app's `Track` type is snake_case l
 
 Records read from the network are validated against these schemas (`src/lib/atproto/schemas.ts`) and dropped when they don't match.
 
+The index's queries (`radio.4000.listRadios`, `getRadios`, `listTracks`, `listBroadcasts`, `chat.listMessages`, with their views in `radio.4000.defs`) are lexicons too, in the same folder and published alongside; see [indexer.md](indexer.md).
+
 `radio.4000.chat.message` can point at a track (`track`, an at:// URI). It has no `facets`, `langs` or `reply` yet: optional fields can be added to a published lexicon, so they come with the features that use them. The `large-string` lint is ignored: track descriptions allow 30,000 bytes, as imported radio4000.com descriptions may be long.
 
 Everything in a repo is public. Nothing private goes in a record: settings that aren't meant to be seen stay in the browser.

@@ -2,7 +2,7 @@
 
 https://4000.radio — curate lists of media links, play them, explore other people's radios.
 
-Your radio is an atproto account: its tracks are `radio.4000.track` records in your own repository, readable by any app. There is no server of ours; the app reads every radio straight from its PDS and writes to yours over OAuth.
+Your radio is an atproto account: its tracks are `radio.4000.track` records in your own repository, readable by any app. The app writes to your repo over OAuth and reads each radio from its PDS. Lists across the network (the feed, radios, search, live broadcasts, chat) come from an index, [api.4000.radio](https://api.4000.radio/status) (`indexer/`), with direct reads as fallback.
 
 - **Curate:** add tracks from any media URL (YouTube, SoundCloud, files…) with a title, notes, #tags and @mentions. Import a radio4000.com channel.
 - **Play:** r4's multi-deck player: queues, shuffle, auto-radio (everyone hears the same track at the same second), keyboard shortcuts, lock-screen controls.
@@ -23,7 +23,7 @@ bun run types
 bun run check      # Prettier, Biome, ESLint
 ```
 
-`bun run build` writes a static site to `dist/`. The Cloudflare Git integration builds and deploys https://4000.radio on every push to `main`.
+`bun run build` writes a static site to `dist/`. The Cloudflare Git integration builds and deploys https://4000.radio, and the index at https://api.4000.radio, on every push to `main`.
 
 In dev, `window.r4` exposes `appState`, `api`, `tracksCollection` and `channelsCollection` for the console.
 

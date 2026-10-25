@@ -2,7 +2,7 @@
 
 ## Remote
 
-Each radio's PDS is the source of truth; there is no server of ours. `src/lib/atproto/` reads repos with plain fetch (`repo.ts`), resolves handles, DIDs (plc and web) and PDSes (`identity.ts`), reads Bluesky profiles from the public AppView (`profiles.ts`), and writes to the signed-in account's repo (`write.ts`). `records.ts` maps `radio.4000.*` records to the domain types in `src/lib/types.ts`. Service URLs live in `src/lib/config/app.json`.
+Each radio's PDS is the source of truth. Network-wide lists (radios, the feed, search, broadcasts, chat history) are read from our index, `services.index` (see [indexer.md](indexer.md)), and fall back to the reads below when it is unset or unreachable (`atproto/appview.ts`). `src/lib/atproto/` reads repos with plain fetch (`repo.ts`), resolves handles, DIDs (plc and web) and PDSes (`identity.ts`), reads Bluesky profiles from the public AppView (`profiles.ts`), and writes to the signed-in account's repo (`write.ts`). `records.ts` maps `radio.4000.*` records to the domain types in `src/lib/types.ts`. Service URLs live in `src/lib/config/app.json`.
 
 ## Reads and rate limits
 
@@ -23,7 +23,7 @@ PDS → Query cache (memory) → Collection (memory) → useLiveQuery → Compon
 
 ## Chat
 
-`src/lib/chat.ts`. Each radio has a public room at `/@handle/chat`. Messages are records in their senders' repos; the room's history comes from Constellation (microcosm's public backlinks index, `services.constellation`), new messages from Jetstream. A message can point at a track (its at:// URI in `track`): the composer offers the track on the active deck, and the room shows it with a play button.
+`src/lib/chat.ts`. Each radio has a public room at `/@handle/chat`. Messages are records in their senders' repos; the room's history comes from the index (`radio.4000.chat.listMessages`), or Constellation (microcosm's public backlinks index, `services.constellation`) without it; new messages from Jetstream. A message can point at a track (its at:// URI in `track`): the composer offers the track on the active deck, and the room shows it with a play button.
 
 Rooms respect Bluesky blocks (`chat-blocks.ts`): Bluesky's AppView, which knows every block of the network, is asked who blocks whom (`app.bsky.graph.getRelationships`, one request per 30 authors). Authors blocked by or blocking the radio's owner are out of its room, and can't post there; the same goes between you and the authors you read. Muting an account (`chat-moderation.svelte.ts`) is private and stays in the browser. Unread counts skip both.
 
