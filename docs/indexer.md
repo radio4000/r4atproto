@@ -73,7 +73,7 @@ Workers paid plan ($5/month). At this size D1 storage, reads and writes, the Que
 1. ✅ Query lexicons.
 2. ✅ Indexer: ingest, backfill, tables, API, with tests (`indexer/test`, on node:sqlite).
 3. Load test: 10,000 synthetic radios in a local D1, measure response times.
-4. ✅ App: radio lists and cards, the feed, broadcasts, network search and chat read from the index (`src/lib/atproto/appview.ts`), each with its direct read as fallback; a radio's own page still reads its PDS. Off until deployed: `indexer.enabled` in `app.json`.
+4. ✅ App: radio lists and cards, the feed, broadcasts, network search and chat read from the index (`src/lib/atproto/appview.ts`), each with its direct read as fallback; a radio's own page still reads its PDS. The index the app uses is `services.index` in `app.json`; empty means none.
 5. Deploy `api.4000.radio`, backfill the real network, compare against direct reads.
 6. Publish the query lexicons. Then promote.
 
@@ -98,7 +98,12 @@ Each read starts from the index that narrows it most and stops after a page (`qu
 
 - `bun run indexer:check`: generate Worker types and type-check.
 - Locally: `cd indexer && wrangler d1 migrations apply r4-index --local`, put `ADMIN_TOKEN=…` in `indexer/.dev.vars`, then `bun run indexer:dev`. `POST /admin/backfill` (with `Authorization: Bearer <token>`) reads every repo the relay lists and starts the ingest; `GET /admin/ingest` shows whether it is connected and its Jetstream position.
-- Deploying needs, once: `wrangler d1 create r4-index` (its id goes in `indexer/wrangler.toml`), `wrangler queues create r4-index-backfill`, `wrangler d1 migrations apply r4-index --remote`, `wrangler secret put ADMIN_TOKEN`, then `wrangler deploy` from `indexer/`.
+- Deploying: the `r4-index` Worker is connected to this GitHub repository (Cloudflare Workers Builds) and deploys on every push to `main`, like the app. Root directory: `indexer` (so the build reads `indexer/wrangler.toml`, not the app's). Build command: `cd .. && bun install --frozen-lockfile` (the indexer uses the repository's packages). Deploy command: `npx wrangler d1 migrations apply r4-index --remote && npx wrangler deploy`. A deploy keeps the data; the Jetstream connection restarts and replays from its saved position, so no event is missed. `ADMIN_TOKEN` is a secret set in the Worker's settings.
+- Set up once (done for 4000.radio): `wrangler d1 create r4-index` (its id is in `indexer/wrangler.toml`) and `wrangler queues create r4-index-backfill`.
+
+## Static deploys and other indexes
+
+The app stays a static site: any copy can be hosted anywhere. `services.index` in `app.json` chooses the index it reads from: 4000.radio's (`https://api.4000.radio`, open to any origin), one deployed from `indexer/`, or none (empty), in which case every read goes to the repos directly, as before the index existed: fine for a few dozen radios.
 
 ## Decided
 

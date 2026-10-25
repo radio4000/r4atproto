@@ -2,7 +2,8 @@ import {expect, test, vi} from 'vitest'
 
 vi.mock('../config/app.json', async (original) => {
 	const app = ((await original()) as {default: Record<string, unknown>}).default
-	return {default: {...app, indexer: {...(app.indexer as object), enabled: true, retrySeconds: 60}}}
+	const services = {...(app.services as object), index: 'https://index.test'}
+	return {default: {...app, services}}
 })
 
 const {fromIndex, indexAvailable} = await import('./appview')

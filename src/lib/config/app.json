@@ -15,7 +15,7 @@
 		"constellation": "https://constellation.microcosm.blue",
 		"slingshot": "https://slingshot.microcosm.blue",
 		"youtubeEmbed": "https://www.youtube-nocookie.com",
-		"index": "https://api.4000.radio"
+		"index": ""
 	},
 	"oauth": {
 		"permissionSet": "authFull",
@@ -44,7 +44,6 @@
 		"size": 50
 	},
 	"indexer": {
-		"enabled": false,
 		"retrySeconds": 60,
 		"browseMax": 1000,
 		"maxTracksPerRadio": 20000,

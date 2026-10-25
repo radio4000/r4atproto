@@ -1,7 +1,8 @@
 /**
- * Reads from the 4000.radio index (services.index, our AppView for radio.4000.*,
- * see docs/indexer.md). Each read has a direct fallback: reading repos from the
- * browser, as without an index. When the index fails, it is left alone for
+ * Reads from an index of radio.4000.* (an AppView, see docs/indexer.md) at
+ * services.index: 4000.radio's own, another one, or none (empty). Each read has a
+ * direct fallback, reading repos from the browser, so the app works without an
+ * index, only slower on a big network. When the index fails, it is left alone for
  * indexer.retrySeconds and the fallback is used.
  */
 import app from '../config/app.json' with {type: 'json'}
@@ -9,7 +10,7 @@ import {xrpcGet, type XrpcParams} from './xrpc'
 
 let downUntil = 0
 
-export const indexAvailable = () => app.indexer.enabled && Date.now() >= downUntil
+export const indexAvailable = () => Boolean(app.services.index) && Date.now() >= downUntil
 
 export function indexGet<T>(query: string, params: XrpcParams = {}): Promise<T> {
 	return xrpcGet<T>(app.services.index, `${app.namespace}.${query}`, params)

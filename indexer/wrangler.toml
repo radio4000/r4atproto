@@ -1,5 +1,5 @@
 # The 4000.radio index: follows Jetstream, serves radio.4000.* queries at api.4000.radio.
-# Deploy: bunx wrangler deploy -c indexer/wrangler.toml (after creating the database and queue)
+# Deployed from GitHub on push (Cloudflare Workers Builds), see docs/indexer.md.
 name = "r4-index"
 main = "src/index.ts"
 account_id = "46bcc6e9a78b2e839068c0685143e1a2"
