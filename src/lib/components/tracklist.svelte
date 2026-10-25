@@ -42,7 +42,7 @@
 		playlistTitle,
 		footer,
 		grouped = false,
-		canEdit = false,
+		canEdit,
 		canEditTrack,
 		virtual = false,
 		playContext = false,

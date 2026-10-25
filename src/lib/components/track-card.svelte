@@ -10,7 +10,7 @@
 	} from '#lib/api.js'
 	import {deleteTrack} from '#lib/collections/tracks.js'
 	import {channelsCollection} from '#lib/collections/channels.js'
-	import {appState} from '#lib/app-state.svelte.js'
+	import {appState, canEditChannel} from '#lib/app-state.svelte.js'
 	import {trackAddSearchParams} from '#lib/track-add.js'
 	import type {Track, Channel} from '#lib/types.js'
 	import Icon from './icon.svelte'
@@ -58,7 +58,7 @@
 		onPlay,
 		showImage = true,
 		showSlug = false,
-		canEdit = false,
+		canEdit,
 		showMenu = true,
 		onTagClick,
 		onMentionClick,
@@ -137,6 +137,8 @@
 	}
 
 	let showDeleteDialog = $state(false)
+	/** Edit and delete show for the track's own account, unless the list says otherwise */
+	const editable = $derived(canEdit ?? canEditChannel(track.did))
 	let deleteError = $state('')
 	let menu = $state<{close: () => void; open: () => Promise<void>}>()
 	// A list renders thousands of cards and few menus get opened, so each card starts
@@ -335,7 +337,7 @@
 						>
 					{/if}
 				</li>
-				{#if canEdit}
+				{#if editable}
 					<li>
 						<button type="button" role="menuitem" onclick={editTrack}
 							><Icon icon="edit" />{m.common_edit()}</button
