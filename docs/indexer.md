@@ -28,7 +28,7 @@ With one radio on the network this is ~10–35 requests a page. It grows with ev
 All on Cloudflare, next to the app, in this repository (`indexer/`, its own `wrangler.toml`).
 
 1. **Ingest: a Durable Object, one instance.** Holds one Jetstream connection filtered to `radio.4000.*`, plus identity and account events (handle changes, deactivated or taken-down accounts). It validates each record against our lexicons (the same `schemas.ts` as the app), writes to D1 in small batches, and stores Jetstream's cursor so a restart resumes where it stopped, without gaps.
-2. **Backfill: a Queue.** Lists every repo holding `radio.4000.channel` or `radio.4000.track` (relay `listReposByCollection`), then reads each repo once with `listRecords`, a few repos at a time per PDS host. Runs at first start, and again for any repo the ingest finds out of sync.
+2. **Backfill: a Queue.** Lists every repo holding `radio.4000.channel` or `radio.4000.track` (relay `listReposByCollection`), then reads each repo once with `listRecords`, a few repos at a time per PDS host. Runs by itself when the ingest starts without a position Jetstream still holds (the first start, or after an outage longer than `indexer.jetstreamRetentionHours`), and for any repo the ingest finds out of sync.
 3. **Database: D1** (SQLite). Full-text search with FTS5.
 4. **API: a Worker** at `https://api.4000.radio` (`services.index` in `app.json`), answering XRPC queries with cache headers, so visitors share responses for 30–60 s and the database sees a fraction of the traffic.
 
@@ -97,8 +97,8 @@ Each read starts from the index that narrows it most and stops after a page (`qu
 ## Running it
 
 - `bun run indexer:check`: generate Worker types and type-check.
-- Locally: `cd indexer && wrangler d1 migrations apply r4-index --local`, put `ADMIN_TOKEN=…` in `indexer/.dev.vars`, then `bun run indexer:dev`. `POST /admin/backfill` (with `Authorization: Bearer <token>`) reads every repo the relay lists and starts the ingest; `GET /admin/ingest` shows whether it is connected and its Jetstream position.
-- Deploying: the `r4-index` Worker is connected to this GitHub repository (Cloudflare Workers Builds) and deploys on every push to `main`, like the app. Root directory: `indexer` (so the build reads `indexer/wrangler.toml`, not the app's). Build command: `cd .. && bun install --frozen-lockfile` (the indexer uses the repository's packages). Deploy command: `npx wrangler d1 migrations apply r4-index --remote && npx wrangler deploy`. A deploy keeps the data; the Jetstream connection restarts and replays from its saved position, so no event is missed. `ADMIN_TOKEN` is a secret set in the Worker's settings.
+- Locally: `cd indexer && wrangler d1 migrations apply r4-index --local`, then `bun run indexer:dev`. `GET /status` starts the ingest (the cron does too, every 5 minutes) and shows whether it is connected, its Jetstream position, and whether a backfill is due.
+- Deploying: the `r4-index` Worker is connected to this GitHub repository (Cloudflare Workers Builds) and deploys on every push to `main`, like the app. Root directory: `indexer` (so the build reads `indexer/wrangler.toml`, not the app's). Build command: `cd .. && bun install --frozen-lockfile` (the indexer uses the repository's packages). Deploy command: `npx wrangler d1 migrations apply r4-index --remote && npx wrangler deploy`. A deploy keeps the data; the Jetstream connection restarts and replays from its saved position, so no event is missed.
 - Set up once (done for 4000.radio): `wrangler d1 create r4-index` (its id is in `indexer/wrangler.toml`) and `wrangler queues create r4-index-backfill`.
 
 ## Static deploys and other indexes

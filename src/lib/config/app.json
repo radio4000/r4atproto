@@ -50,7 +50,8 @@
 		"cacheSeconds": 60,
 		"flushMs": 1000,
 		"flushSize": 200,
-		"cursorRewindSeconds": 5
+		"cursorRewindSeconds": 5,
+		"jetstreamRetentionHours": 24
 	},
 	"csp": {
 		"scripts": ["https://www.youtube.com", "https://w.soundcloud.com"],

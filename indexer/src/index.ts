@@ -3,15 +3,12 @@
  * the live ingest (a Durable Object), and repo backfills (a Queue).
  */
 import {resolveIdentityFresh} from '#lib/atproto/identity.js'
-import {backfillRepo, listIndexedRepos} from './backfill'
+import {backfillRepo} from './backfill'
 import {handleXrpc} from './xrpc'
 
 export {Ingest} from './ingest'
 
 const ingest = (env: Env) => env.INGEST.get(env.INGEST.idFromName('jetstream'))
-
-const authorized = (request: Request, env: Env) =>
-	Boolean(env.ADMIN_TOKEN) && request.headers.get('authorization') === `Bearer ${env.ADMIN_TOKEN}`
 
 export default {
 	async fetch(request, env, ctx) {
@@ -30,20 +27,9 @@ export default {
 			if (response.ok) ctx.waitUntil(cache.put(request, response.clone()))
 			return response
 		}
-		if (url.pathname.startsWith('/admin/') && !authorized(request, env)) {
-			return new Response('Unauthorized', {status: 401})
-		}
-		// Whether the ingest is connected, and its Jetstream position
-		if (url.pathname === '/admin/ingest') return ingest(env).fetch('https://ingest/start')
-		if (url.pathname === '/admin/backfill' && request.method === 'POST') {
-			const dids = await listIndexedRepos()
-			for (let i = 0; i < dids.length; i += 100) {
-				await env.BACKFILL.sendBatch(dids.slice(i, i + 100).map((did) => ({body: {did}})))
-			}
-			await ingest(env).fetch('https://ingest/start')
-			return Response.json({queued: dids.length})
-		}
-		if (url.pathname === '/') return new Response('4000.radio index: GET /xrpc/radio.4000.*')
+		if (url.pathname === '/status') return ingest(env).fetch('https://ingest/status')
+		if (url.pathname === '/')
+			return new Response('4000.radio index: GET /xrpc/radio.4000.*, /status')
 		return new Response('Not found', {status: 404})
 	},
 
