@@ -1,3 +1,6 @@
+> **This repository moved to Tangled: https://tangled.org/4000.radio/4000.radio**
+> This GitHub copy is no longer updated.
+
 # Radio4000 on the AT Protocol
 
 https://4000.radio — curate lists of media links, play them, explore other people's radios.
